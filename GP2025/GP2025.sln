@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GP2025", "GP2025.vcxproj", "{26920F78-BCFC-470B-965D-236E7BAAD17A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{26920F78-BCFC-470B-965D-236E7BAAD17A}.Debug|x86.ActiveCfg = Debug|Win32
+		{26920F78-BCFC-470B-965D-236E7BAAD17A}.Debug|x86.Build.0 = Debug|Win32
+		{26920F78-BCFC-470B-965D-236E7BAAD17A}.Release|x86.ActiveCfg = Release|Win32
+		{26920F78-BCFC-470B-965D-236E7BAAD17A}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {236D24E4-034E-4E60-AA30-76B26E9086E9}
+	EndGlobalSection
+EndGlobal
