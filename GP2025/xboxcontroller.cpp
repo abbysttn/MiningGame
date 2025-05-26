@@ -115,3 +115,8 @@ XboxController::GetRightStick() const
 {
 	return m_rightStick;
 }
+
+bool XboxController::IsConnected() const
+{ 
+	return m_bConnected; 
+}

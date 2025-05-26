@@ -21,7 +21,6 @@ public:
 	bool Initialise();
 	bool DoGameLoop();
 	void Quit();
-	void InitBalls();
 	void ToggleDebugWindow();
 
 protected:
