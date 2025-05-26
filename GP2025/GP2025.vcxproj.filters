@@ -90,10 +90,7 @@
     <ClCompile Include="animatedsprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ball.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scenebouncingballs.cpp">
+    <ClCompile Include="entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -174,12 +171,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDL_ttf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scenebouncingballs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ball.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="entity.h">
