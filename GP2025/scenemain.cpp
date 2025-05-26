@@ -47,7 +47,8 @@ bool SceneMain::Initialise(Renderer& renderer)
     float scale = std::max(scaleX, scaleY);  //ensuring background covers whole screen
 
     m_pMineBackground->SetX(renderer.GetWidth() / 2);
-    m_pMineBackground->SetY(renderer.GetHeight() / 2);
+    float scaledHeight = m_pMineBackground->GetHeight() * scale;
+    m_pMineBackground->SetY(scaledHeight / 2.0f);
     m_pMineBackground->SetScale(scale);
 
     m_pPlayer = new Player();
