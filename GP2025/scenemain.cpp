@@ -84,12 +84,12 @@ void SceneMain::Draw(Renderer& renderer)
 {
     float playerX = static_cast<float>(m_pPlayer->GetPosition().x);
     float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
-    playerX = 500.0f;
+    //playerX = 500.0f;
     std::cout << playerX << "   " << playerY << std::endl;
     renderer.SetCameraPosition(playerX, playerY);
 
     // Optional zoom logic:
-    renderer.SetZoom(1.5f);
+    renderer.SetZoom(1.0f);
 
 
 

@@ -64,8 +64,8 @@ void Game::Quit()
 
 bool Game::Initialise()
 {
-	int bbWidth = 1280;
-	int bbHeight = 720;
+	int bbWidth = 1920;
+	int bbHeight = 1080;
 
 	m_pRenderer = new Renderer();
 	if (!m_pRenderer->Initialise(true, bbWidth, bbHeight))
