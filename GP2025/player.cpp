@@ -51,7 +51,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     if (IsKeyHeld(inputSystem, SDL_SCANCODE_D) || IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) direction.x += 1.0f;
 
     //controller input
-    if (inputSystem.GetController(0)) {
+    if (inputSystem.GetNumberOfControllersAttached() > 0) {
         XboxController* controller = inputSystem.GetController(0);
         if (controller != nullptr && controller->IsConnected())
         {

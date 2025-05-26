@@ -39,9 +39,9 @@ private:
 
 	float m_tileSize;
 
-	int m_cols = 10;
+	int m_cols = 15;
 	int m_rows = 5;
-	int m_count = 50;
+	int m_count = m_rows * m_cols;
 
 	float screenOffsetX;
 	float screenOffsetY;
