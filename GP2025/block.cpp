@@ -4,7 +4,10 @@
 #include "sprite.h"
 
 #include <cstdlib>
+#include "inlinehelper.h"
 #include "logmanager.h"
+
+#include <string>
 
 Block::Block() : m_sprite(0) {}
 
@@ -14,9 +17,12 @@ Block::~Block()
 	m_sprite = nullptr;
 }
 
-bool Block::Initialise(Renderer& renderer)
+bool Block::Initialise(Renderer& renderer, int depth)
 {
-	m_sprite = renderer.CreateSprite("../assets/dirt.png");
+	m_depth = depth;
+	GetBlockType(m_depth, m_filepath);
+
+	m_sprite = renderer.CreateSprite(m_filepath);
 
 	if (!m_sprite) {
 		LogManager::GetInstance().Log("Failed to load block.");
@@ -83,4 +89,37 @@ void Block::SetScale(float scale)
 void Block::SetActive(bool active)
 {
 	m_active = active;
+}
+
+void Block::GetBlockType(int& depth, const char*& filepath)
+{
+	float percentage = 0.0f;
+	bool IsGem = false;
+
+	if (depth < 40) {
+		percentage = 0.00f;
+	}
+	else if (depth < 50) {
+		percentage = 0.05f;
+	}
+	else if (depth < 70) {
+		percentage = 0.15f;
+	}
+	else if (depth >= 80) {
+		percentage = 0.4f;
+	}
+
+	float chance = GetRandomPercentage();
+	LogManager::GetInstance().Log(std::to_string(chance).c_str());
+
+	if (chance <= percentage) {
+		IsGem = true;
+	}
+
+	if (IsGem) {
+		filepath = "../assets/ball.png";
+	}
+	else {
+		filepath = "../assets/dirt.png";
+	}
 }

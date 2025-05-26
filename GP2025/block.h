@@ -12,7 +12,7 @@ public:
 	Block();
 	virtual ~Block();
 
-	bool Initialise(Renderer& renderer);
+	bool Initialise(Renderer& renderer, int depth);
 	void Process(float deltaTime);
 	void Draw(Renderer& renderer);
 	Vector2& Position();
@@ -27,6 +27,7 @@ public:
 	void SetActive(bool active);
 
 protected:
+	void GetBlockType(int& depth, const char*& filepath);
 
 private:
 	Block(const Block& edge);
@@ -39,6 +40,9 @@ protected:
 	Sprite* m_sprite;
 
 	bool m_active;
+
+	int m_depth;
+	const char* m_filepath;
 
 private:
 

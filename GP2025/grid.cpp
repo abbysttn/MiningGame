@@ -75,7 +75,7 @@ bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 	if (GameObject* obj = m_grid->getObject()) {
 		Block* block = dynamic_cast<Block*>(obj);
 
-		block->Initialise(renderer);
+		block->Initialise(renderer, y);
 
 		if (!block) {
 			m_grid->release(block);

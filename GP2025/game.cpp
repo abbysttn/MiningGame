@@ -211,6 +211,9 @@ void Game::DebugDraw
 			Quit();
 		}
 
+		ImGui::Text("Log Manager");
+		LogManager::GetInstance().DebugDraw();
+
 		ImGui::SliderInt("Active scene", &m_iCurrentScene, 0, m_scenes.size() - 1, "%d");
 
 		m_scenes[m_iCurrentScene]->DebugDraw();

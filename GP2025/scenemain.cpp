@@ -80,7 +80,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
 void SceneMain::Draw(Renderer& renderer)
 {
-    float playerX = static_cast<float>(m_pPlayer->GetPosition().x);
+    float playerX = renderer.GetWidth() / 2.0f;
     float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
     //playerX = 500.0f;
     std::cout << playerX << "   " << playerY << std::endl;
