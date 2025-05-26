@@ -5,6 +5,7 @@
 // Library includes:
 #include <SDL.h>
 #include "SDL_ttf.h"
+#include "font.h"
 
 class Texture
 {
@@ -22,7 +23,7 @@ public:
 	int GetWidth() const;
 	int GetHeight() const;
 
-	void LoadTextTexture(const char* text, const char* fontname, int pointsize);
+	void LoadTextTexture(SDL_Renderer* renderer, const char* text, const Font& font, SDL_Color color);
 
 protected:
 

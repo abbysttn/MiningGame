@@ -51,8 +51,15 @@ Renderer::~Renderer()
 	delete m_pTextureManager;
 	m_pTextureManager = 0;
 
+	if (m_pSDLRenderer)
+	{
+		SDL_DestroyRenderer(m_pSDLRenderer);
+		m_pSDLRenderer = nullptr;
+	}
+
 	SDL_DestroyWindow(m_pWindow);
 	IMG_Quit();
+	TTF_Quit();
 	SDL_Quit();
 }
 
@@ -63,6 +70,7 @@ bool Renderer::Initialise(bool windowed, int width, int height)
 		LogSdlError();
 		return false;
 	}
+	TTF_Init();
 
 	if (!windowed)
 	{
@@ -110,6 +118,14 @@ bool Renderer::Initialise(bool windowed, int width, int height)
 	ImGui_ImplSDL2_InitForOpenGL(m_pWindow, m_glContext);
 	ImGui_ImplOpenGL3_Init();
 	ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+
+	// Creating SDL Renderer for Text
+	m_pSDLRenderer = SDL_CreateRenderer(m_pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (!m_pSDLRenderer)
+	{
+		LogSdlError();
+		return false;
+	}
 
 	return initialised;
 }
@@ -222,6 +238,25 @@ Sprite* Renderer::CreateSprite(const char* pcFilename)
 	}
 
 	return (pSprite);
+}
+
+Sprite* Renderer::CreateTextSprite(Texture* pTexture)
+{
+	if (!pTexture)
+	{
+		LogManager::GetInstance().Log("CreateTextSprite: Null texture passed");
+		return nullptr;
+	}
+
+	Sprite* pSprite = new Sprite();
+	if (!pSprite->Initialise(*pTexture))
+	{
+		LogManager::GetInstance().Log("CreateTextSprite: Failed to initialize sprite with texture");
+		delete pSprite;
+		return nullptr;
+	}
+
+	return pSprite;
 }
 
 void Renderer::LogSdlError()
@@ -357,13 +392,13 @@ Renderer::DrawAnimatedSprite(AnimatedSprite& sprite, int frame)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)((frame * 6) * sizeof(GLuint)));
 }
 
-void
-Renderer::CreateStaticText(const char* pText, int pointsize)
-{
-	Texture* pTexture = new Texture();
-	pTexture->LoadTextTexture(pText, "ArianaVioleta-dz2K.ttf", pointsize);
-	m_pTextureManager->AddTexture(pText, pTexture);
-}
+//void
+//Renderer::CreateStaticText(const char* pText, int pointsize)
+//{
+//	Texture* pTexture = new Texture();
+//	pTexture->LoadTextTexture(pText, "ArianaVioleta-dz2K.ttf", pointsize);
+//	m_pTextureManager->AddTexture(pText, pTexture);
+//}
 
 void 
 Renderer::SetCameraPosition(float x, float y)

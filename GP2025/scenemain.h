@@ -7,6 +7,7 @@
 #include "sprite.h"
 #include "animatedsprite.h"
 #include "fmod.hpp"
+#include "ui.h"
 
 #include <vector>
 #include <map>
@@ -31,8 +32,6 @@ public:
 	void DebugDraw() override;
 
 
-
-
 private:
 	Grid* m_grid;
 
@@ -43,6 +42,8 @@ private:
 	Renderer* m_pRenderer;
 	Sprite* m_pWarehouseBackground;
 	FMOD::System* m_pFMODSystem;
+
+	std::unique_ptr<UI> ui;
 
 };
 

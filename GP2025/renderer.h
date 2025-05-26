@@ -35,6 +35,7 @@ public:
 	int GetHeight() const;
 
 	Sprite* CreateSprite(const char* pcFilename);
+	Sprite* CreateTextSprite(Texture* pTexture);
 	void DrawSprite(Sprite& sprite);
 
 	AnimatedSprite* CreateAnimatedSprite(const char* pcFilename);
@@ -44,6 +45,8 @@ public:
 
 	void SetCameraPosition(float x, float y);
 	void SetZoom(float zoom) { m_zoom = zoom; }
+
+	SDL_Renderer* GetSDLRenderer() const { return m_pSDLRenderer; }
 
 
 
@@ -66,6 +69,7 @@ protected:
 	TextureManager* m_pTextureManager;
 	SDL_Window* m_pWindow;
 	SDL_GLContext m_glContext;
+	SDL_Renderer* m_pSDLRenderer;
 
 	Shader* m_pSpriteShader;
 	VertexArray* m_pSpriteVertexData;

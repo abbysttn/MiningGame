@@ -8,6 +8,7 @@
 #include "scene.h"
 #include "xboxcontroller.h"
 #include <iostream>
+#include "ui.h"
 
 #include "grid.h"
 
@@ -35,7 +36,6 @@ SceneMain::~SceneMain()
 
 bool SceneMain::Initialise(Renderer& renderer)
 {
-
     m_screenWidth = static_cast<float>(renderer.GetWidth());
     m_screenHeight = static_cast<float>(renderer.GetHeight());
 
@@ -61,6 +61,7 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_grid = new Grid();
     m_grid->Initialise(renderer);
 
+    ui = std::make_unique<UI>(&renderer);
 
     return true;
 }
@@ -76,6 +77,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     }
 
     m_grid->Process(deltaTime, inputSystem);
+
+    ui->Update(depth);
 }
 
 void SceneMain::Draw(Renderer& renderer)
@@ -99,6 +102,8 @@ void SceneMain::Draw(Renderer& renderer)
     if (m_pPlayer) {
         m_pPlayer->Draw(renderer);
     }
+
+    ui->Render();
 }
 
 
