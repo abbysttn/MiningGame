@@ -8,6 +8,7 @@
 #include "sprite.h"
 #include <iostream>
 #include "scenecheckerboards.h"
+#include "scenemain.h"
 #include "imgui/imgui_impl_sdl2.h"
 #include "inputsystem.h"
 #include "xboxcontroller.h"
@@ -63,7 +64,7 @@ void Game::Quit()
 
 bool Game::Initialise()
 {
-	int bbWidth = 960;
+	int bbWidth = 1280;
 	int bbHeight = 720;
 
 	m_pRenderer = new Renderer();
@@ -93,7 +94,7 @@ bool Game::Initialise()
 	}
 
 	Scene* pScene = 0;
-	pScene = new SceneCheckerboards(m_pFMODSystem);
+	pScene = new SceneMain(m_pFMODSystem);
 	pScene->Initialise(*m_pRenderer);
 	m_scenes.push_back(pScene);
 

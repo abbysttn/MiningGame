@@ -42,6 +42,11 @@ public:
 
 	void CreateStaticText(const char* pText, int pointsize);
 
+	void SetCameraPosition(float x, float y);
+	void SetZoom(float zoom) { m_zoom = zoom; }
+
+
+
 protected:
 	bool InitialiseOpenGL(int screenWidth, int screenHeight);
 	void SetFullscreen(bool fullscreen);
@@ -72,7 +77,9 @@ protected:
 	float m_fClearBlue;
 
 private:
-
+	float m_zoom = 1.0f;
+	float m_cameraX = 0.0f;
+	float m_cameraY = 0.0f;
 };
 
 #endif // RENDERER_H

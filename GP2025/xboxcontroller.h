@@ -25,6 +25,8 @@ public:
 	float GetRightTrigger() const;
 	const Vector2& GetLeftStick() const;
 	const Vector2& GetRightStick() const;
+	bool IsConnected() const;
+
 
 protected:
 
