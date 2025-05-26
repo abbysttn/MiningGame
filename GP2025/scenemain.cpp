@@ -9,36 +9,29 @@
 #include "xboxcontroller.h"
 #include <iostream>
 
+#include "grid.h"
+
 #include <fmod.hpp>
 #include <fmod_errors.h>
 
 #include "imgui/imgui_impl_sdl2.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-SceneMain::SceneMain(FMOD::System* pFMODSystem)
-
-
-{
-}
+SceneMain::SceneMain(FMOD::System* pFMODSystem) : m_grid(nullptr) {}
 
 SceneMain::~SceneMain()
 {
     delete m_pPlayer;
     m_pPlayer = nullptr;
 
-
+    delete m_grid;
+    m_grid = nullptr;
 
     if (m_pWarehouseBackground) {
         delete m_pWarehouseBackground;
         m_pWarehouseBackground = nullptr;
     }
-
 }
-
-
-
-
-
 
 bool SceneMain::Initialise(Renderer& renderer)
 {
@@ -65,19 +58,24 @@ bool SceneMain::Initialise(Renderer& renderer)
         return false;
     }
 
+    m_grid = new Grid();
+    m_grid->Initialise(renderer);
+
 
     return true;
 }
 
 void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 {
-    XboxController* controller = inputSystem.GetController(0);
+    //XboxController* controller = inputSystem.GetController(0);
 
    //m_pTitleText->Process(deltaTime);
     if (m_pPlayer)
     {
         m_pPlayer->Process(deltaTime, inputSystem);
     }
+
+    m_grid->Process(deltaTime, inputSystem);
 }
 
 void SceneMain::Draw(Renderer& renderer)
@@ -91,17 +89,16 @@ void SceneMain::Draw(Renderer& renderer)
     // Optional zoom logic:
     renderer.SetZoom(1.0f);
 
-
-
     if (m_pWarehouseBackground)
     {
         m_pWarehouseBackground->Draw(renderer);
     }
 
+    m_grid->Draw(renderer);
+
     if (m_pPlayer) {
         m_pPlayer->Draw(renderer);
     }
-
 }
 
 
