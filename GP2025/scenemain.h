@@ -15,6 +15,8 @@
 #include <list>
 #include <string>
 
+class Grid;
+
 
 
 class SceneMain : public Scene
@@ -32,7 +34,7 @@ public:
 
 
 private:
-
+	Grid* m_grid;
 
 	float m_screenWidth;
 	float m_screenHeight;
