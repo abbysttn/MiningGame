@@ -98,8 +98,8 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     float maxY = screenHeight - wallMarginY - spriteHalfHeight;
 
 
-    m_position.x = std::max(minX, std::min(maxX, m_position.x));
-    m_position.y = std::max(minY, std::min(maxY, m_position.y));
+    //m_position.x = std::max(minX, std::min(maxX, m_position.x));
+    //m_position.y = std::max(minY, std::min(maxY, m_position.y));
 
     m_pAnimSprite->Process(deltaTime);
 }
