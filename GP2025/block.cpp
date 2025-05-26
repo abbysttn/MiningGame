@@ -105,8 +105,8 @@ void Block::GetBlockType(int& depth, const char*& filepath)
 	else if (depth < 70) {
 		percentage = 0.15f;
 	}
-	else if (depth >= 80) {
-		percentage = 0.4f;
+	else if (depth >= 71) {
+		percentage = 0.3f;
 	}
 
 	float chance = GetRandomPercentage();
@@ -117,7 +117,7 @@ void Block::GetBlockType(int& depth, const char*& filepath)
 	}
 
 	if (IsGem) {
-		filepath = "../assets/ball.png";
+		filepath = "../assets/gem.png";
 	}
 	else {
 		filepath = "../assets/dirt.png";
