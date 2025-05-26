@@ -27,9 +27,9 @@ SceneMain::~SceneMain()
     delete m_grid;
     m_grid = nullptr;
 
-    if (m_pWarehouseBackground) {
-        delete m_pWarehouseBackground;
-        m_pWarehouseBackground = nullptr;
+    if (m_pMineBackground) {
+        delete m_pMineBackground;
+        m_pMineBackground = nullptr;
     }
 }
 
@@ -39,16 +39,17 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_screenWidth = static_cast<float>(renderer.GetWidth());
     m_screenHeight = static_cast<float>(renderer.GetHeight());
 
-    m_pWarehouseBackground = renderer.CreateSprite("../assets/background.png");
+    m_pMineBackground = renderer.CreateSprite("../assets/background.png");
 
 
-    float scaleX = static_cast<float>(renderer.GetWidth()) / m_pWarehouseBackground->GetWidth();
-    float scaleY = static_cast<float>(renderer.GetHeight()) / m_pWarehouseBackground->GetHeight();
+    float scaleX = static_cast<float>(renderer.GetWidth()) / m_pMineBackground->GetWidth();
+    float scaleY = static_cast<float>(renderer.GetHeight()) / m_pMineBackground->GetHeight();
     float scale = std::max(scaleX, scaleY);  //ensuring background covers whole screen
 
-    m_pWarehouseBackground->SetX(renderer.GetWidth() / 2);
-    m_pWarehouseBackground->SetY(renderer.GetHeight() / 2);
-    m_pWarehouseBackground->SetScale(scale);
+    m_pMineBackground->SetX(renderer.GetWidth() / 2);
+    float scaledHeight = m_pMineBackground->GetHeight() * scale;
+    m_pMineBackground->SetY(scaledHeight / 2.0f);
+    m_pMineBackground->SetScale(scale);
 
     m_pPlayer = new Player();
     if (!m_pPlayer->Initialise(renderer))
@@ -80,7 +81,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
 void SceneMain::Draw(Renderer& renderer)
 {
-    float playerX = static_cast<float>(m_pPlayer->GetPosition().x);
+    float playerX = renderer.GetWidth() / 2;
     float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
     //playerX = 500.0f;
     std::cout << playerX << "   " << playerY << std::endl;
@@ -89,9 +90,9 @@ void SceneMain::Draw(Renderer& renderer)
     // Optional zoom logic:
     renderer.SetZoom(1.0f);
 
-    if (m_pWarehouseBackground)
+    if (m_pMineBackground)
     {
-        m_pWarehouseBackground->Draw(renderer);
+        m_pMineBackground->Draw(renderer);
     }
 
     m_grid->Draw(renderer);

@@ -41,7 +41,7 @@ private:
 	Player* m_pPlayer;
 
 	Renderer* m_pRenderer;
-	Sprite* m_pWarehouseBackground;
+	Sprite* m_pMineBackground;
 	FMOD::System* m_pFMODSystem;
 
 };
