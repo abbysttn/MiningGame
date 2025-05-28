@@ -13,6 +13,7 @@
 #include "inputsystem.h"
 #include "xboxcontroller.h"
 #include "fmod.hpp"
+#include "scenetitlescreen.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -35,7 +36,22 @@ void Game::DestroyInstance()
 	sm_pInstance = 0;
 }
 
-Game::Game() : m_pRenderer(0), m_bLooping(true)
+Game::Game() 
+	: m_pRenderer(0)
+	, m_bLooping(true)
+	, m_iLastTime(0)
+	, m_fExecutionTime(0.0f)
+	, m_fElapsedSeconds(0.0f)
+	, m_iFrameCount(0)
+	, m_iFPS(0)
+	, m_iCurrentScene(0)
+	, m_pInputSystem(nullptr)
+	, m_bShowDebugWindow(false)
+	, m_pFMODSystem(nullptr)
+	, m_pSound(nullptr)
+	, m_pChannel(nullptr)
+	, bbWidth(0.0f)
+	, bbHeight(0.0f)
 {
 
 }
@@ -93,10 +109,26 @@ bool Game::Initialise()
 		return false;
 	}
 
-	Scene* pScene = 0;
-	pScene = new SceneMain(m_pFMODSystem);
-	pScene->Initialise(*m_pRenderer);
-	m_scenes.push_back(pScene);
+	// Titlescreen stuffz
+	Scene* pTitleScene = new SceneTitlescreen();
+	if (!pTitleScene->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("Titlescreen fialed to load!!");
+		delete pTitleScene;
+		return false;
+	}
+	m_scenes.push_back(pTitleScene);
+
+	Scene* pMainScene = new SceneMain(m_pFMODSystem);
+	if (!pMainScene->Initialise(*m_pRenderer))
+	{
+		// Debugging stuff
+		LogManager::GetInstance().Log("TItle screne failed to load!");
+		delete pMainScene;
+		delete pTitleScene;
+		m_scenes.clear();
+	}
+	m_scenes.push_back(pMainScene);
 
 	m_iCurrentScene = 0;
 
@@ -225,4 +257,26 @@ void Game::ToggleDebugWindow
 	std::cout << "Toggle Debug Window" << std::endl;
 	m_bShowDebugWindow = !m_bShowDebugWindow;
 	m_pInputSystem->ShowMouseCursor(m_bShowDebugWindow);
+}
+
+void Game::SetCurrentScene(int sceneIndex)
+{
+	if (sceneIndex >= 0 && sceneIndex < static_cast<int>(m_scenes.size()))
+	{
+		m_iCurrentScene = sceneIndex;
+
+		if (m_pInputSystem)
+		{
+			if (m_iCurrentScene == 0)
+			{
+				m_pInputSystem->ShowMouseCursor(true);
+				m_pInputSystem->SetRelativeMode(false);
+			}
+			else
+			{
+				m_pInputSystem->ShowMouseCursor(m_bShowDebugWindow);
+				m_pInputSystem->SetRelativeMode(false);
+			}
+		}
+	}
 }

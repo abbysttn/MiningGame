@@ -164,6 +164,7 @@
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scenecheckerboards.cpp" />
+    <ClCompile Include="scenetitlescreen.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="texture.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="scene.h" />
     <ClInclude Include="scenecheckerboards.h" />
     <ClInclude Include="scenemain.h" />
+    <ClInclude Include="scenetitlescreen.h" />
     <ClInclude Include="SDL_ttf.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="sprite.h" />
