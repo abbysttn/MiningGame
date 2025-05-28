@@ -42,13 +42,15 @@ protected:
 	float m_screenWidth;
 	float m_screenHeight;
 
+	// White
 	const float m_defaultRed = 1.0f;
 	const float m_defaultGreen = 1.0f;
 	const float m_defaultBlue = 1.0f;
 
+	// Orange
 	const float m_hoverRed = 1.0f;
-	const float m_hoverGreen = 1.0f;
-	const float m_hoverBlue = 1.0f;
+	const float m_hoverGreen = 0.65f;
+	const float m_hoverBlue = 0.0f;
 };
 
 #endif // __SCENETITLESCREEN_H__

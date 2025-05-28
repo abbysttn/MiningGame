@@ -58,6 +58,7 @@ public:
 
 	float bbWidth;
 	float bbHeight;
+	InputSystem* m_pInputSystem;
 
 protected:
 	static Game* sm_pInstance;
@@ -72,8 +73,6 @@ protected:
 
 	std::vector<Scene*> m_scenes;
 	int m_iCurrentScene;
-
-	InputSystem* m_pInputSystem;
 
 	bool m_bShowDebugWindow;
 

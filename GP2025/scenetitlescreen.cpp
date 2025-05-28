@@ -19,9 +19,9 @@ SceneTitlescreen::SceneTitlescreen()
 	, m_pStartBtnSprite(nullptr)
 	, m_pExitBtnSprite(nullptr)
 	, m_pBackgroundSprite(nullptr)
-	, m_bisMouseOverStart(nullptr)
-	, m_bisMouseOverExit(nullptr)
-	, m_screenWidth(0)
+	, m_bisMouseOverStart(false)
+	, m_bisMouseOverExit(false)
+	, m_screenWidth(0.0f)
 	, m_screenHeight(0.0f)
 {
 }
@@ -49,10 +49,12 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 	m_screenWidth = static_cast<float>(renderer.GetWidth());
 	m_screenHeight = static_cast<float>(renderer.GetHeight());
 
+	Game::GetInstance().m_pInputSystem->ShowMouseCursor(true);
+
 	// Background sprite
 	m_pBackgroundSprite = renderer.CreateSprite("../assets/titlescreen.png");
 	m_pBackgroundSprite->SetX(static_cast<int>(m_screenWidth / 2));
-	m_pBackgroundSprite->SetX(static_cast<int>(m_screenWidth / 2));
+	m_pBackgroundSprite->SetY(static_cast<int>(m_screenHeight / 2));
 	float bgScaleX = m_screenWidth / m_pBackgroundSprite->GetWidth();
 	float bgScaleY = m_screenHeight / m_pBackgroundSprite->GetHeight();
 	m_pBackgroundSprite->SetScale(std::max(bgScaleX, bgScaleY));
@@ -84,6 +86,7 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 		m_pStartBtnTexture = nullptr;
 		return false;
 	}
+	// Start position
 	m_pStartBtnSprite->SetX(static_cast<int>(m_screenWidth / 2));
 	m_pStartBtnSprite->SetY(static_cast<int>(m_screenHeight / 2));
 	// Color change when been hovered
@@ -93,8 +96,8 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 
 	// Exot button
 	m_pExitBtnTexture = new Texture();
-	m_pExitBtnTexture->LoadTextTexture("Start Game", fontName, buttonFontSize);
-	if (m_pStartBtnTexture->GetWidth() == 0)
+	m_pExitBtnTexture->LoadTextTexture("Exit Game", fontName, buttonFontSize);
+	if (m_pExitBtnTexture->GetWidth() == 0)
 	{
 		LogManager::GetInstance().Log("Failed to load start game button");
 		delete m_pExitBtnTexture;
@@ -113,8 +116,11 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 		m_pExitBtnTexture = nullptr;
 		return false;
 	}
+	// Exit position
 	m_pExitBtnSprite->SetX(static_cast<int>(m_screenWidth / 2));
-	m_pExitBtnSprite->SetY(static_cast<int>(m_screenHeight / 2));
+	int startBtnHeight = m_pStartBtnTexture->GetHeight();
+	m_pExitBtnSprite->SetY(m_pStartBtnSprite->GetY() + startBtnHeight + 30);
+
 	// Color change when been hovered
 	m_pExitBtnSprite->SetRedTint(m_defaultRed);
 	m_pExitBtnSprite->SetGreenTint(m_defaultGreen);
@@ -162,7 +168,7 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 
 			if (inputSystem.GetMouseButtonState(SDL_BUTTON_LEFT) == BS_PRESSED)
 			{
-				Game::GetInstance().SetCurrentScene(1);
+				Game::GetInstance().Quit();
 			}
 		}
 		else
