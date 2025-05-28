@@ -89,8 +89,8 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     const float spriteHalfWidth = m_pAnimSprite->GetWidth() / 2.0f;
     const float spriteHalfHeight = m_pAnimSprite->GetHeight() / 2.0f;
 
-    float wallMarginX = screenWidth * 0.02f;  //2% horizontal margin (for the walls)
-    float wallMarginY = screenHeight * 0.02f; //2% vertical margin
+    float wallMarginX = screenWidth * 0.00f;  //2% horizontal margin (for the walls)
+    float wallMarginY = screenHeight * 0.00f; //2% vertical margin
 
     float minX = wallMarginX + spriteHalfWidth;
     float maxX = screenWidth - wallMarginX - spriteHalfWidth;
