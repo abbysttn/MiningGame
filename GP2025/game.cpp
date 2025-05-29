@@ -80,7 +80,6 @@ bool Game::Initialise()
 	m_iLastTime = SDL_GetPerformanceCounter();
 
 	m_pRenderer->SetClearColour(0, 255, 255);
-
 	// Initialise FMOD
 	FMOD::System_Create(&m_pFMODSystem);
 	m_pFMODSystem->init(512, FMOD_INIT_NORMAL, 0);
@@ -97,6 +96,7 @@ bool Game::Initialise()
 	pScene = new SceneMain(m_pFMODSystem);
 	pScene->Initialise(*m_pRenderer);
 	m_scenes.push_back(pScene);
+	m_pRenderer->SetSceneMain(static_cast<SceneMain*>(pScene));
 
 	m_iCurrentScene = 0;
 

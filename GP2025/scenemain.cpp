@@ -62,7 +62,7 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_grid = new Grid();
     m_grid->Initialise(renderer);
 
-
+    m_screenX = renderer.GetWidth() / 2;
     return true;
 }
 
@@ -79,13 +79,11 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     m_grid->Process(deltaTime, inputSystem);
 }
 
-void SceneMain::Draw(Renderer& renderer)
-{
-    float playerX = renderer.GetWidth() / 2;
+void SceneMain::Draw(Renderer& renderer){
+
     float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
-    //playerX = 500.0f;
-    std::cout << playerX << "   " << playerY << std::endl;
-    renderer.SetCameraPosition(playerX, playerY);
+
+    renderer.SetCameraPosition(m_screenX, playerY);
 
     // Optional zoom logic:
     renderer.SetZoom(1.0f);
@@ -113,6 +111,10 @@ void SceneMain::DebugDraw()
         ImGui::Text("Debugging Tools:");
 
     }
+}
+
+int SceneMain::GetBackgroundHeight() {
+    return m_pMineBackground->GetHeight();
 }
 
 

@@ -30,6 +30,8 @@ public:
 	void Draw(Renderer& renderer) override;
 	void DebugDraw() override;
 
+	int GetBackgroundHeight();
+
 
 
 
@@ -43,6 +45,7 @@ private:
 	Renderer* m_pRenderer;
 	Sprite* m_pMineBackground;
 	FMOD::System* m_pFMODSystem;
+	int m_screenX;
 
 };
 

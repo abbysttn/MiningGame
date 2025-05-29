@@ -13,6 +13,8 @@
 #include "imgui/imgui_impl_sdl2.h"
 #include "imgui/imgui_impl_opengl3.h"
 #include "animatedsprite.h"
+#include "scenemain.h"
+
 #include "texture.h"
 
 // Library includes:
@@ -207,6 +209,14 @@ int Renderer::GetWidth() const
 int Renderer::GetHeight() const
 {
 	return m_iHeight;
+}
+void Renderer::SetSceneMain(SceneMain* scene)
+{
+	m_sceneMain = scene;
+}
+int Renderer::GetWorldHeight() {
+	return m_sceneMain->GetBackgroundHeight();
+
 }
 
 Sprite* Renderer::CreateSprite(const char* pcFilename)

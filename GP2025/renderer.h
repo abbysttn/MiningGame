@@ -10,6 +10,8 @@ class Sprite;
 class AnimatedSprite;
 class Texture;
 
+class SceneMain;
+
 struct SDL_Window;
 
 // Library includes:
@@ -32,7 +34,9 @@ public:
 	void GetClearColour(unsigned char& r, unsigned char& g, unsigned char& b);
 
 	int GetWidth() const;
+
 	int GetHeight() const;
+	int GetWorldHeight();
 
 	Sprite* CreateSprite(const char* pcFilename);
 	void DrawSprite(Sprite& sprite);
@@ -44,6 +48,7 @@ public:
 
 	void SetCameraPosition(float x, float y);
 	void SetZoom(float zoom) { m_zoom = zoom; }
+	void SetSceneMain(SceneMain* scene);
 
 
 
@@ -66,6 +71,7 @@ protected:
 	TextureManager* m_pTextureManager;
 	SDL_Window* m_pWindow;
 	SDL_GLContext m_glContext;
+	SceneMain* m_sceneMain;
 
 	Shader* m_pSpriteShader;
 	VertexArray* m_pSpriteVertexData;
