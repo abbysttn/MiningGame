@@ -18,8 +18,6 @@
 
 class Grid;
 
-
-
 class SceneMain : public Scene
 {
 public:
@@ -34,6 +32,7 @@ public:
 
 private:
 	Grid* m_grid;
+	float m_tileSize;
 
 	float m_screenWidth;
 	float m_screenHeight;
@@ -44,6 +43,7 @@ private:
 	FMOD::System* m_pFMODSystem;
 
 	std::unique_ptr<UI> ui;
+	int m_depth;
 
 };
 

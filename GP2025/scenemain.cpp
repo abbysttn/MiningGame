@@ -62,6 +62,8 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_grid = new Grid();
     m_grid->Initialise(renderer);
 
+    m_tileSize = m_grid->GetTileSize();
+
     ui = std::make_unique<UI>(&renderer);
 
     return true;
@@ -69,9 +71,6 @@ bool SceneMain::Initialise(Renderer& renderer)
 
 void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 {
-    //XboxController* controller = inputSystem.GetController(0);
-
-   //m_pTitleText->Process(deltaTime);
     if (m_pPlayer)
     {
         m_pPlayer->Process(deltaTime, inputSystem);
@@ -79,7 +78,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
     m_grid->Process(deltaTime, inputSystem);
 
-    ui->Update(depth);
+    m_depth = static_cast<int>(m_pPlayer->GetPosition().y / m_tileSize);
+    ui->Update(m_depth);
 }
 
 void SceneMain::Draw(Renderer& renderer)
@@ -87,7 +87,7 @@ void SceneMain::Draw(Renderer& renderer)
     float playerX = renderer.GetWidth() / 2;
     float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
     //playerX = 500.0f;
-    std::cout << playerX << "   " << playerY << std::endl;
+    //std::cout << playerX << "   " << playerY << std::endl;
     renderer.SetCameraPosition(playerX, playerY);
 
     // Optional zoom logic:
@@ -104,7 +104,7 @@ void SceneMain::Draw(Renderer& renderer)
         m_pPlayer->Draw(renderer);
     }
 
-    ui->Render();
+    ui->Render(); // Draw Last
 }
 
 
@@ -112,11 +112,9 @@ void SceneMain::DebugDraw()
 {
     if (m_pPlayer)
     {
-
         ImGui::NewLine();
         ImGui::Text("Press Spacebar to hide/show");
         ImGui::Text("Debugging Tools:");
-
     }
 }
 

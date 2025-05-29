@@ -334,6 +334,46 @@ void Renderer::DrawSprite(Sprite& sprite)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
+void Renderer::DrawSpriteScreenSpace(Sprite& sprite)
+{
+	m_pSpriteShader->SetActive();
+	m_pSpriteVertexData->SetActive();
+	sprite.GetTexture()->SetActive();
+
+	float sizeX = static_cast<float>(sprite.GetWidth()) * sprite.GetScale();
+	float sizeY = static_cast<float>(sprite.GetHeight()) * sprite.GetScale();
+
+	Matrix4 world;
+	SetIdentity(world);
+	world.m[0][0] = sizeX;
+	world.m[1][1] = -sizeY;
+	world.m[3][0] = sprite.GetX();
+	world.m[3][1] = sprite.GetY();
+	m_pSpriteShader->SetMatrixUniform("uWorldTransform", world);
+
+	Matrix4 ortho;
+	CreateOrthoProjection(ortho,
+		static_cast<float>(m_iWidth),
+		static_cast<float>(m_iHeight));
+
+	Matrix4 view;
+	SetIdentity(view);
+
+	Matrix4 viewProj = view * ortho;
+	m_pSpriteShader->SetMatrixUniform("uViewProj", viewProj);
+
+	m_pSpriteShader->SetVector4Uniform("colour",
+		sprite.GetRedTint(),
+		sprite.GetGreenTint(),
+		sprite.GetBlueTint(),
+		sprite.GetAlpha());
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
 
 AnimatedSprite*
 Renderer::CreateAnimatedSprite(const char* pcFilename)
@@ -391,14 +431,6 @@ Renderer::DrawAnimatedSprite(AnimatedSprite& sprite, int frame)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)((frame * 6) * sizeof(GLuint)));
 }
-
-//void
-//Renderer::CreateStaticText(const char* pText, int pointsize)
-//{
-//	Texture* pTexture = new Texture();
-//	pTexture->LoadTextTexture(pText, "ArianaVioleta-dz2K.ttf", pointsize);
-//	m_pTextureManager->AddTexture(pText, pTexture);
-//}
 
 void 
 Renderer::SetCameraPosition(float x, float y)

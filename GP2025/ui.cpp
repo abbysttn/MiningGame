@@ -6,12 +6,18 @@
 #include "texture.h"
 #include "font.h"
 #include "SDL.h"
+#include <iostream>
 
 UI::UI(Renderer* renderer)
 	: m_SDLRenderer(renderer)
 	, m_font(std::make_unique<Font>("../assets/fonts/joystix.otf", 24))
-	, m_depthTextPos(10.0f, 10.0f)
 {
+	m_screenWidth = static_cast<float>(m_SDLRenderer->GetWidth());
+	m_screenHeight = static_cast<float>(m_SDLRenderer->GetHeight());
+
+	m_depthTextPos.x = m_screenWidth - 150.0f; 
+	m_depthTextPos.y = 50.0f;
+
 	// Set Initial Depth
 	m_depthText = "Depth: 0m";
 	LoadDefaultTexture();
@@ -36,8 +42,9 @@ void UI::Update(int currentDepth)
 
 void UI::Render()
 {
-	if (m_depthSprite) {
-		m_depthSprite->Draw(*m_SDLRenderer);
+	if (m_depthSprite)
+	{
+		m_SDLRenderer->DrawSpriteScreenSpace(*m_depthSprite);
 	}
 }
 

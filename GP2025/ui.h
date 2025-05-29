@@ -29,6 +29,9 @@ private:
     Renderer* m_SDLRenderer;
     std::unique_ptr<Font> m_font;
 
+	float m_screenWidth;
+	float m_screenHeight;
+
     Texture m_depthTexture;
     std::unique_ptr<Sprite> m_depthSprite;
 

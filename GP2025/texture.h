@@ -23,6 +23,8 @@ public:
 	int GetWidth() const;
 	int GetHeight() const;
 
+	unsigned int GetTextureId() const { return m_uiTextureId; }
+
 	void LoadTextTexture(SDL_Renderer* renderer, const char* text, const Font& font, SDL_Color color);
 
 protected:

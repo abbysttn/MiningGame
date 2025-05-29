@@ -38,10 +38,10 @@ public:
 	Sprite* CreateTextSprite(Texture* pTexture);
 	void DrawSprite(Sprite& sprite);
 
+	void DrawSpriteScreenSpace(Sprite& sprite);
+
 	AnimatedSprite* CreateAnimatedSprite(const char* pcFilename);
 	void DrawAnimatedSprite(AnimatedSprite& sprite, int frame);
-
-	void CreateStaticText(const char* pText, int pointsize);
 
 	void SetCameraPosition(float x, float y);
 	void SetZoom(float zoom) { m_zoom = zoom; }
