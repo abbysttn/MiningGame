@@ -21,13 +21,13 @@ bool Grid::Initialise(Renderer& renderer)
 	float screenWidth = (float)renderer.GetWidth();
 	float screenHeight = (float)renderer.GetHeight();
 
-	m_tileSize = screenWidth / (float)m_cols;
+	m_tileSize = (screenWidth / ((float)m_cols + 1)) - 2.5f;
 
 	float levelPixelWidth = m_cols * m_tileSize;
 	float levelPixelHeight = m_rows * m_tileSize;
 
 	screenOffsetX = ((screenWidth - levelPixelWidth) / 2.0f) + (m_tileSize / 2.0f);
-	screenOffsetY = ((screenHeight - levelPixelHeight) / 2.0f) + (m_tileSize / 2.0f);
+	screenOffsetY = 330.0f + (m_tileSize / 2.0f);
 
 	for (size_t y = 0; y < m_rows; y++) {
 		for (size_t x = 0; x < m_cols; x++) {
@@ -75,7 +75,7 @@ bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 	if (GameObject* obj = m_grid->getObject()) {
 		Block* block = dynamic_cast<Block*>(obj);
 
-		block->Initialise(renderer);
+		block->Initialise(renderer, y);
 
 		if (!block) {
 			m_grid->release(block);
