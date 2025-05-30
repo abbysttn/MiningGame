@@ -84,7 +84,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 
     //clamp to screen with halfWidth, to prevent clipping outside screen
     const int screenWidth = m_pRenderer->GetWidth();
-    const int screenHeight = m_pRenderer->GetHeight() * m_heightMultiple;
+    const int screenHeight = m_pRenderer->GetHeight()*m_heightMultiple;
 
     const float spriteHalfWidth = m_pAnimSprite->GetWidth() / 2.0f;
     const float spriteHalfHeight = m_pAnimSprite->GetHeight() / 2.0f;
@@ -98,8 +98,8 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     float maxY = screenHeight - wallMarginY - spriteHalfHeight;
 
 
-    //m_position.x = std::max(minX, std::min(maxX, m_position.x));
-    //m_position.y = std::max(minY, std::min(maxY, m_position.y));
+    m_position.x = std::max(minX, std::min(maxX, m_position.x));
+    m_position.y = std::max(minY, std::min(maxY, m_position.y));
 
     m_pAnimSprite->Process(deltaTime);
 }

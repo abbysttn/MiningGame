@@ -65,7 +65,7 @@ void Game::Quit()
 bool Game::Initialise()
 {
 	int bbWidth = 0;
-	int bbHeight =	0;
+	int bbHeight = 0;
 
 	m_pRenderer = new Renderer();
 	if (!m_pRenderer->Initialise(false, bbWidth, bbHeight))
@@ -210,9 +210,6 @@ void Game::DebugDraw
 		{
 			Quit();
 		}
-
-		ImGui::Text("Log Manager");
-		LogManager::GetInstance().DebugDraw();
 
 		ImGui::SliderInt("Active scene", &m_iCurrentScene, 0, m_scenes.size() - 1, "%d");
 

@@ -48,7 +48,7 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     m_pMineBackground->SetX(renderer.GetWidth() / 2);
     float scaledHeight = m_pMineBackground->GetHeight() * scale;
-    m_pMineBackground->SetY(scaledHeight / 2);
+    m_pMineBackground->SetY(scaledHeight / 2.0f);
     m_pMineBackground->SetScale(scale);
 
     m_pPlayer = new Player();
@@ -81,7 +81,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
 void SceneMain::Draw(Renderer& renderer)
 {
-    float playerX = renderer.GetWidth() / 2.0f;
+    float playerX = static_cast<float>(m_pPlayer->GetPosition().x);
     float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
     renderer.SetCameraPosition(playerX, playerY);
 
