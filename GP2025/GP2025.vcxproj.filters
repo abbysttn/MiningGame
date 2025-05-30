@@ -108,6 +108,12 @@
     <ClCompile Include="block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gridstate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="quadtree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logmanager.h">
@@ -207,6 +213,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="block.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gridstate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="quadtree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="collisionhelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

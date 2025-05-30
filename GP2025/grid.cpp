@@ -1,6 +1,7 @@
 #include "grid.h"
 
 #include "gameobjectpool.h"
+#include "quadtree.h"
 #include "block.h"
 
 #include "renderer.h"
@@ -21,7 +22,7 @@ bool Grid::Initialise(Renderer& renderer)
 	float screenWidth = (float)renderer.GetWidth();
 	float screenHeight = (float)renderer.GetHeight();
 
-	m_tileSize = (screenWidth / ((float)m_cols + 1)) - 2.5f;
+	m_tileSize = (screenWidth / ((float)m_cols));
 
 	float levelPixelWidth = m_cols * m_tileSize;
 	float levelPixelHeight = m_rows * m_tileSize;
@@ -37,16 +38,32 @@ bool Grid::Initialise(Renderer& renderer)
 		}
 	}
 
+	m_collisionTree = make_unique<QuadTree>(Box(0.0f, 0.0f, (float)renderer.GetWidth(), (float)renderer.GetHeight()));
+
 	return true;
 }
 
 void Grid::Process(float deltaTime, InputSystem& inputSystem)
 {
+	m_collisionTree->clear();
+
 	for (size_t i = 0; i < m_grid->totalCount(); i++) {
 		if (GameObject* obj = m_grid->getObjectAtIndex(i)) {
 			if (obj && dynamic_cast<Block*>(obj)) {
 				Block* block = dynamic_cast<Block*>(obj);
 				block->Process(deltaTime);
+
+				if (block && block->IsActive()) {
+					float blockSize = (float)block->GetSpriteWidth();
+					Box blockRange(
+						block->Position().x,
+						block->Position().y,
+						blockSize,
+						blockSize
+					);
+
+					m_collisionTree->insert(block, blockRange);
+				}
 			}
 		}
 	}
@@ -66,6 +83,11 @@ void Grid::Draw(Renderer& renderer)
 
 void Grid::DebugDraw()
 {
+}
+
+QuadTree& Grid::GetCollisionTree()
+{
+	return *m_collisionTree;
 }
 
 bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)

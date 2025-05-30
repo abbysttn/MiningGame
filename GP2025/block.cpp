@@ -99,10 +99,10 @@ void Block::GetBlockType(int& depth, const char*& filepath)
 	if (depth < 40) {
 		percentage = 0.00f;
 	}
-	else if (depth < 50) {
+	else if (depth < 50 && depth > 40) {
 		percentage = 0.05f;
 	}
-	else if (depth < 70) {
+	else if (depth < 70 && depth > 50) {
 		percentage = 0.15f;
 	}
 	else if (depth >= 71) {
@@ -110,7 +110,6 @@ void Block::GetBlockType(int& depth, const char*& filepath)
 	}
 
 	float chance = GetRandomPercentage();
-	LogManager::GetInstance().Log(std::to_string(chance).c_str());
 
 	if (chance <= percentage) {
 		IsGem = true;

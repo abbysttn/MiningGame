@@ -9,7 +9,7 @@
 #include "xboxcontroller.h"
 #include <iostream>
 
-#include "grid.h"
+#include "gridstate.h"
 
 #include <fmod.hpp>
 #include <fmod_errors.h>
@@ -17,15 +17,14 @@
 #include "imgui/imgui_impl_sdl2.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-SceneMain::SceneMain(FMOD::System* pFMODSystem) : m_grid(nullptr) {}
+SceneMain::SceneMain(FMOD::System* pFMODSystem) {}
 
 SceneMain::~SceneMain()
 {
     delete m_pPlayer;
     m_pPlayer = nullptr;
 
-    delete m_grid;
-    m_grid = nullptr;
+    GridState::GetInstance().ResetGrid();
 
     if (m_pMineBackground) {
         delete m_pMineBackground;
@@ -59,8 +58,7 @@ bool SceneMain::Initialise(Renderer& renderer)
         return false;
     }
 
-    m_grid = new Grid();
-    m_grid->Initialise(renderer);
+    GridState::GetInstance().CreateGrid(renderer);
 
 
     return true;
@@ -76,12 +74,12 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         m_pPlayer->Process(deltaTime, inputSystem);
     }
 
-    m_grid->Process(deltaTime, inputSystem);
+    GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
 }
 
 void SceneMain::Draw(Renderer& renderer)
 {
-    float playerX = static_cast<float>(m_pPlayer->GetPosition().x);
+    float playerX = renderer.GetWidth() / 2.0f;
     float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
     renderer.SetCameraPosition(playerX, playerY);
 
@@ -93,7 +91,7 @@ void SceneMain::Draw(Renderer& renderer)
         m_pMineBackground->Draw(renderer);
     }
 
-    m_grid->Draw(renderer);
+    GridState::GetInstance().DrawGrid(renderer);
 
     if (m_pPlayer) {
         m_pPlayer->Draw(renderer);

@@ -24,8 +24,6 @@ private:
 	Renderer* m_pRenderer;
 	float m_heightMultiple = 3.0f; //The height multiple vs the height of the renderer. e.g. the renderer height is 1080, 3240 = 3*1080. NEEED to make this dynamic
 
-	float m_heightMultiple = 3.0f;
-
 };
 
 #endif // PLAYER_H

@@ -3,6 +3,9 @@
 #include "sprite.h"
 #include "animatedsprite.h"
 
+#include "gridstate.h"
+#include "quadtree.h"
+
 #include "vector2.h"
 #include "xboxcontroller.h"
 
@@ -36,7 +39,7 @@ bool Player::Initialise(Renderer& renderer)
         return false;
     }
 
-    m_position = Vector2(400.0f, 300.0f);
+    m_position = Vector2(400.0f, 200.0f);
     m_bAlive = true;
     return true;
 }
@@ -80,7 +83,22 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     }
 
     //move the player
-    m_position += direction * m_speed * deltaTime;
+    Vector2 testPos = m_position;
+
+    testPos += direction * m_speed * deltaTime;
+
+    Box testBoxX(testPos.x, m_position.y, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
+
+    if (!GridState::GetInstance().CheckCollision(testBoxX)) {
+        m_position.x = testPos.x;
+    }
+
+    Box testBoxY(m_position.x, testPos.y, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
+
+    if (!GridState::GetInstance().CheckCollision(testBoxY)) {
+        m_position.y = testPos.y;
+    }
+
 
     //clamp to screen with halfWidth, to prevent clipping outside screen
     const int screenWidth = m_pRenderer->GetWidth();
@@ -97,6 +115,10 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     float minY = wallMarginY + spriteHalfHeight;
     float maxY = screenHeight - wallMarginY - spriteHalfHeight;
 
+    Box playerBox(m_position.x, m_position.y, (float)m_pAnimSprite->GetWidth(),
+        (float)m_pAnimSprite->GetHeight());
+
+    GridState::GetInstance().CheckCollision(playerBox);
 
     m_position.x = std::max(minX, std::min(maxX, m_position.x));
     m_position.y = std::max(minY, std::min(maxY, m_position.y));
