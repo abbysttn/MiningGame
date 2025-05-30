@@ -23,6 +23,8 @@ private:
 	float m_speed;
 	Renderer* m_pRenderer;
 
+	float m_heightMultiple = 3.0f;
+
 };
 
 #endif // PLAYER_H

@@ -21,7 +21,7 @@ bool Grid::Initialise(Renderer& renderer)
 	float screenWidth = (float)renderer.GetWidth();
 	float screenHeight = (float)renderer.GetHeight();
 
-	m_tileSize = screenWidth / (float)m_cols;
+	m_tileSize = (screenWidth / ((float)m_cols + 1)) - 2.5f;
 
 	float levelPixelWidth = m_cols * m_tileSize;
 	float levelPixelHeight = m_rows * m_tileSize;
