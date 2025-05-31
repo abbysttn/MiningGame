@@ -60,6 +60,8 @@ public:
 
 	SDL_Renderer* GetSDLRenderer() const { return m_pSDLRenderer; }
 
+	SDL_Renderer* GetSDLRenderer() const { return m_pSDLRenderer; }
+
 
 
 protected:
