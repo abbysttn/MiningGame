@@ -53,8 +53,15 @@ Renderer::~Renderer()
 	delete m_pTextureManager;
 	m_pTextureManager = 0;
 
+	if (m_pSDLRenderer)
+	{
+		SDL_DestroyRenderer(m_pSDLRenderer);
+		m_pSDLRenderer = nullptr;
+	}
+
 	SDL_DestroyWindow(m_pWindow);
 	IMG_Quit();
+	TTF_Quit();
 	SDL_Quit();
 }
 
@@ -65,6 +72,7 @@ bool Renderer::Initialise(bool windowed, int width, int height)
 		LogSdlError();
 		return false;
 	}
+	TTF_Init();
 
 	if (!windowed)
 	{
@@ -112,6 +120,18 @@ bool Renderer::Initialise(bool windowed, int width, int height)
 	ImGui_ImplSDL2_InitForOpenGL(m_pWindow, m_glContext);
 	ImGui_ImplOpenGL3_Init();
 	ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+
+	// Creating SDL Renderer for Text
+	m_pSDLRenderer = SDL_CreateRenderer(m_pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (!m_pSDLRenderer)
+	{
+		LogSdlError();
+		return false;
+	}
+
+	// Creating plain white pixel for rectangle functions
+	m_pWhiteTexture = new Texture();
+	m_pWhiteTexture->SetID(CreateWhiteTexture());
 
 	return initialised;
 }
@@ -234,6 +254,25 @@ Sprite* Renderer::CreateSprite(const char* pcFilename)
 	return (pSprite);
 }
 
+Sprite* Renderer::CreateTextSprite(Texture* pTexture)
+{
+	if (!pTexture)
+	{
+		LogManager::GetInstance().Log("CreateTextSprite: Null texture passed");
+		return nullptr;
+	}
+
+	Sprite* pSprite = new Sprite();
+	if (!pSprite->Initialise(*pTexture))
+	{
+		LogManager::GetInstance().Log("CreateTextSprite: Failed to initialize sprite with texture");
+		delete pSprite;
+		return nullptr;
+	}
+
+	return pSprite;
+}
+
 void Renderer::LogSdlError()
 {
 	LogManager::GetInstance().Log(SDL_GetError());
@@ -309,6 +348,46 @@ void Renderer::DrawSprite(Sprite& sprite)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
+void Renderer::DrawSpriteScreenSpace(Sprite& sprite)
+{
+	m_pSpriteShader->SetActive();
+	m_pSpriteVertexData->SetActive();
+	sprite.GetTexture()->SetActive();
+
+	float sizeX = static_cast<float>(sprite.GetWidth()) * sprite.GetScale();
+	float sizeY = static_cast<float>(sprite.GetHeight()) * sprite.GetScale();
+
+	Matrix4 world;
+	SetIdentity(world);
+	world.m[0][0] = sizeX;
+	world.m[1][1] = -sizeY;
+	world.m[3][0] = static_cast<float>(sprite.GetX());
+	world.m[3][1] = static_cast<float>(sprite.GetY());
+	m_pSpriteShader->SetMatrixUniform("uWorldTransform", world);
+
+	Matrix4 ortho;
+	CreateOrthoProjection(ortho,
+		static_cast<float>(m_iWidth),
+		static_cast<float>(m_iHeight));
+
+	Matrix4 view;
+	SetIdentity(view);
+
+	Matrix4 viewProj = view * ortho;
+	m_pSpriteShader->SetMatrixUniform("uViewProj", viewProj);
+
+	m_pSpriteShader->SetVector4Uniform("colour",
+		sprite.GetRedTint(),
+		sprite.GetGreenTint(),
+		sprite.GetBlueTint(),
+		sprite.GetAlpha());
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
 
 AnimatedSprite*
 Renderer::CreateAnimatedSprite(const char* pcFilename)
@@ -367,17 +446,56 @@ Renderer::DrawAnimatedSprite(AnimatedSprite& sprite, int frame)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)((frame * 6) * sizeof(GLuint)));
 }
 
-void
-Renderer::CreateStaticText(const char* pText, int pointsize)
-{
-	Texture* pTexture = new Texture();
-	pTexture->LoadTextTexture(pText, "ArianaVioleta-dz2K.ttf", pointsize);
-	m_pTextureManager->AddTexture(pText, pTexture);
-}
-
 void 
 Renderer::SetCameraPosition(float x, float y)
 {
 	m_cameraX = x;
 	m_cameraY = y;
+}
+
+void Renderer::DrawRectScreenSpace(const Vector2& position, const Vector2& size, float r, float g, float b, float a)
+{
+	m_pSpriteShader->SetActive();
+	m_pSpriteVertexData->SetActive();
+
+	m_pWhiteTexture->SetActive();
+
+	Matrix4 world;
+	SetIdentity(world);
+	world.m[0][0] = size.x;
+	world.m[1][1] = -size.y;
+	world.m[3][0] = position.x;
+	world.m[3][1] = position.y;
+	m_pSpriteShader->SetMatrixUniform("uWorldTransform", world);
+
+	Matrix4 ortho;
+	CreateOrthoProjection(ortho, (float)m_iWidth, (float)m_iHeight);
+
+	Matrix4 view;
+	SetIdentity(view);
+
+	Matrix4 viewProj = view * ortho;
+	m_pSpriteShader->SetMatrixUniform("uViewProj", viewProj);
+
+	m_pSpriteShader->SetVector4Uniform("colour", r, g, b, a);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+}
+
+GLuint Renderer::CreateWhiteTexture()
+{
+	GLuint texID;
+	unsigned char whitePixel[4] = { 255, 255, 255, 255 }; // RGBA white pixel
+
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_2D, texID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, whitePixel);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	return texID;
 }

@@ -108,6 +108,12 @@
     <ClCompile Include="block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logmanager.h">
@@ -209,9 +215,19 @@
     <ClInclude Include="block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="game\shader\sprite.frag" />
-    <None Include="game\shader\sprite.vert" />
+    <None Include="game\shaders\sprite.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="game\shaders\sprite.vert">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

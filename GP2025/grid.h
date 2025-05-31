@@ -23,6 +23,7 @@ public:
 	virtual void Draw(Renderer& renderer);
 	virtual void DebugDraw();
 
+	float GetTileSize() const { return m_tileSize; }
 
 protected:
 	bool InitObjects(Renderer& renderer, size_t x, size_t y);

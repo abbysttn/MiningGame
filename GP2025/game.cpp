@@ -22,7 +22,6 @@ Game& Game::GetInstance()
 {
 	if (sm_pInstance == 0)
 	{
-
 		sm_pInstance = new Game();
 	}
 
@@ -42,19 +41,18 @@ Game::Game() : m_pRenderer(0), m_bLooping(true)
 
 Game::~Game()
 {
-	delete m_pRenderer;
-	m_pRenderer = nullptr;
-
-	delete m_pInputSystem;
-	m_pInputSystem = nullptr;
-
-	for (Scene* scene : m_scenes)
+	for (Scene*& scene : m_scenes)
 	{
 		delete scene;
 		scene = nullptr;
 	}
 	m_scenes.clear();
 
+	delete m_pInputSystem;
+	m_pInputSystem = nullptr;
+
+	delete m_pRenderer;
+	m_pRenderer = nullptr;
 }
 
 void Game::Quit()

@@ -6,6 +6,7 @@
 #include "sprite.h"
 #include "animatedsprite.h"
 #include "fmod.hpp"
+#include "ui.h"
 
 #include <vector>
 #include <map>
@@ -15,8 +16,6 @@
 #include <string>
 
 class Grid;
-
-
 
 class SceneMain : public Scene
 {
@@ -33,10 +32,10 @@ public:
 	int GetBackgroundHeight();
 
 
-
-
 private:
 	Grid* m_grid;
+	float m_tileSize;
+	int aboveGroundOffset = 10; // Change later to correct above ground size
 
 	float m_screenWidth;
 	float m_screenHeight;
@@ -47,6 +46,7 @@ private:
 	FMOD::System* m_pFMODSystem;
 	int m_screenX;
 
+	std::unique_ptr<UI> ui;
 };
 
 #endif // __SceneMain_H__
