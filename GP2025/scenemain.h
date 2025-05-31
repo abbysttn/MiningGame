@@ -1,4 +1,3 @@
-#pragma once
 #ifndef __SCENEMAIN_H__
 #define __SCENEMAIN_H__
 
@@ -28,6 +27,7 @@ public:
 	bool Initialise(Renderer& renderer) override;
 	void Process(float deltaTime, InputSystem& inputSystem) override;
 	void Draw(Renderer& renderer) override;
+	void MoveCamera(Renderer& renderer);
 	void DebugDraw() override;
 
 	int GetBackgroundHeight();

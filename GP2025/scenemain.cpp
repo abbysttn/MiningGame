@@ -81,9 +81,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
 void SceneMain::Draw(Renderer& renderer){
 
-    float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
-
-    renderer.SetCameraPosition(m_screenX, playerY);
+    MoveCamera(renderer);
 
     // Optional zoom logic:
     renderer.SetZoom(1.0f);
@@ -115,6 +113,13 @@ void SceneMain::DebugDraw()
 
 int SceneMain::GetBackgroundHeight() {
     return m_pMineBackground->GetHeight();
+}
+void SceneMain::MoveCamera(Renderer& renderer) {
+
+
+    float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
+
+    renderer.SetCameraPosition(m_screenX, playerY);
 }
 
 
