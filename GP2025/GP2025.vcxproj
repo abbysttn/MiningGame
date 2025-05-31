@@ -212,8 +212,8 @@
     <ClInclude Include="xboxcontroller.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="game\shader\sprite.frag" />
-    <None Include="game\shader\sprite.vert" />
+    <None Include="game\shaders\sprite.frag" />
+    <None Include="game\shaders\sprite.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

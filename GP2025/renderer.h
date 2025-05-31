@@ -15,6 +15,7 @@ struct SDL_Window;
 // Library includes:
 #include <SDL.h>
 #include "texture.h"
+#include "vector2.h"
 
 class Renderer
 {
@@ -44,6 +45,10 @@ public:
 	void DrawAnimatedSprite(AnimatedSprite& sprite, int frame);
 
 	void SetCameraPosition(float x, float y);
+	
+	void DrawRectScreenSpace(const Vector2& position, const Vector2& size, float r, float g, float b, float a);
+	GLuint CreateWhiteTexture();
+	
 	void SetZoom(float zoom) { m_zoom = zoom; }
 
 	SDL_Renderer* GetSDLRenderer() const { return m_pSDLRenderer; }
@@ -60,7 +65,7 @@ protected:
 
 private:
 	Renderer(const Renderer& renderer);
-	Renderer& operator=(const Renderer& renderer);
+	//Renderer& operator=(const Renderer& renderer);
 
 	// Member data:
 public:
@@ -79,6 +84,8 @@ protected:
 	float m_fClearRed;
 	float m_fClearGreen;
 	float m_fClearBlue;
+
+	Texture* m_pWhiteTexture;
 
 private:
 	float m_zoom = 1.0f;

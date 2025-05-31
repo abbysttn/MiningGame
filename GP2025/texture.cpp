@@ -122,7 +122,7 @@ Texture::LoadSurfaceIntoTexture(SDL_Surface* pSurface)
 		m_iHeight = pSurface->h;
 		int bytesPerPixel = pSurface->format->BytesPerPixel;
 		unsigned int format = 0;
-		
+
 		if (bytesPerPixel == 3)
 		{
 			format = GL_RGB;
@@ -131,18 +131,23 @@ Texture::LoadSurfaceIntoTexture(SDL_Surface* pSurface)
 		{
 			format = GL_RGBA;
 		}
-		
+
 		glGenTextures(1, &m_uiTextureId);
 		glBindTexture(GL_TEXTURE_2D, m_uiTextureId);
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, format, m_iWidth, m_iHeight, 0, format,
-				  	GL_UNSIGNED_BYTE, pSurface->pixels);
+			GL_UNSIGNED_BYTE, pSurface->pixels);
 		SDL_FreeSurface(pSurface);
 		pSurface = 0;
-		
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
+}
+
+void Texture::SetID(GLuint id)
+{
+	m_uiTextureId = id;
 }

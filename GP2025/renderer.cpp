@@ -127,6 +127,10 @@ bool Renderer::Initialise(bool windowed, int width, int height)
 		return false;
 	}
 
+	// Creating plain white pixel for rectangle functions
+	m_pWhiteTexture = new Texture();
+	m_pWhiteTexture->SetID(CreateWhiteTexture());
+
 	return initialised;
 }
 
@@ -347,8 +351,8 @@ void Renderer::DrawSpriteScreenSpace(Sprite& sprite)
 	SetIdentity(world);
 	world.m[0][0] = sizeX;
 	world.m[1][1] = -sizeY;
-	world.m[3][0] = sprite.GetX();
-	world.m[3][1] = sprite.GetY();
+	world.m[3][0] = static_cast<float>(sprite.GetX());
+	world.m[3][1] = static_cast<float>(sprite.GetY());
 	m_pSpriteShader->SetMatrixUniform("uWorldTransform", world);
 
 	Matrix4 ortho;
@@ -437,4 +441,51 @@ Renderer::SetCameraPosition(float x, float y)
 {
 	m_cameraX = x;
 	m_cameraY = y;
+}
+
+void Renderer::DrawRectScreenSpace(const Vector2& position, const Vector2& size, float r, float g, float b, float a)
+{
+	m_pSpriteShader->SetActive();
+	m_pSpriteVertexData->SetActive();
+
+	m_pWhiteTexture->SetActive();
+
+	Matrix4 world;
+	SetIdentity(world);
+	world.m[0][0] = size.x;
+	world.m[1][1] = -size.y;
+	world.m[3][0] = position.x;
+	world.m[3][1] = position.y;
+	m_pSpriteShader->SetMatrixUniform("uWorldTransform", world);
+
+	Matrix4 ortho;
+	CreateOrthoProjection(ortho, (float)m_iWidth, (float)m_iHeight);
+
+	Matrix4 view;
+	SetIdentity(view);
+
+	Matrix4 viewProj = view * ortho;
+	m_pSpriteShader->SetMatrixUniform("uViewProj", viewProj);
+
+	m_pSpriteShader->SetVector4Uniform("colour", r, g, b, a);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+}
+
+GLuint Renderer::CreateWhiteTexture()
+{
+	GLuint texID;
+	unsigned char whitePixel[4] = { 255, 255, 255, 255 }; // RGBA white pixel
+
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_2D, texID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, whitePixel);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	return texID;
 }

@@ -33,6 +33,7 @@ public:
 private:
 	Grid* m_grid;
 	float m_tileSize;
+	int aboveGroundOffset = 10; // Change later to correct above ground size
 
 	float m_screenWidth;
 	float m_screenHeight;
@@ -43,8 +44,6 @@ private:
 	FMOD::System* m_pFMODSystem;
 
 	std::unique_ptr<UI> ui;
-	int m_depth;
-
 };
 
 #endif // __SceneMain_H__

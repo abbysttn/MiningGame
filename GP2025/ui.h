@@ -5,6 +5,8 @@
 #include "vector2.h"
 #include "texture.h"
 #include "sprite.h"
+#include "player.h"
+#include "renderer.h"
 
 #include "SDL.h"
 #include <memory>
@@ -17,7 +19,7 @@ public:
     UI(Renderer* renderer);
     ~UI();
 
-    void Update(int currentDepth);
+    void Update(Player* player, Renderer* renderer);
     void Render();
 
     void LoadDefaultTexture();
@@ -26,7 +28,7 @@ protected:
     SDL_Color white = { 255, 255, 255, 255 };
 
 private:
-    Renderer* m_SDLRenderer;
+    Renderer* m_pRenderer;
     std::unique_ptr<Font> m_font;
 
 	float m_screenWidth;
@@ -37,6 +39,15 @@ private:
 
     std::string m_depthText;
     Vector2 m_depthTextPos;
+
+    // Set health and stamina bar position and size
+    const float barWidth = 200.0f;
+    const float barHeight = 25.0f;
+    Vector2 barPositionHealth;
+    Vector2 barPositionStamina;
+
+    float healthPercent;
+    float staminaPercent;
 };
 
 #endif // UI_H

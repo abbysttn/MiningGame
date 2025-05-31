@@ -74,17 +74,26 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     if (m_pPlayer)
     {
         m_pPlayer->Process(deltaTime, inputSystem);
+        m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - aboveGroundOffset));
+    }
+
+	if (inputSystem.GetKeyState(SDL_SCANCODE_K))
+	{
+		m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 0.5f);
+	}
+    if (inputSystem.GetKeyState(SDL_SCANCODE_L))
+    {
+        m_pPlayer->SetStamina(m_pPlayer->GetStamina() - 0.5f);
     }
 
     m_grid->Process(deltaTime, inputSystem);
 
-    m_depth = static_cast<int>(m_pPlayer->GetPosition().y / m_tileSize);
-    ui->Update(m_depth);
+    ui->Update(m_pPlayer, m_pRenderer);
 }
 
 void SceneMain::Draw(Renderer& renderer)
 {
-    float playerX = renderer.GetWidth() / 2;
+    float playerX = static_cast<float>(renderer.GetWidth() / 2);
     float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
     //playerX = 500.0f;
     //std::cout << playerX << "   " << playerY << std::endl;
