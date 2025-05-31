@@ -1,15 +1,20 @@
-// COMP710 GP Framework 2025
-#ifndef LOGMANAGER_H
-#define LOGMANAGER_H
+//COMP710 GP Framework 2025
 
-class LogManager
-{
-	// Member methods:
+#ifndef __LOGMANAGER_H__
+#define __LOGMANAGER_H
+
+#include <vector>
+#include <string>
+
+class LogManager {
+	//Member methods:
 public:
 	static LogManager& GetInstance();
 	static void DestroyInstance();
+	void DebugDraw();
 
 	void Log(const char* pcMessage);
+
 protected:
 
 private:
@@ -18,13 +23,16 @@ private:
 	LogManager(const LogManager& logManager);
 	LogManager& operator=(const LogManager& logManager);
 
-	// Member data:
+	//Member data:
+
 public:
 
 protected:
 	static LogManager* sm_pInstance;
+	std::vector<std::string> m_logHistory;
+	bool m_bShowLogMessages;
 
 private:
 };
 
-#endif
+#endif // __LOGMANAGER_H
