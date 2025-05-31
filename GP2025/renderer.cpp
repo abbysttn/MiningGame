@@ -423,7 +423,6 @@ Renderer::DrawAnimatedSprite(AnimatedSprite& sprite, int frame)
 	world.m[3][0] = static_cast<float>(sprite.GetX());
 	world.m[3][1] = static_cast<float>(sprite.GetY());
 	m_pSpriteShader->SetMatrixUniform("uWorldTransform", world);
-	Matrix4 orthoViewProj;
 	Matrix4 ortho;
 	CreateOrthoProjection(ortho, static_cast<float>(m_iWidth), static_cast<float>(m_iHeight));
 

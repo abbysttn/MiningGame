@@ -35,7 +35,7 @@ public:
 private:
 	Grid* m_grid;
 	float m_tileSize;
-	int aboveGroundOffset = 10; // Change later to correct above ground size
+	int m_aboveGroundOffset = 11; // Change later to correct above ground size
 
 	float m_screenWidth;
 	float m_screenHeight;
@@ -45,6 +45,7 @@ private:
 	Sprite* m_pMineBackground;
 	FMOD::System* m_pFMODSystem;
 	int m_screenX;
+	float m_playerY;
 
 	std::unique_ptr<UI> ui;
 };

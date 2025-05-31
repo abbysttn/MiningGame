@@ -48,7 +48,7 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     m_pMineBackground->SetX(renderer.GetWidth() / 2);
     float scaledHeight = m_pMineBackground->GetHeight() * scale;
-    m_pMineBackground->SetY(scaledHeight / 2.0f);
+    m_pMineBackground->SetY(static_cast<int>(scaledHeight / 2.0f));
     m_pMineBackground->SetScale(scale);
 
     m_pPlayer = new Player();
@@ -66,6 +66,10 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     ui = std::make_unique<UI>(&renderer);
     m_screenX = renderer.GetWidth() / 2;
+    m_playerY = static_cast<float>(m_pPlayer->GetPosition().y);
+
+    renderer.SetCameraPosition(static_cast<float>(m_screenX), m_pMineBackground->GetHeight() * 0.1f);
+
     return true;
 }
 
@@ -74,7 +78,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     if (m_pPlayer)
     {
         m_pPlayer->Process(deltaTime, inputSystem);
-        m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - aboveGroundOffset));
+        m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
     }
 
 	if (inputSystem.GetKeyState(SDL_SCANCODE_K))
@@ -129,9 +133,17 @@ int SceneMain::GetBackgroundHeight() {
 void SceneMain::MoveCamera(Renderer& renderer) {
 
 
-    float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
+    m_playerY = static_cast<float>(m_pPlayer->GetPosition().y);
+    float scrollStart = static_cast<float>(m_pMineBackground->GetHeight())*0.1f;
+    float scrollStop = static_cast<float>(m_pMineBackground->GetHeight())*0.8315f; //change
 
-    renderer.SetCameraPosition(m_screenX, playerY);
+
+    if (m_playerY >= scrollStart && m_playerY <= scrollStop) {
+        renderer.SetCameraPosition(static_cast<float>(m_screenX), m_playerY);
+
+    }
+
+
 }
 
 

@@ -38,7 +38,7 @@ bool Player::Initialise(Renderer& renderer)
         return false;
     }
 
-    m_position = Vector2(400.0f, 300.0f);
+    m_position = Vector2(m_pRenderer->GetWidth()*0.4f, m_pRenderer->GetHeight()*0.4f);
     m_bAlive = true;
     return true;
 }
@@ -88,8 +88,8 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     const int screenWidth = m_pRenderer->GetWidth();
     const int screenHeight = m_pRenderer->GetWorldHeight();
 
-    const int spriteHalfWidth = m_pAnimSprite->GetWidth() / 2.0f;
-    const int spriteHalfHeight = m_pAnimSprite->GetHeight() / 2.0f;
+    const int spriteHalfWidth = m_pAnimSprite->GetWidth() / 2;
+    const int spriteHalfHeight = m_pAnimSprite->GetHeight() / 2;
 
     float wallMarginX = screenWidth * 0.00f;  //2% horizontal margin (for the walls)
     float wallMarginY = screenHeight * 0.00f; //PLayer can't move past the top 5%
@@ -97,7 +97,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     float minX = wallMarginX + spriteHalfWidth;
     float maxX = screenWidth - wallMarginX - spriteHalfWidth;
     float minY = wallMarginY + spriteHalfHeight;
-    float maxY = screenHeight - spriteHalfHeight;
+    float maxY = static_cast<float>(screenHeight - spriteHalfHeight);
 
 
     m_position.x = std::max(minX, std::min(maxX, m_position.x));
