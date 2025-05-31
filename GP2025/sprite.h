@@ -17,6 +17,10 @@ public:
 	void Process(float deltaTime);
 	void Draw(Renderer& renderer);
 
+	void DrawScreenSpace(Renderer& renderer);
+
+	Texture* GetTexture() const { return m_pTexture; }
+
 	int GetWidth() const;
 	int GetHeight() const;
 

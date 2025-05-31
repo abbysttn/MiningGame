@@ -5,6 +5,8 @@
 // Library includes:
 #include <SDL.h>
 #include "SDL_ttf.h"
+#include "font.h"
+#include <glew.h>
 
 class Texture
 {
@@ -17,18 +19,22 @@ public:
 
 	void LoadSurfaceIntoTexture(SDL_Surface* pSurface);
 
+
 	void SetActive();
 
 	int GetWidth() const;
 	int GetHeight() const;
 
-	void LoadTextTexture(const char* text, const char* fontname, int pointsize);
+	unsigned int GetTextureId() const { return m_uiTextureId; }
+	void SetID(GLuint id);
+
+	void LoadTextTexture(SDL_Renderer* renderer, const char* text, const Font& font, SDL_Color color);
 
 protected:
 
 private:
 	Texture(const Texture& texture);
-	Texture& operator=(const Texture& texture);
+	//Texture& operator=(const Texture& texture);
 
 	// Member data:
 public:

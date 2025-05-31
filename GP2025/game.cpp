@@ -22,7 +22,6 @@ Game& Game::GetInstance()
 {
 	if (sm_pInstance == 0)
 	{
-
 		sm_pInstance = new Game();
 	}
 
