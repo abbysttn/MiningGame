@@ -13,6 +13,8 @@
 #include "imgui/imgui_impl_sdl2.h"
 #include "imgui/imgui_impl_opengl3.h"
 #include "animatedsprite.h"
+#include "scenemain.h"
+
 #include "texture.h"
 
 // Library includes:
@@ -228,6 +230,14 @@ int Renderer::GetHeight() const
 {
 	return m_iHeight;
 }
+void Renderer::SetSceneMain(SceneMain* scene)
+{
+	m_sceneMain = scene;
+}
+int Renderer::GetWorldHeight() {
+	return m_sceneMain->GetBackgroundHeight();
+
+}
 
 Sprite* Renderer::CreateSprite(const char* pcFilename)
 {
@@ -413,7 +423,6 @@ Renderer::DrawAnimatedSprite(AnimatedSprite& sprite, int frame)
 	world.m[3][0] = static_cast<float>(sprite.GetX());
 	world.m[3][1] = static_cast<float>(sprite.GetY());
 	m_pSpriteShader->SetMatrixUniform("uWorldTransform", world);
-	Matrix4 orthoViewProj;
 	Matrix4 ortho;
 	CreateOrthoProjection(ortho, static_cast<float>(m_iWidth), static_cast<float>(m_iHeight));
 

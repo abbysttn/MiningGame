@@ -48,7 +48,7 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     m_pMineBackground->SetX(renderer.GetWidth() / 2);
     float scaledHeight = m_pMineBackground->GetHeight() * scale;
-    m_pMineBackground->SetY(scaledHeight / 2.0f);
+    m_pMineBackground->SetY(static_cast<int>(scaledHeight / 2.0f));
     m_pMineBackground->SetScale(scale);
 
     m_pPlayer = new Player();
@@ -65,6 +65,10 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_tileSize = m_grid->GetTileSize();
 
     ui = std::make_unique<UI>(&renderer);
+    m_screenX = renderer.GetWidth() / 2;
+    m_playerY = static_cast<float>(m_pPlayer->GetPosition().y);
+
+    renderer.SetCameraPosition(static_cast<float>(m_screenX), m_pMineBackground->GetHeight() * 0.1f);
 
     return true;
 }
@@ -74,7 +78,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     if (m_pPlayer)
     {
         m_pPlayer->Process(deltaTime, inputSystem);
-        m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - aboveGroundOffset));
+        m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
     }
 
 	if (inputSystem.GetKeyState(SDL_SCANCODE_K))
@@ -91,13 +95,9 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     ui->Update(m_pPlayer, m_pRenderer);
 }
 
-void SceneMain::Draw(Renderer& renderer)
-{
-    float playerX = static_cast<float>(renderer.GetWidth() / 2);
-    float playerY = static_cast<float>(m_pPlayer->GetPosition().y);
-    //playerX = 500.0f;
-    //std::cout << playerX << "   " << playerY << std::endl;
-    renderer.SetCameraPosition(playerX, playerY);
+void SceneMain::Draw(Renderer& renderer){
+
+    MoveCamera(renderer);
 
     // Optional zoom logic:
     renderer.SetZoom(1.0f);
@@ -125,6 +125,25 @@ void SceneMain::DebugDraw()
         ImGui::Text("Press Spacebar to hide/show");
         ImGui::Text("Debugging Tools:");
     }
+}
+
+int SceneMain::GetBackgroundHeight() {
+    return m_pMineBackground->GetHeight();
+}
+void SceneMain::MoveCamera(Renderer& renderer) {
+
+
+    m_playerY = static_cast<float>(m_pPlayer->GetPosition().y);
+    float scrollStart = static_cast<float>(m_pMineBackground->GetHeight())*0.1f;
+    float scrollStop = static_cast<float>(m_pMineBackground->GetHeight())*0.8315f; //change
+
+
+    if (m_playerY >= scrollStart && m_playerY <= scrollStop) {
+        renderer.SetCameraPosition(static_cast<float>(m_screenX), m_playerY);
+
+    }
+
+
 }
 
 

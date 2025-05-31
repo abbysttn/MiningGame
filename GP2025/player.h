@@ -3,6 +3,8 @@
 
 #include "entity.h"
 #include "inputsystem.h"
+//#include "renderer.h"
+//#include "scenemain.h"
 #include <cmath>
 #include <algorithm>
 
