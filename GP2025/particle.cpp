@@ -36,8 +36,8 @@ void Particle::Activate(Vector2 position) {
         if (m_type == ParticleType::DigDirt && m_pSprite) {
             float scale = 5.0f + static_cast<float>(rand()) / RAND_MAX * 3.0f;
             float colourVariation = 0.4f + static_cast<float>(rand()) / RAND_MAX * 0.25f;
-            m_pSprite->SetScale(scale);
-            m_pSprite->SetRedTint(colourVariation);
+            m_pSprite->SetScale(7.0f);
+            m_pSprite->SetRedTint(0.5f);
             m_pSprite->SetGreenTint(0.40f);
             m_pSprite->SetBlueTint(0.25f);
         }
@@ -128,8 +128,10 @@ void Particle::Update(float deltaTime) {
     else if (m_type == ParticleType::DigDirt) {
         m_velocity.y += m_gravity * deltaTime;
         m_velocity.x *= 0.99f;
+        if (m_position.y <= (m_pPlayer->GetPosition().y + m_pPlayer->GetPlayerHeight()/2)) {
+            m_position += m_velocity * deltaTime;
+        }
 
-        m_position += m_velocity * deltaTime;
 
         if (m_lifetime > m_maxLifetime) {
             m_active = false;
@@ -138,8 +140,11 @@ void Particle::Update(float deltaTime) {
     else if (m_type == ParticleType::BlockBreak) {
         m_velocity.y += m_gravity * deltaTime;
         m_velocity.x *= 0.992f;
+        if (m_position.y <= (m_pPlayer->GetPosition().y + m_pPlayer->GetPlayerHeight() / 2)) {
+            m_position += m_velocity * deltaTime;
 
-        m_position += m_velocity * deltaTime;
+        }
+
 
         if (m_lifetime > m_maxLifetime) {
             m_active = false;

@@ -30,6 +30,8 @@ public:
 	int GetDepth() const { return m_depth; }
 	void SetDepth(int depth) { m_depth = depth; }
 
+	float GetPlayerHeight();
+
 private:
 	float m_speed;
 	Renderer* m_pRenderer;

@@ -88,7 +88,7 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     //init particles
     m_pCoinSprite = renderer.CreateSprite("../assets/ball.png");
-    m_pCoinSprite->SetScale(0.5f);
+    m_pCoinSprite->SetScale(0.05f);
 
     m_pDirtSprite = renderer.CreateSprite("../assets/dirtParticle.png");
     m_pDirtSprite->SetScale(5.0f);
