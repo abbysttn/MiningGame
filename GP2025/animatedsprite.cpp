@@ -200,3 +200,13 @@ void AnimatedSprite::DebugDraw
 {
 	ImGui::SliderInt("Frame ", &m_iCurrentFrame, 0, m_iTotalFrames - 1);
 }
+
+void AnimatedSprite::SetCurrentFrame(int frame)
+{
+	m_iCurrentFrame = frame;
+}
+
+bool AnimatedSprite::FramesFinished()
+{
+	return (m_iCurrentFrame >= m_iTotalFrames);
+}

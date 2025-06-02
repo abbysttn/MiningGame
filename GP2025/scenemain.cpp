@@ -11,7 +11,7 @@
 #include "ui.h"
 #include "logmanager.h"
 
-#include "grid.h"
+#include "gridstate.h"
 
 #include <fmod.hpp>
 #include <fmod_errors.h>
@@ -20,8 +20,7 @@
 #include "imgui/imgui_impl_opengl3.h"
 
 SceneMain::SceneMain(FMOD::System* pFMODSystem) 
-    : m_grid(nullptr)
-    , m_tileSize(0.0f)
+    : m_tileSize(0.0f)
     , m_screenWidth(0.0f)
     , m_screenHeight(0.0f)
     , m_pMineBackground(nullptr)
@@ -38,8 +37,7 @@ SceneMain::~SceneMain()
     delete m_pPlayer;
     m_pPlayer = nullptr;
 
-    delete m_grid;
-    m_grid = nullptr;
+    GridState::GetInstance().ResetGrid();
 
     if (m_pMineBackground) {
         delete m_pMineBackground;
@@ -92,10 +90,9 @@ bool SceneMain::Initialise(Renderer& renderer)
         return false;
     }
 
-    m_grid = new Grid();
-    m_grid->Initialise(renderer);
+    GridState::GetInstance().CreateGrid(renderer);
 
-    m_tileSize = m_grid->GetTileSize();
+    m_tileSize = GridState::GetInstance().GetTileSize();
 
     ui = std::make_unique<UI>(&renderer);
     m_screenX = renderer.GetWidth() / 2;
@@ -121,10 +118,6 @@ bool SceneMain::Initialise(Renderer& renderer)
 
 void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 {
-
-
-
-
     if (m_pPlayer)
     {
         m_pPlayer->Process(deltaTime, inputSystem);
@@ -180,7 +173,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         m_particleSystems.push_back(std::move(ps));
     }
 
-    m_grid->Process(deltaTime, inputSystem);
+    GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
 
     ui->Update(m_pPlayer, m_pRenderer);
 
@@ -210,7 +203,7 @@ void SceneMain::Draw(Renderer& renderer){
         m_pMineBackground->Draw(renderer);
     }
 
-    m_grid->Draw(renderer);
+    GridState::GetInstance().DrawGrid(renderer);
 
     if (m_pPlayer) {
         m_pPlayer->Draw(renderer);
