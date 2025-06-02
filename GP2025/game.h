@@ -88,6 +88,8 @@ protected:
 
 private:
 	
+	const int targetFPS = 120;
+	const float targetFrameTime = 1.0f / targetFPS;
 };
 
 #endif // GAME_H
