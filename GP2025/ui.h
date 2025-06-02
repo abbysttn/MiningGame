@@ -48,6 +48,23 @@ private:
 
     float healthPercent;
     float staminaPercent;
+
+	// Resource counters
+    std::unique_ptr<Sprite> m_dirtIcon;
+    std::unique_ptr<Sprite> m_stoneIcon;
+    std::unique_ptr<Sprite> m_gemIcon;
+
+    Texture m_dirtCountTexture;
+    Texture m_stoneCountTexture;
+    Texture m_gemCountTexture;
+
+    std::unique_ptr<Sprite> m_dirtCountSprite;
+    std::unique_ptr<Sprite> m_stoneTextSprite;
+    std::unique_ptr<Sprite> m_gemTextSprite;
+
+    std::string m_dirtCountText;
+	std::string m_stoneCountText;
+	std::string m_gemCountText;
 };
 
 #endif // UI_H
