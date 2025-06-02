@@ -108,28 +108,16 @@
     <ClCompile Include="block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gridstate.cpp">
+    <ClCompile Include="font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="quadtree.cpp">
+    <ClCompile Include="ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gamestatemanager.cpp">
+    <ClCompile Include="particle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="scenesplashaut.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scenesplashfmod.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="splashautstate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="splashfmodstate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scenemainstate.cpp">
+    <ClCompile Include="particlesystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -233,39 +221,25 @@
     <ClInclude Include="block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gridstate.h">
+    <ClInclude Include="font.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="quadtree.h">
+    <ClInclude Include="ui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="collisionhelper.h">
+    <ClInclude Include="particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gamestate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gamestatemanager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scenesplashaut.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scenesplashfmod.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="splashautstate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="splashfmodstate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scenemainstate.h">
+    <ClInclude Include="particlesystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="game\shader\sprite.frag" />
-    <None Include="game\shader\sprite.vert" />
+    <None Include="game\shaders\sprite.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="game\shaders\sprite.vert">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -22,7 +22,6 @@ Game& Game::GetInstance()
 {
 	if (sm_pInstance == 0)
 	{
-
 		sm_pInstance = new Game();
 	}
 
@@ -42,19 +41,18 @@ Game::Game() : m_pRenderer(0), m_bLooping(true)
 
 Game::~Game()
 {
-	delete m_pRenderer;
-	m_pRenderer = nullptr;
-
-	delete m_pInputSystem;
-	m_pInputSystem = nullptr;
-
-	for (Scene* scene : m_scenes)
+	for (Scene*& scene : m_scenes)
 	{
 		delete scene;
 		scene = nullptr;
 	}
 	m_scenes.clear();
 
+	delete m_pInputSystem;
+	m_pInputSystem = nullptr;
+
+	delete m_pRenderer;
+	m_pRenderer = nullptr;
 }
 
 void Game::Quit()
@@ -80,7 +78,6 @@ bool Game::Initialise()
 	m_iLastTime = SDL_GetPerformanceCounter();
 
 	m_pRenderer->SetClearColour(0, 255, 255);
-
 	// Initialise FMOD
 	FMOD::System_Create(&m_pFMODSystem);
 	m_pFMODSystem->init(512, FMOD_INIT_NORMAL, 0);
@@ -97,6 +94,7 @@ bool Game::Initialise()
 	pScene = new SceneMain(m_pFMODSystem);
 	pScene->Initialise(*m_pRenderer);
 	m_scenes.push_back(pScene);
+	m_pRenderer->SetSceneMain(static_cast<SceneMain*>(pScene));
 
 	m_iCurrentScene = 0;
 

@@ -6,6 +6,7 @@
 // Local includes:
 #include "renderer.h"
 #include "texture.h"
+#include <glew.h>
 
 Sprite::Sprite()
 	: m_pTexture(0)
