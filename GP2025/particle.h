@@ -10,7 +10,8 @@ class Player;
 enum class ParticleType {
     BlockPickup,
     BlockBreak,
-    DigDirt
+    DigDirt,
+    WaterDrop
 };
 class Particle {
 public:

@@ -1,4 +1,8 @@
 #include "particle.h"
+
+#include <fmod.hpp>
+#include <fmod_errors.h>
+
 #include <cstdlib>
 #include <iostream>
 
@@ -63,6 +67,20 @@ void Particle::Activate(Vector2 position) {
             (((rand() % 200) - 100) / 100.0f) * m_speedMultiplier,
             (((rand() % 200) - 100) / 100.0f) * m_speedMultiplier * 1.2f
         );
+        m_maxLifetime = 4.0f;
+        break;
+
+    case ParticleType::WaterDrop:
+        if (m_type == ParticleType::WaterDrop && m_pSprite) {
+            float scale = 8.0f + static_cast<float>(rand()) / RAND_MAX * 5.0f;
+            m_pSprite->SetScale(scale);
+            m_pSprite->SetRedTint(0.3f);
+            m_pSprite->SetGreenTint(0.5f);
+            m_pSprite->SetBlueTint(1.0f);
+            m_pSprite->SetAlpha(0.35f);
+        }
+        m_speedMultiplier = 400.0f;
+        m_velocity = Vector2(0.0f, 0.0f);
         m_maxLifetime = 4.0f;
         break;
     }
@@ -138,6 +156,19 @@ void Particle::Update(float deltaTime) {
         }
     }    
     else if (m_type == ParticleType::BlockBreak) {
+        m_velocity.y += m_gravity * deltaTime;
+        m_velocity.x *= 0.992f;
+        if (m_position.y <= (m_pPlayer->GetPosition().y + m_pPlayer->GetPlayerHeight() / 2)) {
+            m_position += m_velocity * deltaTime;
+
+        }
+
+
+        if (m_lifetime > m_maxLifetime) {
+            m_active = false;
+        }
+    }
+    else if (m_type == ParticleType::WaterDrop) {
         m_velocity.y += m_gravity * deltaTime;
         m_velocity.x *= 0.992f;
         if (m_position.y <= (m_pPlayer->GetPosition().y + m_pPlayer->GetPlayerHeight() / 2)) {

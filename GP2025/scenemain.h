@@ -58,6 +58,7 @@ private:
 	Sprite* m_pCoinSprite = nullptr;
 	Sprite* m_pDirtSprite = nullptr;
 	Sprite* m_pBreakBlockSprite = nullptr;
+	Sprite* m_pWaterDropSprite = nullptr;
 
 
 	std::list<ParticleSystem> m_particleSystems;

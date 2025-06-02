@@ -49,6 +49,11 @@ SceneMain::~SceneMain()
         delete m_pBreakBlockSprite;
         m_pBreakBlockSprite = nullptr;
     }
+
+    if (m_pWaterDropSprite) {
+        delete m_pWaterDropSprite;
+        m_pWaterDropSprite = nullptr;
+    }
 }
 
 bool SceneMain::Initialise(Renderer& renderer)
@@ -82,7 +87,7 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_tileSize = m_grid->GetTileSize();
 
     ui = std::make_unique<UI>(&renderer);
-    m_screenX = renderer.GetWidth() / 2;
+    m_screenX = renderer.GetWidth();
     m_playerY = static_cast<float>(m_pPlayer->GetPosition().y);
 
 
@@ -90,13 +95,16 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_pCoinSprite = renderer.CreateSprite("../assets/ball.png");
     m_pCoinSprite->SetScale(0.05f);
 
-    m_pDirtSprite = renderer.CreateSprite("../assets/dirtParticle.png");
+    m_pDirtSprite = renderer.CreateSprite("../assets/particle.png");
     m_pDirtSprite->SetScale(5.0f);
 
-    m_pBreakBlockSprite = renderer.CreateSprite("../assets/dirtParticle.png");
+    m_pBreakBlockSprite = renderer.CreateSprite("../assets/particle.png");
     m_pBreakBlockSprite->SetScale(5.0f);
 
-    renderer.SetCameraPosition(static_cast<float>(m_screenX), m_pMineBackground->GetHeight() * 0.1f);
+    m_pWaterDropSprite = renderer.CreateSprite("../assets/particle.png");
+    m_pWaterDropSprite->SetScale(5.0f);
+
+    renderer.SetCameraPosition(static_cast<float>(m_screenX/2), m_pMineBackground->GetHeight() * 0.1f);
 
     return true;
 }
@@ -159,6 +167,15 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         ParticleSystem ps;
         ps.Initialise(m_pBreakBlockSprite, m_pPlayer, 50, ParticleType::BlockBreak);
         ps.ActivateAt(m_pPlayer->GetPosition());
+        m_particleSystems.push_back(std::move(ps));
+    }
+    if (inputSystem.GetKeyState(SDL_SCANCODE_Y) == BS_PRESSED)
+    {
+        float randX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * static_cast<float>(m_screenX);
+        Vector2 dropSpawn = Vector2(randX, 0.0f);
+        ParticleSystem ps;
+        ps.Initialise(m_pWaterDropSprite, m_pPlayer, 1, ParticleType::WaterDrop);
+        ps.ActivateAt(dropSpawn);
         m_particleSystems.push_back(std::move(ps));
     }
 
@@ -232,13 +249,13 @@ void SceneMain::MoveCamera(Renderer& renderer) {
     float scrollStop = bgHeight - screenHeight / 2.0f; // Player must be this far from bottom before scrolling stops
 
     if (m_playerY >= scrollStart && m_playerY <= scrollStop) {
-        renderer.SetCameraPosition(static_cast<float>(m_screenX), m_playerY);
+        renderer.SetCameraPosition(static_cast<float>(m_screenX/2), m_playerY);
     }
     else if (m_playerY < scrollStart) {
-        renderer.SetCameraPosition(static_cast<float>(m_screenX), scrollStart);
+        renderer.SetCameraPosition(static_cast<float>(m_screenX/2), scrollStart);
     }
     else if (m_playerY > scrollStop) {
-        renderer.SetCameraPosition(static_cast<float>(m_screenX), scrollStop);
+        renderer.SetCameraPosition(static_cast<float>(m_screenX/2), scrollStop);
     }
 }
 
