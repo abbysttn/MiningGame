@@ -21,6 +21,7 @@ GameObjectPool* GridState::GetPool()
 
 void GridState::BreakBlock(Block* block)
 {
+	block->SetActive(false);
 }
 
 void GridState::StopBreakingBlock(Block* block)
@@ -56,13 +57,15 @@ bool GridState::CheckCollision(Box& box)
 
 	for (auto* object : potentialCollision) {
 		if (Block* block = dynamic_cast<Block*>(object)) {
-			Box blockBox(block->Position().x, block->Position().y, (float)block->GetSpriteWidth(),
-				(float)block->GetSpriteWidth());
+			if (block->IsActive()) {
+				Box blockBox(block->Position().x - block->GetSpriteWidth() / 2.0f, block->Position().y - block->GetSpriteWidth() / 2.0f, (float)block->GetSpriteWidth(),
+					(float)block->GetSpriteHeight());
 
-			if (CollisionHelper::IsColliding(box, blockBox)) {
-				LogManager::GetInstance().Log("Colliding");
+				if (CollisionHelper::IsColliding(box, blockBox)) {
+					LogManager::GetInstance().Log("Colliding");
 
-				return true;
+					return true;
+				}
 			}
 		}
 	}

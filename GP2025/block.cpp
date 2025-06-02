@@ -61,6 +61,11 @@ void Block::SetColour(float red, float green, float blue)
 	m_sprite->SetBlueTint(blue);
 }
 
+int Block::GetSpriteHeight()
+{
+	return m_sprite->GetHeight();
+}
+
 int Block::GetSpriteWidth() const
 {
 	return m_sprite->GetWidth();

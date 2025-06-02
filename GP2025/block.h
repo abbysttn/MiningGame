@@ -18,6 +18,7 @@ public:
 	Vector2& Position();
 	void SetColour(float red, float green, float blue);
 
+	int GetSpriteHeight();
 	virtual int GetSpriteWidth() const override;
 	virtual GameObject* Create() const override;
 	virtual bool IsActive() const override;

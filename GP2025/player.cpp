@@ -32,7 +32,7 @@ bool Player::Initialise(Renderer& renderer)
     m_pAnimSprite->SetLooping(true);
     m_pAnimSprite->SetFrameDuration(0.07f);
     m_pAnimSprite->Animate();
-    m_pAnimSprite->SetScale(1.0f);
+    m_pAnimSprite->SetScale(0.8f);
 
     if (m_pAnimSprite == nullptr)
     {
@@ -114,11 +114,6 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     float maxX = screenWidth - wallMarginX - spriteHalfWidth;
     float minY = wallMarginY + spriteHalfHeight;
     float maxY = screenHeight - wallMarginY - spriteHalfHeight;
-
-    Box playerBox(m_position.x, m_position.y, (float)m_pAnimSprite->GetWidth(),
-        (float)m_pAnimSprite->GetHeight());
-
-    GridState::GetInstance().CheckCollision(playerBox);
 
     m_position.x = std::max(minX, std::min(maxX, m_position.x));
     m_position.y = std::max(minY, std::min(maxY, m_position.y));

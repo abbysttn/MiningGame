@@ -51,18 +51,20 @@ void Grid::Process(float deltaTime, InputSystem& inputSystem)
 		if (GameObject* obj = m_grid->getObjectAtIndex(i)) {
 			if (obj && dynamic_cast<Block*>(obj)) {
 				Block* block = dynamic_cast<Block*>(obj);
-				block->Process(deltaTime);
+				if (block->IsActive()) {
+					block->Process(deltaTime);
 
-				if (block && block->IsActive()) {
-					float blockSize = (float)block->GetSpriteWidth();
-					Box blockRange(
-						block->Position().x,
-						block->Position().y,
-						blockSize,
-						blockSize
-					);
+					if (block && block->IsActive()) {
+						float blockSize = (float)block->GetSpriteWidth();
+						Box blockRange(
+							block->Position().x,
+							block->Position().y,
+							blockSize,
+							blockSize
+						);
 
-					m_collisionTree->insert(block, blockRange);
+						m_collisionTree->insert(block, blockRange);
+					}
 				}
 			}
 		}
@@ -112,6 +114,11 @@ bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 
 		block->Position().x = (x * m_tileSize) + screenOffsetX;
 		block->Position().y = (y * m_tileSize) + screenOffsetY;	
+
+		//testing
+		if (y == 0 && (x == 4 || x == 5)) {
+			block->SetActive(false);
+		}
 
 		return true;
 	}
