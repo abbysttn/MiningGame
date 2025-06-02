@@ -3,6 +3,7 @@
 
 #include "grid.h"
 #include "block.h"
+#include "vector"
 
 class GameObjectPool;
 class Renderer;
@@ -45,6 +46,8 @@ public:
 protected:
 	//unordered_map<Block*, bool> m_itemStates; maybe for keeping track of broken blocks
 	Grid* m_gameGrid;
+
+	Block* m_collidingBlock;
 
 private:
 };

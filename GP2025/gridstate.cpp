@@ -58,11 +58,12 @@ bool GridState::CheckCollision(Box& box)
 	for (auto* object : potentialCollision) {
 		if (Block* block = dynamic_cast<Block*>(object)) {
 			if (block->IsActive()) {
-				Box blockBox(block->Position().x - block->GetSpriteWidth() / 2.0f, block->Position().y - block->GetSpriteWidth() / 2.0f, (float)block->GetSpriteWidth(),
+				Box blockBox(block->Position().x, block->Position().y, (float)block->GetSpriteWidth(),
 					(float)block->GetSpriteHeight());
 
-				if (CollisionHelper::IsColliding(box, blockBox)) {
+				if (CollisionHelper::IsColliding(blockBox, box)) {
 					LogManager::GetInstance().Log("Colliding");
+					m_collidingBlock = block;
 
 					return true;
 				}

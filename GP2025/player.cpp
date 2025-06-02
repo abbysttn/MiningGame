@@ -11,6 +11,9 @@
 
 #include <algorithm>
 
+#include "logmanager.h"
+#include "collisionhelper.h"
+
 
 Player::Player()
     : m_speed(400.0f)
@@ -27,8 +30,8 @@ bool Player::Initialise(Renderer& renderer)
 {
 
     m_pRenderer = &renderer;
-    m_pAnimSprite = m_pRenderer->CreateAnimatedSprite("../assets/playerAnimSprite.png");
-    m_pAnimSprite->SetupFrames(128, 128);
+    m_pAnimSprite = m_pRenderer->CreateAnimatedSprite("../assets/playerAnimSprite2.png");
+    m_pAnimSprite->SetupFrames(72, 125);
     m_pAnimSprite->SetLooping(true);
     m_pAnimSprite->SetFrameDuration(0.07f);
     m_pAnimSprite->Animate();
@@ -82,18 +85,28 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
         direction.y /= length;
     }
 
+    const int screenWidth = m_pRenderer->GetWidth();
+    const int screenHeight = m_pRenderer->GetHeight() * m_heightMultiple;
+
+    const float spriteHalfWidth = m_pAnimSprite->GetWidth() / 2.0f;
+    const float spriteHalfHeight = m_pAnimSprite->GetHeight() / 2.0f;
+
     //move the player
     Vector2 testPos = m_position;
 
+    //fixes issue with player collision box
+    float paddingX = (m_pAnimSprite->GetWidth() / 2.0f) + 5.0f;
+    float paddingY = (m_pAnimSprite->GetHeight() / 3.0f) - 20.0f;
+
     testPos += direction * m_speed * deltaTime;
 
-    Box testBoxX(testPos.x, m_position.y, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
+    Box testBoxX(testPos.x + paddingX, m_position.y + paddingY, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
 
     if (!GridState::GetInstance().CheckCollision(testBoxX)) {
         m_position.x = testPos.x;
     }
 
-    Box testBoxY(m_position.x, testPos.y, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
+    Box testBoxY(m_position.x + paddingX, testPos.y + paddingY, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
 
     if (!GridState::GetInstance().CheckCollision(testBoxY)) {
         m_position.y = testPos.y;
@@ -101,12 +114,6 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 
 
     //clamp to screen with halfWidth, to prevent clipping outside screen
-    const int screenWidth = m_pRenderer->GetWidth();
-    const int screenHeight = m_pRenderer->GetHeight()*m_heightMultiple;
-
-    const float spriteHalfWidth = m_pAnimSprite->GetWidth() / 2.0f;
-    const float spriteHalfHeight = m_pAnimSprite->GetHeight() / 2.0f;
-
     float wallMarginX = screenWidth * 0.00f;  //2% horizontal margin (for the walls)
     float wallMarginY = screenHeight * 0.00f; //2% vertical margin
 
