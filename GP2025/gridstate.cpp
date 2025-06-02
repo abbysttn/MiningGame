@@ -21,7 +21,7 @@ GameObjectPool* GridState::GetPool()
 
 void GridState::BreakBlock(Block* block)
 {
-	block->SetActive(false);
+	block->BreakBlock();
 }
 
 void GridState::StopBreakingBlock(Block* block)
@@ -62,6 +62,7 @@ bool GridState::CheckCollision(Box& box)
 					(float)block->GetSpriteHeight());
 
 				if (CollisionHelper::IsColliding(blockBox, box)) {
+					block->BreakBlock();
 					LogManager::GetInstance().Log("Colliding");
 					m_collidingBlock = block;
 

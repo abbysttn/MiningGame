@@ -86,7 +86,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     }
 
     const int screenWidth = m_pRenderer->GetWidth();
-    const int screenHeight = m_pRenderer->GetHeight() * m_heightMultiple;
+    const int screenHeight = m_pRenderer->GetHeight() * (int)m_heightMultiple;
 
     const float spriteHalfWidth = m_pAnimSprite->GetWidth() / 2.0f;
     const float spriteHalfHeight = m_pAnimSprite->GetHeight() / 2.0f;

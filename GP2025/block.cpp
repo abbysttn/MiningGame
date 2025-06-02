@@ -1,7 +1,7 @@
 #include "block.h"
 
 #include "renderer.h"
-#include "sprite.h"
+#include "animatedsprite.h"
 
 #include <cstdlib>
 #include "inlinehelper.h"
@@ -9,7 +9,7 @@
 
 #include <string>
 
-Block::Block() : m_sprite(0) {}
+Block::Block() : m_sprite(0), m_isBroken(false) {}
 
 Block::~Block()
 {
@@ -22,7 +22,10 @@ bool Block::Initialise(Renderer& renderer, int depth)
 	m_depth = depth;
 	GetBlockType(m_depth, m_filepath);
 
-	m_sprite = renderer.CreateSprite(m_filepath);
+	m_sprite = renderer.CreateAnimatedSprite(m_filepath);
+	m_sprite->SetupFrames(8, 8);
+	m_sprite->SetLooping(false);
+	m_sprite->SetFrameDuration(m_animatingTime);
 
 	if (!m_sprite) {
 		LogManager::GetInstance().Log("Failed to load block.");
@@ -37,9 +40,23 @@ bool Block::Initialise(Renderer& renderer, int depth)
 
 void Block::Process(float deltaTime)
 {
-	if (m_active) {
+	if (m_active && !m_isBroken) {
 		m_sprite->SetX(static_cast<int>(m_position.x));
 		m_sprite->SetY(static_cast<int>(m_position.y));
+
+		if (m_isBreaking) {
+			if (m_isBreaking && m_currentTime == 0.0f) {
+				m_currentBlockStatus++;
+				m_sprite->SetCurrentFrame(m_currentBlockStatus);
+			}
+
+			m_currentTime += deltaTime;
+
+			if (m_currentTime >= m_animatingTime) {
+				m_isBreaking = false;
+				m_currentTime = 0.0f;
+			}
+		}		
 	}
 	m_sprite->Process(deltaTime);
 }
@@ -94,6 +111,18 @@ void Block::SetScale(float scale)
 void Block::SetActive(bool active)
 {
 	m_active = active;
+}
+
+void Block::BreakBlock()
+{
+	if (!m_isBroken && !m_isBreaking) {
+		m_isBreaking = true;
+
+		if (m_sprite->FramesFinished()) {
+			m_isBroken = true;
+			m_active = false;
+		}
+	}
 }
 
 void Block::GetBlockType(int& depth, const char*& filepath)

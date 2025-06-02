@@ -5,7 +5,7 @@
 #include "gameobject.h"
 
 class Renderer;
-class Sprite;
+class AnimatedSprite;
 
 class Block : public GameObject {
 public:
@@ -27,6 +27,8 @@ public:
 	void SetScale(float scale);
 	void SetActive(bool active);
 
+	void BreakBlock();
+
 protected:
 	void GetBlockType(int& depth, const char*& filepath);
 
@@ -38,12 +40,18 @@ public:
 
 protected:
 	Vector2 m_position;
-	Sprite* m_sprite;
+	AnimatedSprite* m_sprite;
 
 	bool m_active;
 
 	int m_depth;
 	const char* m_filepath;
+
+	bool m_isBroken;
+	bool m_isBreaking = false;
+	int m_currentBlockStatus = 0;
+	float m_animatingTime = 0.5f;
+	float m_currentTime = 0.0f;
 
 private:
 
