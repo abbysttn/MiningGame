@@ -23,7 +23,6 @@ Game& Game::GetInstance()
 {
 	if (sm_pInstance == 0)
 	{
-
 		sm_pInstance = new Game();
 	}
 
@@ -58,19 +57,18 @@ Game::Game()
 
 Game::~Game()
 {
-	delete m_pRenderer;
-	m_pRenderer = nullptr;
-
-	delete m_pInputSystem;
-	m_pInputSystem = nullptr;
-
-	for (Scene* scene : m_scenes)
+	for (Scene*& scene : m_scenes)
 	{
 		delete scene;
 		scene = nullptr;
 	}
 	m_scenes.clear();
 
+	delete m_pInputSystem;
+	m_pInputSystem = nullptr;
+
+	delete m_pRenderer;
+	m_pRenderer = nullptr;
 }
 
 void Game::Quit()
@@ -80,11 +78,11 @@ void Game::Quit()
 
 bool Game::Initialise()
 {
-	int bbWidth = 1920;
-	int bbHeight = 1080;
+	int bbWidth = 0;
+	int bbHeight = 0;
 
 	m_pRenderer = new Renderer();
-	if (!m_pRenderer->Initialise(true, bbWidth, bbHeight))
+	if (!m_pRenderer->Initialise(false, bbWidth, bbHeight))
 	{
 		LogManager::GetInstance().Log("Renderer failed to initialise!");
 		return false;
@@ -96,7 +94,6 @@ bool Game::Initialise()
 	m_iLastTime = SDL_GetPerformanceCounter();
 
 	m_pRenderer->SetClearColour(0, 255, 255);
-
 	// Initialise FMOD
 	FMOD::System_Create(&m_pFMODSystem);
 	m_pFMODSystem->init(512, FMOD_INIT_NORMAL, 0);

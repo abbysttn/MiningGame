@@ -109,6 +109,16 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="scenetitlescreen.cpp">
+    <ClCompile Include="font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="particle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="particlesystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -213,11 +223,25 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scenetitlescreen.h">
+    <ClInclude Include="font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="particle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="particlesystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="game\shader\sprite.frag" />
-    <None Include="game\shader\sprite.vert" />
+    <None Include="game\shaders\sprite.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="game\shaders\sprite.vert">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
