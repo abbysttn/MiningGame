@@ -81,6 +81,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
     }
 
+    // DEBUG STUFF
 	if (inputSystem.GetKeyState(SDL_SCANCODE_K))
 	{
 		m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 0.5f);
@@ -89,6 +90,18 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     {
         m_pPlayer->SetStamina(m_pPlayer->GetStamina() - 0.5f);
     }
+	if (inputSystem.GetKeyState(SDL_SCANCODE_J))
+	{
+		m_pPlayer->SetDirt(m_pPlayer->GetDirt() + 1);
+	}
+	if (inputSystem.GetKeyState(SDL_SCANCODE_H))
+	{
+		m_pPlayer->SetStone(m_pPlayer->GetStone() + 1);
+	}
+	if (inputSystem.GetKeyState(SDL_SCANCODE_G))
+	{
+		m_pPlayer->SetGem(m_pPlayer->GetGem() + 1);
+	}
 
     m_grid->Process(deltaTime, inputSystem);
 
