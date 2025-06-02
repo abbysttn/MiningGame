@@ -56,6 +56,11 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     if (IsKeyHeld(inputSystem, SDL_SCANCODE_A) || IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT))  direction.x -= 1.0f;
     if (IsKeyHeld(inputSystem, SDL_SCANCODE_D) || IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) direction.x += 1.0f;
 
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_UP))    GridState::GetInstance().BreakBlock(m_position, 'U');
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN))  GridState::GetInstance().BreakBlock(m_position, 'D');
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT))  GridState::GetInstance().BreakBlock(m_position, 'L');
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) GridState::GetInstance().BreakBlock(m_position, 'R');
+
     //controller input
     if (inputSystem.GetNumberOfControllersAttached() > 0) {
         XboxController* controller = inputSystem.GetController(0);

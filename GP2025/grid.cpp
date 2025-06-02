@@ -92,6 +92,42 @@ QuadTree& Grid::GetCollisionTree()
 	return *m_collisionTree;
 }
 
+Vector2 Grid::GetBlockSize()
+{
+	return m_blockSize;
+}
+
+Block* Grid::GetBlockFromGrid(const Vector2 position) const
+{
+	int spriteIndex = position.y * m_cols + position.x;
+	Block* closestBlock = nullptr;
+
+	if (GameObject* obj = m_grid->getObjectAtIndex(spriteIndex)) {
+		if (obj && dynamic_cast<Block*>(obj)) {
+			Block* block = dynamic_cast<Block*>(obj);
+
+			closestBlock = block;
+		}
+	}
+
+	return closestBlock;
+}
+
+int Grid::GetRows()
+{
+	return (size_t)m_rows;
+}
+
+int Grid::GetColumns()
+{
+	return (size_t)m_cols;
+}
+
+Vector2 Grid::GetScreenOffsets()
+{
+	return Vector2(screenOffsetX, screenOffsetY);
+}
+
 bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 {
 	int spriteIndex = y * m_cols + x;
@@ -114,6 +150,9 @@ bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 
 		block->Position().x = (x * m_tileSize) + screenOffsetX;
 		block->Position().y = (y * m_tileSize) + screenOffsetY;	
+
+		m_blockSize.x = block->GetSpriteWidth();
+		m_blockSize.y = block->GetSpriteHeight();
 
 		//testing
 		if (y == 0 && (x == 4 || x == 5)) {

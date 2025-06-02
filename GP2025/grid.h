@@ -12,6 +12,7 @@ class Scene;
 class Renderer;
 class Sprite;
 class GameObjectPool;
+class Block;
 
 class QuadTree;
 struct Box;
@@ -26,6 +27,14 @@ public:
 	virtual void DebugDraw();
 
 	QuadTree& GetCollisionTree();
+
+	Vector2 GetBlockSize();
+	Block* GetBlockFromGrid(const Vector2 position) const;
+
+	int GetRows();
+	int GetColumns();
+
+	Vector2 GetScreenOffsets();
 
 
 protected:
@@ -51,6 +60,8 @@ private:
 
 	float screenOffsetX;
 	float screenOffsetY;
+
+	Vector2 m_blockSize;
 
 };
 

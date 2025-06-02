@@ -40,7 +40,7 @@ bool Block::Initialise(Renderer& renderer, int depth)
 
 void Block::Process(float deltaTime)
 {
-	if (m_active && !m_isBroken) {
+	if (m_active) {
 		m_sprite->SetX(static_cast<int>(m_position.x));
 		m_sprite->SetY(static_cast<int>(m_position.y));
 
@@ -55,6 +55,10 @@ void Block::Process(float deltaTime)
 			if (m_currentTime >= m_animatingTime) {
 				m_isBreaking = false;
 				m_currentTime = 0.0f;
+				if (m_sprite->FramesFinished()) {
+					m_isBroken = true;
+					m_active = false;
+				}
 			}
 		}		
 	}
@@ -117,11 +121,6 @@ void Block::BreakBlock()
 {
 	if (!m_isBroken && !m_isBreaking) {
 		m_isBreaking = true;
-
-		if (m_sprite->FramesFinished()) {
-			m_isBroken = true;
-			m_active = false;
-		}
 	}
 }
 

@@ -23,8 +23,7 @@ public:
 	void CreateGrid(Renderer& renderer);
 	GameObjectPool* GetPool();
 
-	void BreakBlock(Block* block);
-	void StopBreakingBlock(Block* block);
+	void BreakBlock(Vector2 position, char direction);
 
 	void ResetGrid();
 
