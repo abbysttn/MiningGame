@@ -110,7 +110,7 @@ bool Game::Initialise()
 	}
 
 	// Titlescreen stuffz
-	Scene* pTitleScene = new SceneTitlescreen();
+	Scene* pTitleScene = new SceneTitlescreen(m_pFMODSystem);
 	if (!pTitleScene->Initialise(*m_pRenderer))
 	{
 		LogManager::GetInstance().Log("Titlescreen fialed to load!!");

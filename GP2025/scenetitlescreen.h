@@ -2,6 +2,7 @@
 #define __SCENETITLESCREEN_H__
 
 #include "scene.h"
+#include "fmod.hpp"
 
 class Sprite;
 class Texture;
@@ -12,7 +13,7 @@ class SceneTitlescreen : public Scene
 {
 	// Member methods
 public:
-	SceneTitlescreen();
+	SceneTitlescreen(FMOD::System* fmodSystem);
 	virtual ~SceneTitlescreen();
 
 	virtual bool Initialise(Renderer& renderer);
@@ -35,6 +36,7 @@ protected:
 	Sprite* m_pExitBtnSprite;
 
 	Sprite* m_pBackgroundSprite;
+	Sprite* m_pTitleSprite;
 
 	bool m_bisMouseOverStart;
 	bool m_bisMouseOverExit;
@@ -42,15 +44,25 @@ protected:
 	float m_screenWidth;
 	float m_screenHeight;
 
-	// White
+	// White color
 	const float m_defaultRed = 1.0f;
 	const float m_defaultGreen = 1.0f;
 	const float m_defaultBlue = 1.0f;
 
-	// Orange
+	// Orange color
 	const float m_hoverRed = 1.0f;
 	const float m_hoverGreen = 0.65f;
 	const float m_hoverBlue = 0.0f;
+
+	FMOD::System* m_pFMODSystem;
+	FMOD::Sound* m_pClickSound;
+	FMOD::Sound* m_pBgmSound;
+	FMOD::Channel* m_pBgmChannel;
+
+	// Layout for titlescreen
+	const float m_titleTopMargin = 0.25f;
+	const float m_titleButtonPadding = 50.0f;
+	const float m_buttonPadding = 30.0f;
 };
 
 #endif // __SCENETITLESCREEN_H__

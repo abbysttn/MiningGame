@@ -12,22 +12,46 @@
 
 // Lib includes
 #include "imgui/imgui.h"
+#include <algorithm>
 
-SceneTitlescreen::SceneTitlescreen()
+SceneTitlescreen::SceneTitlescreen(FMOD::System* fmodSystem)
 	: m_pStartBtnTexture(nullptr)
 	, m_pExitBtnTexture(nullptr)
 	, m_pStartBtnSprite(nullptr)
 	, m_pExitBtnSprite(nullptr)
 	, m_pBackgroundSprite(nullptr)
+	, m_pTitleSprite(nullptr)
 	, m_bisMouseOverStart(false)
 	, m_bisMouseOverExit(false)
 	, m_screenWidth(0.0f)
 	, m_screenHeight(0.0f)
+	, m_pFMODSystem(fmodSystem)
+	, m_pClickSound(nullptr)
+	, m_pBgmChannel(nullptr)
+	, m_pBgmSound(nullptr)
 {
 }
 
 SceneTitlescreen::~SceneTitlescreen()
 {
+	if (m_pBgmChannel)
+	{
+		m_pBgmChannel->stop();
+		m_pBgmChannel = nullptr;
+	}
+
+	if (m_pClickSound)
+	{
+		m_pClickSound->release();
+		m_pClickSound = nullptr;
+	}
+
+	if (m_pBgmSound)
+	{
+		m_pBgmSound->release();
+		m_pBgmSound = nullptr;
+	}
+
 	delete m_pStartBtnSprite;
 	m_pStartBtnSprite = nullptr;
 
@@ -36,6 +60,9 @@ SceneTitlescreen::~SceneTitlescreen()
 
 	delete m_pBackgroundSprite;
 	m_pBackgroundSprite = nullptr;
+
+	delete m_pTitleSprite;
+	m_pTitleSprite = nullptr;
 
 	delete m_pStartBtnTexture;
 	m_pStartBtnTexture = nullptr;
@@ -52,17 +79,21 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 	Game::GetInstance().m_pInputSystem->ShowMouseCursor(true);
 
 	// Background sprite
-	m_pBackgroundSprite = renderer.CreateSprite("../assets/titlescreen.png");
+	m_pBackgroundSprite = renderer.CreateSprite("../assets/titleBackground.png");
 	m_pBackgroundSprite->SetX(static_cast<int>(m_screenWidth / 2));
 	m_pBackgroundSprite->SetY(static_cast<int>(m_screenHeight / 2));
 	float bgScaleX = m_screenWidth / m_pBackgroundSprite->GetWidth();
 	float bgScaleY = m_screenHeight / m_pBackgroundSprite->GetHeight();
 	m_pBackgroundSprite->SetScale(std::max(bgScaleX, bgScaleY));
 
+	// Title sprite
+	m_pTitleSprite = renderer.CreateSprite("../assets/titleScreen.png");
+	m_pTitleSprite->SetX(static_cast<int>(m_screenWidth / 2));
+	m_pTitleSprite->SetY(static_cast<int>(m_screenHeight * m_titleTopMargin));
+
 	// Font
 	const char* fontName = "../game/silkscreen.ttf";
-	int buttonFontSize = 48;
-	int titleFontSize = 72;
+	int buttonFontSize = 38;
 
 	// Buttonz
 	m_pStartBtnTexture = new Texture();
@@ -89,12 +120,13 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 	// Start position
 	m_pStartBtnSprite->SetX(static_cast<int>(m_screenWidth / 2));
 	m_pStartBtnSprite->SetY(static_cast<int>(m_screenHeight / 2));
+	
 	// Color change when been hovered
 	m_pStartBtnSprite->SetRedTint(m_defaultRed);
 	m_pStartBtnSprite->SetGreenTint(m_defaultGreen);
 	m_pStartBtnSprite->SetBlueTint(m_defaultBlue);
 
-	// Exot button
+	// Exit button
 	m_pExitBtnTexture = new Texture();
 	m_pExitBtnTexture->LoadTextTexture("Exit Game", fontName, buttonFontSize);
 	if (m_pExitBtnTexture->GetWidth() == 0)
@@ -126,6 +158,29 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 	m_pExitBtnSprite->SetGreenTint(m_defaultGreen);
 	m_pExitBtnSprite->SetBlueTint(m_defaultBlue);
 
+	if (m_pFMODSystem)
+	{
+		FMOD_RESULT result;
+
+		// Button Sound
+		result = m_pFMODSystem->createSound("../assets/sound/Button_Click.mp3", FMOD_DEFAULT, 0, &m_pClickSound);
+		if (result != FMOD_OK)
+		{
+			LogManager::GetInstance().Log("Oops! Failed to load titlescreen button sound!");
+		}
+
+		// Title BGM
+		result = m_pFMODSystem->createSound("../assets/sound/BGM_Titlescreen.mp3", FMOD_LOOP_NORMAL | FMOD_2D, 0, &m_pBgmSound);
+		if (result != FMOD_OK)
+		{
+			LogManager::GetInstance().Log("Oops!! Failed to load Titlescreen BGM!!");
+		}
+		else
+		{
+			m_pFMODSystem->playSound(m_pBgmSound, nullptr, false, &m_pBgmChannel);
+		}
+	}
+
 	return true;
 }
 
@@ -144,6 +199,18 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 
 			if (inputSystem.GetMouseButtonState(SDL_BUTTON_LEFT) == BS_PRESSED)
 			{
+				if (m_pFMODSystem && m_pClickSound)
+				{
+					m_pFMODSystem->playSound(m_pClickSound, nullptr, false, nullptr);
+				}
+
+				if (m_pBgmChannel)
+				{
+					m_pBgmChannel->stop();
+
+					m_pBgmChannel = nullptr;
+				}
+
 				Game::GetInstance().SetCurrentScene(1);
 			}
 		}
@@ -168,6 +235,18 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 
 			if (inputSystem.GetMouseButtonState(SDL_BUTTON_LEFT) == BS_PRESSED)
 			{
+				if (m_pFMODSystem && m_pClickSound)
+				{
+					m_pFMODSystem->playSound(m_pClickSound, nullptr, false, nullptr);
+				}
+
+				if (m_pBgmChannel)
+				{
+					m_pBgmChannel->stop();
+
+					m_pBgmChannel = nullptr;
+				}
+
 				Game::GetInstance().Quit();
 			}
 		}
@@ -177,6 +256,11 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 			m_pExitBtnSprite->SetGreenTint(m_defaultGreen);
 			m_pExitBtnSprite->SetBlueTint(m_defaultBlue);
 		}
+	}
+
+	if (m_pFMODSystem)
+	{
+		m_pFMODSystem->update();
 	}
 }
 
@@ -188,6 +272,11 @@ void SceneTitlescreen::Draw(Renderer& renderer)
 	if (m_pBackgroundSprite)
 	{
 		m_pBackgroundSprite->Draw(renderer);
+	}
+
+	if (m_pTitleSprite)
+	{
+		m_pTitleSprite->Draw(renderer);
 	}
 
 	if (m_pStartBtnSprite)
