@@ -115,12 +115,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <ClCompile Include="particle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="particlesystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+=======
+>>>>>>> parent of 9118c24 (Fixed gem asset)
 =======
 >>>>>>> parent of 9118c24 (Fixed gem asset)
   </ItemGroup>
@@ -234,9 +237,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <ClInclude Include="particlesystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+=======
+>>>>>>> parent of 9118c24 (Fixed gem asset)
 =======
 >>>>>>> parent of 9118c24 (Fixed gem asset)
   </ItemGroup>
