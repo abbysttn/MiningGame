@@ -108,6 +108,7 @@
     <ClCompile Include="block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="scenetitlescreen.cpp">
     <ClCompile Include="font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -227,6 +228,7 @@
     <ClInclude Include="block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="scenetitlescreen.h">
     <ClInclude Include="font.h">
       <Filter>Header Files</Filter>
     </ClInclude>

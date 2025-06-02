@@ -9,6 +9,7 @@
 #include "xboxcontroller.h"
 #include <iostream>
 #include "ui.h"
+#include "logmanager.h"
 
 #include "grid.h"
 
@@ -18,7 +19,19 @@
 #include "imgui/imgui_impl_sdl2.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-SceneMain::SceneMain(FMOD::System* pFMODSystem) : m_grid(nullptr) {}
+SceneMain::SceneMain(FMOD::System* pFMODSystem) 
+    : m_grid(nullptr)
+    , m_tileSize(0.0f)
+    , m_screenWidth(0.0f)
+    , m_screenHeight(0.0f)
+    , m_pMineBackground(nullptr)
+    , m_pPlayer(nullptr)
+    , m_pFMODSystem(pFMODSystem)
+    , m_pCoinSprite(nullptr)
+    , m_pDirtSprite(nullptr)
+    , m_pBreakBlockSprite(nullptr)
+    , ui(nullptr)
+{}
 
 SceneMain::~SceneMain()
 {
@@ -53,11 +66,14 @@ SceneMain::~SceneMain()
 
 bool SceneMain::Initialise(Renderer& renderer)
 {
+    LogManager::GetInstance().Log("SceneMain is Initialising!");
+
+    m_pRenderer = &renderer;
     m_screenWidth = static_cast<float>(renderer.GetWidth());
     m_screenHeight = static_cast<float>(renderer.GetHeight());
 
     m_pMineBackground = renderer.CreateSprite("../assets/background.png");
-
+   
 
     float scaleX = static_cast<float>(renderer.GetWidth()) / m_pMineBackground->GetWidth();
     float scaleY = static_cast<float>(renderer.GetHeight()) / m_pMineBackground->GetHeight();
@@ -98,6 +114,8 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     renderer.SetCameraPosition(static_cast<float>(m_screenX), m_pMineBackground->GetHeight() * 0.1f);
 
+    m_bIsInitialised = true;
+    LogManager::GetInstance().Log("SceneMain Initialized complete");
     return true;
 }
 
@@ -214,26 +232,34 @@ void SceneMain::DebugDraw()
         ImGui::NewLine();
         ImGui::Text("Press Spacebar to hide/show");
         ImGui::Text("Debugging Tools:");
+        ImGui::Text("%.1f FPS | Frame time: %.3f ms", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
+
     }
 }
 
-int SceneMain::GetBackgroundHeight() {
+int SceneMain::GetBackgroundHeight() 
+{
     return m_pMineBackground->GetHeight();
 }
+
 void SceneMain::MoveCamera(Renderer& renderer) {
-
-
     m_playerY = static_cast<float>(m_pPlayer->GetPosition().y);
-    float scrollStart = static_cast<float>(m_pMineBackground->GetHeight())*0.1f;
-    float scrollStop = static_cast<float>(m_pMineBackground->GetHeight())*0.8315f; //change
 
+    float bgHeight = static_cast<float>(m_pMineBackground->GetHeight());
+    float screenHeight = static_cast<float>(renderer.GetHeight());
+
+    float scrollStart = screenHeight / 2.0f; // Player must be this far from top before scrolling starts
+    float scrollStop = bgHeight - screenHeight / 2.0f; // Player must be this far from bottom before scrolling stops
 
     if (m_playerY >= scrollStart && m_playerY <= scrollStop) {
         renderer.SetCameraPosition(static_cast<float>(m_screenX), m_playerY);
-
     }
-
-
+    else if (m_playerY < scrollStart) {
+        renderer.SetCameraPosition(static_cast<float>(m_screenX), scrollStart);
+    }
+    else if (m_playerY > scrollStop) {
+        renderer.SetCameraPosition(static_cast<float>(m_screenX), scrollStop);
+    }
 }
 
 
