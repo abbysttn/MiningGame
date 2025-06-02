@@ -31,6 +31,14 @@ public:
 	void SetDepth(int depth) { m_depth = depth; }
 
 	float GetPlayerHeight();
+	int GetDirt() const { return m_dirtCount; }
+	void SetDirt(int dirt) { m_dirtCount = std::max(0, dirt); }
+
+	int GetStone() const { return m_stoneCount; }
+	void SetStone(int stone) { m_stoneCount = std::max(0, stone); }
+
+	int GetGem() const { return m_gemCount; }
+	void SetGem(int gem) { m_gemCount = std::max(0, gem); }
 
 private:
 	float m_speed;
@@ -40,6 +48,10 @@ private:
 	float m_health;
 	float m_stamina;
 	int m_depth;
+
+	int m_dirtCount = 0;
+	int m_stoneCount = 0;
+	int m_gemCount = 0;
 };
 
 #endif // PLAYER_H
