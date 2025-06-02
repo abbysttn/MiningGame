@@ -8,6 +8,9 @@
 #include "fmod.hpp"
 #include "ui.h"
 
+#include "particle.h"
+#include "particlesystem.h"
+
 #include <vector>
 #include <map>
 #include <random>
@@ -48,6 +51,17 @@ private:
 	float m_playerY;
 
 	std::unique_ptr<UI> ui;
+
+
+	//Particle System
+
+	Sprite* m_pCoinSprite = nullptr;
+	Sprite* m_pDirtSprite = nullptr;
+	Sprite* m_pBreakBlockSprite = nullptr;
+
+
+	std::list<ParticleSystem> m_particleSystems;
+
 };
 
 #endif // __SceneMain_H__
