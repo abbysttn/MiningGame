@@ -30,6 +30,7 @@ public:
 	int GetDepth() const { return m_depth; }
 	void SetDepth(int depth) { m_depth = depth; }
 
+	float GetPlayerHeight();
 	int GetDirt() const { return m_dirtCount; }
 	void SetDirt(int dirt) { m_dirtCount = std::max(0, dirt); }
 

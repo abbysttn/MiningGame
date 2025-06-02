@@ -38,7 +38,7 @@ bool Player::Initialise(Renderer& renderer)
         return false;
     }
 
-    m_position = Vector2(m_pRenderer->GetWidth()*0.4f, m_pRenderer->GetHeight()*0.4f);
+    m_position = Vector2(m_pRenderer->GetWidth() * 0.4f, m_pRenderer->GetHeight() * 0.4f);
     m_bAlive = true;
     return true;
 }
@@ -114,6 +114,10 @@ void Player::Draw(Renderer& renderer)
         m_pAnimSprite->SetY(static_cast<int>(m_position.y));
         m_pAnimSprite->Draw(renderer);
     }
+}
+
+float Player::GetPlayerHeight(){
+    return m_pAnimSprite->GetHeight();
 }
 
 bool Player::IsKeyHeld(InputSystem& input, SDL_Scancode key)
