@@ -10,7 +10,6 @@ class Renderer;
 class Sprite;
 class Scene;
 class InputSystem;
-class GameStateManager;
 
 class Game
 {
@@ -75,8 +74,6 @@ protected:
 	InputSystem* m_pInputSystem;
 
 	bool m_bShowDebugWindow;
-
-	GameStateManager* m_stateManager;
 
 #ifdef USE_LAG
 	float m_fLag;

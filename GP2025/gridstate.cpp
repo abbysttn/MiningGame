@@ -38,15 +38,6 @@ void GridState::BreakBlock(Vector2 position, char direction)
 	case 'D': targetY++; break;
 	}
 
-	//fixes issue of first row not breaking
-	if (direction == 'D' && y == 0) {
-		targetY -= 2;
-	}
-
-	if (direction == 'U' && y <= 0) {
-		return;
-	}
-
 	targetX = max(0, min(targetX, m_gameGrid->GetColumns() - 1));
 	targetY = max(0, min(targetY, m_gameGrid->GetRows() - 1));
 
@@ -57,6 +48,32 @@ void GridState::BreakBlock(Vector2 position, char direction)
 	if (block != nullptr) {
 		block->BreakBlock();
 	}
+
+
+
+
+	/*Vector2 size = m_gameGrid->GetBlockSize();
+
+	switch (direction) {
+	case 'L':
+		position.x -= size.x * 0.8f;
+		break;
+	case 'R':
+		position.x += size.x * 0.8f;
+		break;
+	case 'U':
+		position.y -= size.y * 0.8f;
+		break;
+	case 'D':
+		position.y += size.y * 0.8f;
+		break;
+	}
+
+	Block* block = m_gameGrid->GetBlockFromGrid(position);
+
+	if (block != nullptr) {
+		block->BreakBlock();
+	}*/
 }
 
 void GridState::ResetGrid()
@@ -93,6 +110,9 @@ bool GridState::CheckCollision(Box& box)
 					(float)block->GetSpriteHeight());
 
 				if (CollisionHelper::IsColliding(blockBox, box)) {
+					LogManager::GetInstance().Log("Colliding");
+					m_collidingBlock = block;
+
 					return true;
 				}
 			}

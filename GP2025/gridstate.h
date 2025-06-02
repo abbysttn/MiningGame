@@ -43,7 +43,10 @@ private:
 public:
 
 protected:
+	//unordered_map<Block*, bool> m_itemStates; maybe for keeping track of broken blocks
 	Grid* m_gameGrid;
+
+	Block* m_collidingBlock;
 
 private:
 };

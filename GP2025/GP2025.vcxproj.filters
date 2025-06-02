@@ -114,12 +114,15 @@
     <ClCompile Include="ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="particle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="particlesystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+=======
+>>>>>>> parent of 9118c24 (Fixed gem asset)
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logmanager.h">
@@ -230,9 +233,12 @@
     <ClInclude Include="particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="particlesystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+=======
+>>>>>>> parent of 9118c24 (Fixed gem asset)
   </ItemGroup>
   <ItemGroup>
     <None Include="game\shaders\sprite.frag">
