@@ -167,6 +167,15 @@ bool Game::DoGameLoop()
 #endif //USE_LAG
 
 		Draw(*m_pRenderer);
+		//frame limiting
+		Uint64 frameEnd = SDL_GetPerformanceCounter();
+		float actualFrameTime = (frameEnd - current) / static_cast<float>(SDL_GetPerformanceFrequency());
+		float sleepTime = targetFrameTime - actualFrameTime;
+
+		if (sleepTime > 0.0f)
+		{
+			SDL_Delay(static_cast<Uint32>(sleepTime * 1000.0f));
+		}
 	}
 
 	return m_bLooping;

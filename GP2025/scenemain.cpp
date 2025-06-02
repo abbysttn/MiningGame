@@ -232,6 +232,8 @@ void SceneMain::DebugDraw()
         ImGui::NewLine();
         ImGui::Text("Press Spacebar to hide/show");
         ImGui::Text("Debugging Tools:");
+        ImGui::Text("%.1f FPS | Frame time: %.3f ms", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
+
     }
 }
 
@@ -241,19 +243,23 @@ int SceneMain::GetBackgroundHeight()
 }
 
 void SceneMain::MoveCamera(Renderer& renderer) {
-
-
     m_playerY = static_cast<float>(m_pPlayer->GetPosition().y);
-    float scrollStart = static_cast<float>(m_pMineBackground->GetHeight())*0.1f;
-    float scrollStop = static_cast<float>(m_pMineBackground->GetHeight())*0.8315f; //change
 
+    float bgHeight = static_cast<float>(m_pMineBackground->GetHeight());
+    float screenHeight = static_cast<float>(renderer.GetHeight());
+
+    float scrollStart = screenHeight / 2.0f; // Player must be this far from top before scrolling starts
+    float scrollStop = bgHeight - screenHeight / 2.0f; // Player must be this far from bottom before scrolling stops
 
     if (m_playerY >= scrollStart && m_playerY <= scrollStop) {
         renderer.SetCameraPosition(static_cast<float>(m_screenX), m_playerY);
-
     }
-
-
+    else if (m_playerY < scrollStart) {
+        renderer.SetCameraPosition(static_cast<float>(m_screenX), scrollStart);
+    }
+    else if (m_playerY > scrollStop) {
+        renderer.SetCameraPosition(static_cast<float>(m_screenX), scrollStop);
+    }
 }
 
 
