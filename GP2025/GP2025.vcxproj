@@ -149,6 +149,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gameobjectpool.cpp" />
     <ClCompile Include="grid.cpp" />
+    <ClCompile Include="gridstate.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="matrix4.cpp" />
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="particlesystem.cpp" />
+    <ClCompile Include="quadtree.cpp" />
     <ClCompile Include="scenemain.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="renderer.cpp" />
@@ -180,12 +182,14 @@
   <ItemGroup>
     <ClInclude Include="animatedsprite.h" />
     <ClInclude Include="block.h" />
+    <ClInclude Include="collisionhelper.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="font.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gameobject.h" />
     <ClInclude Include="gameobjectpool.h" />
     <ClInclude Include="grid.h" />
+    <ClInclude Include="gridstate.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_opengl3.h" />
@@ -202,6 +206,7 @@
     <ClInclude Include="particle.h" />
     <ClInclude Include="particlesystem.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="quadtree.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="scenecheckerboards.h" />

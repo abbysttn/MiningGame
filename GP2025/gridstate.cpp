@@ -1,4 +1,5 @@
 #include "gridstate.h"
+#include "gridstate.h"
 
 #include "gameobjectpool.h"
 #include "quadtree.h"
@@ -28,6 +29,19 @@ void GridState::BreakBlock(Vector2 position, char direction)
 	int x = static_cast<int>((position.x - m_gameGrid->GetScreenOffsets().x + (blockWidth / 2)) / blockWidth);
 	int y = static_cast<int>((position.y - m_gameGrid->GetScreenOffsets().y + (blockHeight / 2)) / blockHeight);
 
+	if (y == 0) {
+		if (direction != 'D' || (x != 4 && x != 5)) {
+			return;
+		}
+
+		if (position.y >= m_gameGrid->GetScreenOffsets().y) {
+			y = 0;
+		}
+		else {
+			y = -1;
+		}
+	}
+
 	int targetX = x;
 	int targetY = y;
 
@@ -36,6 +50,14 @@ void GridState::BreakBlock(Vector2 position, char direction)
 	case 'R': targetX++; break;
 	case 'U': targetY--; break;
 	case 'D': targetY++; break;
+	}
+
+	if (targetY < 0) {
+		return;
+	}
+
+	if (targetY == 0 && direction != 'D') {
+		return;
 	}
 
 	targetX = max(0, min(targetX, m_gameGrid->GetColumns() - 1));
@@ -48,32 +70,6 @@ void GridState::BreakBlock(Vector2 position, char direction)
 	if (block != nullptr) {
 		block->BreakBlock();
 	}
-
-
-
-
-	/*Vector2 size = m_gameGrid->GetBlockSize();
-
-	switch (direction) {
-	case 'L':
-		position.x -= size.x * 0.8f;
-		break;
-	case 'R':
-		position.x += size.x * 0.8f;
-		break;
-	case 'U':
-		position.y -= size.y * 0.8f;
-		break;
-	case 'D':
-		position.y += size.y * 0.8f;
-		break;
-	}
-
-	Block* block = m_gameGrid->GetBlockFromGrid(position);
-
-	if (block != nullptr) {
-		block->BreakBlock();
-	}*/
 }
 
 void GridState::ResetGrid()
@@ -110,9 +106,6 @@ bool GridState::CheckCollision(Box& box)
 					(float)block->GetSpriteHeight());
 
 				if (CollisionHelper::IsColliding(blockBox, box)) {
-					LogManager::GetInstance().Log("Colliding");
-					m_collidingBlock = block;
-
 					return true;
 				}
 			}
@@ -120,4 +113,9 @@ bool GridState::CheckCollision(Box& box)
 	}
 
 	return false;
+}
+
+float GridState::GetTileSize()
+{
+	return m_gameGrid->GetTileSize();
 }

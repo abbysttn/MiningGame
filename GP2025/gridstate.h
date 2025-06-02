@@ -34,6 +34,8 @@ public:
 
 	bool CheckCollision(Box& box);
 
+	float GetTileSize();
+
 protected:
 
 private:
@@ -43,10 +45,7 @@ private:
 public:
 
 protected:
-	//unordered_map<Block*, bool> m_itemStates; maybe for keeping track of broken blocks
 	Grid* m_gameGrid;
-
-	Block* m_collidingBlock;
 
 private:
 };

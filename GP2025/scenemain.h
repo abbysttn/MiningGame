@@ -35,7 +35,6 @@ public:
 	int GetBackgroundHeight();
 
 private:
-	Grid* m_grid;
 	float m_tileSize;
 	int m_aboveGroundOffset = 11; // Change later to correct above ground size
 

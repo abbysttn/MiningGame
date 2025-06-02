@@ -26,6 +26,8 @@ public:
 	virtual void Draw(Renderer& renderer);
 	virtual void DebugDraw();
 
+	float GetTileSize() { return m_tileSize; }
+
 	QuadTree& GetCollisionTree();
 
 	Vector2 GetBlockSize();

@@ -28,7 +28,7 @@ bool Grid::Initialise(Renderer& renderer)
 	float levelPixelHeight = m_rows * m_tileSize;
 
 	screenOffsetX = ((screenWidth - levelPixelWidth) / 2.0f) + (m_tileSize / 2.0f);
-	screenOffsetY = 330.0f + (m_tileSize / 2.0f);
+	screenOffsetY = screenHeight * 0.67f + (m_tileSize / 2.0f);
 
 	for (size_t y = 0; y < (size_t)m_rows; y++) {
 		for (size_t x = 0; x < (size_t)m_cols; x++) {
@@ -38,7 +38,9 @@ bool Grid::Initialise(Renderer& renderer)
 		}
 	}
 
-	m_collisionTree = make_unique<QuadTree>(Box(0.0f, 0.0f, (float)renderer.GetWidth(), (float)renderer.GetHeight()));
+	float fullScreenHeight = (float)renderer.GetHeight() + (m_rows * m_tileSize);
+
+	m_collisionTree = make_unique<QuadTree>(Box(0.0f, 0.0f, (float)renderer.GetWidth(), fullScreenHeight));
 
 	return true;
 }
@@ -153,15 +155,6 @@ bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 
 		m_blockSize.x = block->GetSpriteWidth();
 		m_blockSize.y = block->GetSpriteHeight();
-
-		//testing
-		if (y == 0 && (x == 4 || x == 5)) {
-			block->SetActive(false);
-		}
-
-		if (y == 1 && (x == 4 || x == 5 || x == 3)) {
-			block->SetActive(false);
-		}
 
 		return true;
 	}
