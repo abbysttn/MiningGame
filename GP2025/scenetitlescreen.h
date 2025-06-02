@@ -8,6 +8,7 @@ class Sprite;
 class Texture;
 class Renderer;
 class InputSystem;
+class Font;
 
 class SceneTitlescreen : public Scene
 {
@@ -37,6 +38,8 @@ protected:
 
 	Sprite* m_pBackgroundSprite;
 	Sprite* m_pTitleSprite;
+
+	Font* m_pButtonFont;
 
 	bool m_bisMouseOverStart;
 	bool m_bisMouseOverExit;

@@ -92,8 +92,8 @@ bool Game::Initialise()
 	bbHeight = m_pRenderer->GetHeight();
 
 	m_iLastTime = SDL_GetPerformanceCounter();
-
 	m_pRenderer->SetClearColour(0, 255, 255);
+
 	// Initialise FMOD
 	FMOD::System_Create(&m_pFMODSystem);
 	m_pFMODSystem->init(512, FMOD_INIT_NORMAL, 0);
@@ -261,6 +261,9 @@ void Game::SetCurrentScene(int sceneIndex)
 	if (sceneIndex >= 0 && sceneIndex < static_cast<int>(m_scenes.size()))
 	{
 		m_iCurrentScene = sceneIndex;
+
+		SceneMain* mainScene = dynamic_cast<SceneMain*>(m_scenes[m_iCurrentScene]);
+		m_pRenderer->SetSceneMain(mainScene);
 
 		if (m_pInputSystem)
 		{

@@ -29,6 +29,7 @@ SceneTitlescreen::SceneTitlescreen(FMOD::System* fmodSystem)
 	, m_pClickSound(nullptr)
 	, m_pBgmChannel(nullptr)
 	, m_pBgmSound(nullptr)
+	, m_pButtonFont(nullptr)
 {
 }
 
@@ -69,6 +70,9 @@ SceneTitlescreen::~SceneTitlescreen()
 
 	delete m_pExitBtnTexture;
 	m_pExitBtnTexture = nullptr;
+
+	delete m_pButtonFont;
+	m_pButtonFont = nullptr;
 }
 
 bool SceneTitlescreen::Initialise(Renderer& renderer)
@@ -77,6 +81,8 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 	m_screenHeight = static_cast<float>(renderer.GetHeight());
 
 	Game::GetInstance().m_pInputSystem->ShowMouseCursor(true);
+
+	SDL_Renderer* sdlRenderer = renderer.GetSDLRenderer();
 
 	// Background sprite
 	m_pBackgroundSprite = renderer.CreateSprite("../assets/titleBackground.png");
@@ -92,12 +98,15 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 	m_pTitleSprite->SetY(static_cast<int>(m_screenHeight * m_titleTopMargin));
 
 	// Font
-	const char* fontName = "../game/silkscreen.ttf";
+	const char* fontFilename = "../game/silkscreen.ttf";
 	int buttonFontSize = 38;
+
+	m_pButtonFont = new Font(fontFilename, buttonFontSize);
+	SDL_Color textColor = { 255, 255, 255, 255 };
 
 	// Buttonz
 	m_pStartBtnTexture = new Texture();
-	m_pStartBtnTexture->LoadTextTexture("Start Game", fontName, buttonFontSize);
+	m_pStartBtnTexture->LoadTextTexture(sdlRenderer, "Start Game", *m_pButtonFont, textColor);
 	if (m_pStartBtnTexture->GetWidth() == 0)
 	{
 		LogManager::GetInstance().Log("Failed to load start game button");
@@ -128,7 +137,7 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 
 	// Exit button
 	m_pExitBtnTexture = new Texture();
-	m_pExitBtnTexture->LoadTextTexture("Exit Game", fontName, buttonFontSize);
+	m_pExitBtnTexture->LoadTextTexture(sdlRenderer, "Exit Game", *m_pButtonFont, textColor);
 	if (m_pExitBtnTexture->GetWidth() == 0)
 	{
 		LogManager::GetInstance().Log("Failed to load start game button");

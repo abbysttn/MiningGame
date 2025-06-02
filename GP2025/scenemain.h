@@ -34,7 +34,6 @@ public:
 
 	int GetBackgroundHeight();
 
-
 private:
 	Grid* m_grid;
 	float m_tileSize;

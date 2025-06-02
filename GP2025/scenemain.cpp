@@ -9,6 +9,7 @@
 #include "xboxcontroller.h"
 #include <iostream>
 #include "ui.h"
+#include "logmanager.h"
 
 #include "grid.h"
 
@@ -18,7 +19,19 @@
 #include "imgui/imgui_impl_sdl2.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-SceneMain::SceneMain(FMOD::System* pFMODSystem) : m_grid(nullptr) {}
+SceneMain::SceneMain(FMOD::System* pFMODSystem) 
+    : m_grid(nullptr)
+    , m_tileSize(0.0f)
+    , m_screenWidth(0.0f)
+    , m_screenHeight(0.0f)
+    , m_pMineBackground(nullptr)
+    , m_pPlayer(nullptr)
+    , m_pFMODSystem(pFMODSystem)
+    , m_pCoinSprite(nullptr)
+    , m_pDirtSprite(nullptr)
+    , m_pBreakBlockSprite(nullptr)
+    , ui(nullptr)
+{}
 
 SceneMain::~SceneMain()
 {
@@ -53,11 +66,14 @@ SceneMain::~SceneMain()
 
 bool SceneMain::Initialise(Renderer& renderer)
 {
+    LogManager::GetInstance().Log("SceneMain is Initialising!");
+
+    m_pRenderer = &renderer;
     m_screenWidth = static_cast<float>(renderer.GetWidth());
     m_screenHeight = static_cast<float>(renderer.GetHeight());
 
     m_pMineBackground = renderer.CreateSprite("../assets/background.png");
-
+   
 
     float scaleX = static_cast<float>(renderer.GetWidth()) / m_pMineBackground->GetWidth();
     float scaleY = static_cast<float>(renderer.GetHeight()) / m_pMineBackground->GetHeight();
@@ -98,6 +114,8 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     renderer.SetCameraPosition(static_cast<float>(m_screenX), m_pMineBackground->GetHeight() * 0.1f);
 
+    m_bIsInitialised = true;
+    LogManager::GetInstance().Log("SceneMain Initialized complete");
     return true;
 }
 
@@ -217,9 +235,11 @@ void SceneMain::DebugDraw()
     }
 }
 
-int SceneMain::GetBackgroundHeight() {
+int SceneMain::GetBackgroundHeight() 
+{
     return m_pMineBackground->GetHeight();
 }
+
 void SceneMain::MoveCamera(Renderer& renderer) {
 
 

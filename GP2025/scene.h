@@ -6,6 +6,7 @@
 class Renderer;
 class InputSystem;
 
+
 // Class declaration:
 class Scene
 {
@@ -19,7 +20,10 @@ public:
 	virtual void DebugDraw() = 0;
 	virtual void Process(float deltaTime, InputSystem& inputSystem) = 0;
 
+	virtual bool IsInitialised() const { return m_bIsInitialised; }
+
 protected:
+	bool m_bIsInitialised = false;
 
 private:
 	Scene(const Scene& scene);
