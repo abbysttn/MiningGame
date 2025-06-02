@@ -60,3 +60,8 @@ TextureManager::AddTexture(const char* key, Texture* pTexture)
 {
 	m_pLoadedTextures[key] = pTexture;
 }
+
+void TextureManager::ClearAllTextures()
+{
+	m_pLoadedTextures.clear();
+}

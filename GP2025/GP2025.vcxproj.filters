@@ -114,6 +114,24 @@
     <ClCompile Include="quadtree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gamestatemanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scenesplashaut.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scenesplashfmod.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="splashautstate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="splashfmodstate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scenemainstate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logmanager.h">
@@ -222,6 +240,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="collisionhelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gamestate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gamestatemanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scenesplashaut.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scenesplashfmod.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="splashautstate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="splashfmodstate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scenemainstate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

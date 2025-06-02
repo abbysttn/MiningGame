@@ -22,6 +22,8 @@ public:
 
 	void AddTexture(const char* key, Texture* pTexture);
 
+	void ClearAllTextures();
+
 protected:
 
 private:

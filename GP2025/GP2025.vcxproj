@@ -147,6 +147,7 @@
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gameobjectpool.cpp" />
+    <ClCompile Include="gamestatemanager.cpp" />
     <ClCompile Include="grid.cpp" />
     <ClCompile Include="gridstate.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
@@ -166,7 +167,12 @@
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scenecheckerboards.cpp" />
+    <ClCompile Include="scenemainstate.cpp" />
+    <ClCompile Include="scenesplashaut.cpp" />
+    <ClCompile Include="scenesplashfmod.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="splashautstate.cpp" />
+    <ClCompile Include="splashfmodstate.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="texturemanager.cpp" />
@@ -182,6 +188,8 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="gameobject.h" />
     <ClInclude Include="gameobjectpool.h" />
+    <ClInclude Include="gamestate.h" />
+    <ClInclude Include="gamestatemanager.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="gridstate.h" />
     <ClInclude Include="imgui\imconfig.h" />
@@ -203,8 +211,13 @@
     <ClInclude Include="scene.h" />
     <ClInclude Include="scenecheckerboards.h" />
     <ClInclude Include="scenemain.h" />
+    <ClInclude Include="scenemainstate.h" />
+    <ClInclude Include="scenesplashaut.h" />
+    <ClInclude Include="scenesplashfmod.h" />
     <ClInclude Include="SDL_ttf.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="splashautstate.h" />
+    <ClInclude Include="splashfmodstate.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="texturemanager.h" />

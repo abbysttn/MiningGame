@@ -151,6 +151,11 @@ bool Renderer::InitialiseOpenGL(int screenWidth, int screenHeight)
 	return shadersLoaded;
 }
 
+void Renderer::ClearTextures()
+{
+	m_pTextureManager->ClearAllTextures();
+}
+
 void Renderer::Clear()
 {
 	glClearColor(m_fClearRed, m_fClearGreen, m_fClearBlue, 1.0f);

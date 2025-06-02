@@ -38,7 +38,9 @@ bool Grid::Initialise(Renderer& renderer)
 		}
 	}
 
-	m_collisionTree = make_unique<QuadTree>(Box(0.0f, 0.0f, (float)renderer.GetWidth(), (float)renderer.GetHeight()));
+	float fullScreenHeight = (float)renderer.GetHeight() + (m_rows * m_tileSize);
+
+	m_collisionTree = make_unique<QuadTree>(Box(0.0f, 0.0f, (float)renderer.GetWidth(), fullScreenHeight));
 
 	return true;
 }
@@ -99,7 +101,7 @@ Vector2 Grid::GetBlockSize()
 
 Block* Grid::GetBlockFromGrid(const Vector2 position) const
 {
-	int spriteIndex = position.y * m_cols + position.x;
+	int spriteIndex = (int)position.y * m_cols + (int)position.x;
 	Block* closestBlock = nullptr;
 
 	if (GameObject* obj = m_grid->getObjectAtIndex(spriteIndex)) {
@@ -151,8 +153,8 @@ bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 		block->Position().x = (x * m_tileSize) + screenOffsetX;
 		block->Position().y = (y * m_tileSize) + screenOffsetY;	
 
-		m_blockSize.x = block->GetSpriteWidth();
-		m_blockSize.y = block->GetSpriteHeight();
+		m_blockSize.x = (float)block->GetSpriteWidth();
+		m_blockSize.y = (float)block->GetSpriteHeight();
 
 		//testing
 		if (y == 0 && (x == 4 || x == 5)) {
