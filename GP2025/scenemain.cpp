@@ -9,8 +9,9 @@
 #include "xboxcontroller.h"
 #include <iostream>
 #include "ui.h"
+#include "logmanager.h"
 
-#include "grid.h"
+#include "gridstate.h"
 
 #include <fmod.hpp>
 #include <fmod_errors.h>
@@ -18,15 +19,25 @@
 #include "imgui/imgui_impl_sdl2.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-SceneMain::SceneMain(FMOD::System* pFMODSystem) : m_grid(nullptr) {}
+SceneMain::SceneMain(FMOD::System* pFMODSystem) 
+    : m_tileSize(0.0f)
+    , m_screenWidth(0.0f)
+    , m_screenHeight(0.0f)
+    , m_pMineBackground(nullptr)
+    , m_pPlayer(nullptr)
+    , m_pFMODSystem(pFMODSystem)
+    , m_pCoinSprite(nullptr)
+    , m_pDirtSprite(nullptr)
+    , m_pBreakBlockSprite(nullptr)
+    , ui(nullptr)
+{}
 
 SceneMain::~SceneMain()
 {
     delete m_pPlayer;
     m_pPlayer = nullptr;
 
-    delete m_grid;
-    m_grid = nullptr;
+    GridState::GetInstance().ResetGrid();
 
     if (m_pMineBackground) {
         delete m_pMineBackground;
@@ -58,11 +69,14 @@ SceneMain::~SceneMain()
 
 bool SceneMain::Initialise(Renderer& renderer)
 {
+    LogManager::GetInstance().Log("SceneMain is Initialising!");
+
+    m_pRenderer = &renderer;
     m_screenWidth = static_cast<float>(renderer.GetWidth());
     m_screenHeight = static_cast<float>(renderer.GetHeight());
 
     m_pMineBackground = renderer.CreateSprite("../assets/background.png");
-
+   
 
     float scaleX = static_cast<float>(renderer.GetWidth()) / m_pMineBackground->GetWidth();
     float scaleY = static_cast<float>(renderer.GetHeight()) / m_pMineBackground->GetHeight();
@@ -81,10 +95,9 @@ bool SceneMain::Initialise(Renderer& renderer)
         return false;
     }
 
-    m_grid = new Grid();
-    m_grid->Initialise(renderer);
+    GridState::GetInstance().CreateGrid(renderer);
 
-    m_tileSize = m_grid->GetTileSize();
+    m_tileSize = GridState::GetInstance().GetTileSize();
 
     ui = std::make_unique<UI>(&renderer);
     m_screenX = renderer.GetWidth();
@@ -106,15 +119,13 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     renderer.SetCameraPosition(static_cast<float>(m_screenX/2), m_pMineBackground->GetHeight() * 0.1f);
 
+    m_bIsInitialised = true;
+    LogManager::GetInstance().Log("SceneMain Initialized complete");
     return true;
 }
 
 void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 {
-
-
-
-
     if (m_pPlayer)
     {
         m_pPlayer->Process(deltaTime, inputSystem);
@@ -179,7 +190,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         m_particleSystems.push_back(std::move(ps));
     }
 
-    m_grid->Process(deltaTime, inputSystem);
+    GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
 
     ui->Update(m_pPlayer, m_pRenderer);
 
@@ -209,7 +220,7 @@ void SceneMain::Draw(Renderer& renderer){
         m_pMineBackground->Draw(renderer);
     }
 
-    m_grid->Draw(renderer);
+    GridState::GetInstance().DrawGrid(renderer);
 
     if (m_pPlayer) {
         m_pPlayer->Draw(renderer);
@@ -236,9 +247,11 @@ void SceneMain::DebugDraw()
     }
 }
 
-int SceneMain::GetBackgroundHeight() {
+int SceneMain::GetBackgroundHeight() 
+{
     return m_pMineBackground->GetHeight();
 }
+
 void SceneMain::MoveCamera(Renderer& renderer) {
     m_playerY = static_cast<float>(m_pPlayer->GetPosition().y);
 

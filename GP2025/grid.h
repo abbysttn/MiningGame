@@ -4,6 +4,7 @@
 #include "scene.h"
 #include <string>
 #include "vector2.h"
+#include <memory>
 
 using namespace std;
 
@@ -11,8 +12,10 @@ class Scene;
 class Renderer;
 class Sprite;
 class GameObjectPool;
+class Block;
 
-class EnemySpawner;
+class QuadTree;
+struct Box;
 
 class Grid : public Scene {
 public:
@@ -23,7 +26,18 @@ public:
 	virtual void Draw(Renderer& renderer);
 	virtual void DebugDraw();
 
-	float GetTileSize() const { return m_tileSize; }
+	float GetTileSize() { return m_tileSize; }
+
+	QuadTree& GetCollisionTree();
+
+	Vector2 GetBlockSize();
+	Block* GetBlockFromGrid(const Vector2 position) const;
+
+	int GetRows();
+	int GetColumns();
+
+	Vector2 GetScreenOffsets();
+
 
 protected:
 	bool InitObjects(Renderer& renderer, size_t x, size_t y);
@@ -38,14 +52,18 @@ protected:
 private:
 	GameObjectPool* m_grid;
 
+	unique_ptr<QuadTree> m_collisionTree;
+
 	float m_tileSize;
 
-	int m_cols = 30;
-	int m_rows = 5;
+	int m_cols = 12;
+	int m_rows = 100;
 	int m_count = m_rows * m_cols;
 
 	float screenOffsetX;
 	float screenOffsetY;
+
+	Vector2 m_blockSize;
 
 };
 

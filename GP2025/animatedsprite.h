@@ -31,6 +31,9 @@ public:
 	int GetHeight() const;
 	void DebugDraw();
 
+	void SetCurrentFrame(int frame);
+	bool FramesFinished();
+
 protected:
 
 private:
