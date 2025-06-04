@@ -20,7 +20,7 @@ public:
 	bool Initialise(Texture& texture);
 	void SetupFrames(int fixedFrameWidth, int fixedFrameHeight);
 	void Process(float deltaTime);
-	void Draw(Renderer& renderer);
+	void Draw(Renderer& renderer, bool flipHorizontal);
 
 	void SetLooping(bool loop);
 	void Animate();
@@ -30,6 +30,8 @@ public:
 	int GetWidth() const;
 	int GetHeight() const;
 	void DebugDraw();
+
+	void SetFlip(bool flipHorizontal) { m_flipHorizontal = flipHorizontal; }
 
 protected:
 
@@ -51,6 +53,7 @@ protected:
 	float totalTime;
 	bool m_bAnimating;
 	bool m_bLooping;
+	bool m_flipHorizontal;
 
 private:
 

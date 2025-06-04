@@ -10,6 +10,12 @@
 
 class Player : public Entity {
 
+enum PlayerAnimationState {
+	IDLE,
+	JUMP,
+	MINE
+};
+
 public:
 	Player();
 	~Player();
@@ -17,6 +23,8 @@ public:
 	bool Initialise(Renderer& renderer);
 	void Process(float deltaTime, InputSystem& inputSystem);
 	void Draw(Renderer& renderer);
+	void HandleMovement(float deltaTime, InputSystem& inputSystem);
+	void ClampToScreen();
 	bool IsKeyHeld(InputSystem& input, SDL_Scancode key);
 
 	Vector2 GetPosition() const { return m_position; };
@@ -40,6 +48,10 @@ public:
 	int GetGem() const { return m_gemCount; }
 	void SetGem(int gem) { m_gemCount = std::max(0, gem); }
 
+	void SetNoClip(bool noClip);
+
+	void LoadAnimatedSprites();
+
 private:
 	float m_speed;
 	Renderer* m_pRenderer;
@@ -52,6 +64,23 @@ private:
 	int m_dirtCount = 0;
 	int m_stoneCount = 0;
 	int m_gemCount = 0;
+
+	const float GRAVITY = 1000.0f; // Gravity in pixels per second squared
+	const float JUMP_FORCE = 500.0f; // Force applied when jumping
+	const float GROUND_Y = 700.0f; // Y position of temp ground
+
+	Vector2 m_Velocity;
+	bool m_OnGround = false;
+
+	bool m_noClip = false; 
+
+	PlayerAnimationState m_animationState = IDLE;
+
+	AnimatedSprite* m_pIdleSprite = nullptr;
+	AnimatedSprite* m_pJumpSprite = nullptr;
+	AnimatedSprite* m_pMineSprite = nullptr;
+
+	bool m_facingLeft = false;
 };
 
 #endif // PLAYER_H
