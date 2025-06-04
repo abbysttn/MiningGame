@@ -10,9 +10,12 @@
 #include "logmanager.h"
 #include "vector2.h"
 
+
+
 // Lib includes
 #include "imgui/imgui.h"
 #include <algorithm>
+#include <iostream>
 
 SceneTitlescreen::SceneTitlescreen(FMOD::System* fmodSystem)
 	: m_pStartBtnTexture(nullptr)
@@ -35,23 +38,7 @@ SceneTitlescreen::SceneTitlescreen(FMOD::System* fmodSystem)
 
 SceneTitlescreen::~SceneTitlescreen()
 {
-	if (m_pBgmChannel)
-	{
-		m_pBgmChannel->stop();
-		m_pBgmChannel = nullptr;
-	}
 
-	if (m_pClickSound)
-	{
-		m_pClickSound->release();
-		m_pClickSound = nullptr;
-	}
-
-	if (m_pBgmSound)
-	{
-		m_pBgmSound->release();
-		m_pBgmSound = nullptr;
-	}
 
 	delete m_pStartBtnSprite;
 	m_pStartBtnSprite = nullptr;
@@ -73,10 +60,32 @@ SceneTitlescreen::~SceneTitlescreen()
 
 	delete m_pButtonFont;
 	m_pButtonFont = nullptr;
+
+	m_tSoundSystem.Release();
+}
+
+void SceneTitlescreen::OnEnter() {
+	m_tSoundSystem.PlaySound("bgm");
+
+}
+
+void SceneTitlescreen::OnExit() {
+	m_tSoundSystem.StopSound("bgm");
+
 }
 
 bool SceneTitlescreen::Initialise(Renderer& renderer)
 {
+
+	if (!m_tSoundSystem.Initialise()) {
+		std::cerr << "Failed to initialise FMOD system!" << std::endl;
+		return false;
+	}
+	m_tSoundSystem.LoadSound("click", "../assets/sound/Button_Click.mp3");
+	m_tSoundSystem.LoadSound("bgm", "../assets/sound/BGM_Titlescreen.mp3", true);
+
+
+
 	m_screenWidth = static_cast<float>(renderer.GetWidth());
 	m_screenHeight = static_cast<float>(renderer.GetHeight());
 
@@ -167,28 +176,8 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 	m_pExitBtnSprite->SetGreenTint(m_defaultGreen);
 	m_pExitBtnSprite->SetBlueTint(m_defaultBlue);
 
-	if (m_pFMODSystem)
-	{
-		FMOD_RESULT result;
+	m_tSoundSystem.PlaySound("bgm");
 
-		// Button Sound
-		result = m_pFMODSystem->createSound("../assets/sound/Button_Click.mp3", FMOD_DEFAULT, 0, &m_pClickSound);
-		if (result != FMOD_OK)
-		{
-			LogManager::GetInstance().Log("Oops! Failed to load titlescreen button sound!");
-		}
-
-		// Title BGM
-		result = m_pFMODSystem->createSound("../assets/sound/BGM_Titlescreen.mp3", FMOD_LOOP_NORMAL | FMOD_2D, 0, &m_pBgmSound);
-		if (result != FMOD_OK)
-		{
-			LogManager::GetInstance().Log("Oops!! Failed to load Titlescreen BGM!!");
-		}
-		else
-		{
-			m_pFMODSystem->playSound(m_pBgmSound, nullptr, false, &m_pBgmChannel);
-		}
-	}
 
 	return true;
 }
@@ -208,17 +197,8 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 
 			if (inputSystem.GetMouseButtonState(SDL_BUTTON_LEFT) == BS_PRESSED)
 			{
-				if (m_pFMODSystem && m_pClickSound)
-				{
-					m_pFMODSystem->playSound(m_pClickSound, nullptr, false, nullptr);
-				}
 
-				if (m_pBgmChannel)
-				{
-					m_pBgmChannel->stop();
-
-					m_pBgmChannel = nullptr;
-				}
+				m_tSoundSystem.PlaySound("click");
 
 				Game::GetInstance().SetCurrentScene(1);
 			}
@@ -244,17 +224,12 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 
 			if (inputSystem.GetMouseButtonState(SDL_BUTTON_LEFT) == BS_PRESSED)
 			{
-				if (m_pFMODSystem && m_pClickSound)
+				if (m_pClickSound)
 				{
-					m_pFMODSystem->playSound(m_pClickSound, nullptr, false, nullptr);
+					m_tSoundSystem.PlaySound("click");
 				}
 
-				if (m_pBgmChannel)
-				{
-					m_pBgmChannel->stop();
-
-					m_pBgmChannel = nullptr;
-				}
+				m_tSoundSystem.StopSound("bgm");
 
 				Game::GetInstance().Quit();
 			}
@@ -271,6 +246,8 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 	{
 		m_pFMODSystem->update();
 	}
+
+	m_tSoundSystem.Update();
 }
 
 void SceneTitlescreen::Draw(Renderer& renderer)

@@ -116,7 +116,7 @@ bool Game::Initialise()
 	}
 	m_scenes.push_back(pTitleScene);
 
-	Scene* pMainScene = new SceneMain(m_pFMODSystem);
+	Scene* pMainScene = new SceneMain();
 	if (!pMainScene->Initialise(*m_pRenderer))
 	{
 		// Debugging stuff
@@ -195,13 +195,6 @@ void Game::Process(float deltaTime)
 		ToggleDebugWindow();
 	}
 
-	// Quit Game
-	ButtonState escapeState = m_pInputSystem->GetKeyState(SDL_SCANCODE_ESCAPE);
-	if (escapeState == BS_PRESSED)
-	{
-		std::cout << "Escape pressed" << std::endl;
-		Quit();
-	}
 }
 
 void Game::Draw(Renderer& renderer)
@@ -271,7 +264,10 @@ void Game::SetCurrentScene(int sceneIndex)
 {
 	if (sceneIndex >= 0 && sceneIndex < static_cast<int>(m_scenes.size()))
 	{
+		m_scenes[m_iCurrentScene]->OnExit();
 		m_iCurrentScene = sceneIndex;
+		m_scenes[m_iCurrentScene]->OnEnter();
+
 
 		SceneMain* mainScene = dynamic_cast<SceneMain*>(m_scenes[m_iCurrentScene]);
 		m_pRenderer->SetSceneMain(mainScene);

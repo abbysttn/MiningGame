@@ -6,11 +6,16 @@
 #include "player.h"
 #include "entity.h"
 
+#include "soundsystem.h"
+
+
+
 class Player;
 enum class ParticleType {
     BlockPickup,
     BlockBreak,
-    DigDirt
+    DigDirt,
+    WaterDrop
 };
 class Particle {
 public:
@@ -23,6 +28,13 @@ public:
     void SetTargetPosition(Vector2 target);
     bool IsAlive() const;
     void SetPlayer(Player* player);
+
+
+    ParticleType GetType() const { return m_type; }
+    Vector2 GetVelocity() const { return m_velocity; }
+    bool CheckPlayedSound() const { return m_hasPlayedSound; }
+    void SetSoundPlayed() { m_hasPlayedSound = true; }
+
 
 private:
     Sprite* m_pSprite = nullptr;
@@ -39,6 +51,12 @@ private:
     Player* m_pPlayer;
 
     const float m_gravity = 600.0f;
+
+    bool m_hasPlayedSound = false;
+
+
+
+
 
 };
 #endif // PARTICLE_H
