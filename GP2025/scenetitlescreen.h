@@ -2,7 +2,11 @@
 #define __SCENETITLESCREEN_H__
 
 #include "scene.h"
-#include "fmod.hpp"
+
+
+#include <fmod.hpp>
+#include <fmod_errors.h>
+#include "soundsystem.h"
 
 class Sprite;
 class Texture;
@@ -21,6 +25,9 @@ public:
 	virtual void Process(float deltaTime, InputSystem& inputSystem);
 	virtual void Draw(Renderer& renderer);
 	virtual void DebugDraw();
+
+	void OnEnter() override;
+	void OnExit() override;
 
 private:
 	SceneTitlescreen(const SceneTitlescreen& scene);
@@ -61,6 +68,10 @@ protected:
 	FMOD::Sound* m_pClickSound;
 	FMOD::Sound* m_pBgmSound;
 	FMOD::Channel* m_pBgmChannel;
+
+
+	SoundSystem m_tSoundSystem;
+
 
 	// Layout for titlescreen
 	const float m_titleTopMargin = 0.25f;

@@ -1,8 +1,23 @@
 #include "particlesystem.h"
 
+
+
+
+
+
+ParticleSystem::ParticleSystem() {
+
+}
+
+ParticleSystem::~ParticleSystem() {
+    //m_soundSystem.Release();
+}
+
 void ParticleSystem::Initialise(Sprite* sprite, Player* player, int maxParticles, ParticleType type) {
     m_pSprite = sprite;
     m_particles.clear();
+
+
     for (int i = 0; i < maxParticles; ++i) {
         Particle particle;
         particle.Initialise(sprite, type);
@@ -23,6 +38,7 @@ void ParticleSystem::Update(float deltaTime) {
     for (Particle& particle : m_particles) {
         particle.Update(deltaTime);
     }
+
 }
 
 void ParticleSystem::Draw(Renderer& renderer) {

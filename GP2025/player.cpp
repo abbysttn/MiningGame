@@ -146,7 +146,7 @@ void Player::Draw(Renderer& renderer)
 }
 
 float Player::GetPlayerHeight(){
-    return m_pAnimSprite->GetHeight();
+    return static_cast<float>(m_pAnimSprite->GetHeight());
 }
 
 bool Player::IsKeyHeld(InputSystem& input, SDL_Scancode key)

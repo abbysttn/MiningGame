@@ -8,6 +8,9 @@
 #include "fmod.hpp"
 #include "ui.h"
 
+#include "soundsystem.h"
+
+
 #include "particle.h"
 #include "particlesystem.h"
 
@@ -23,7 +26,7 @@ class Grid;
 class SceneMain : public Scene
 {
 public:
-	SceneMain(FMOD::System* pFMODSystem);
+	SceneMain();
 	~SceneMain();
 
 	bool Initialise(Renderer& renderer) override;
@@ -32,7 +35,16 @@ public:
 	void MoveCamera(Renderer& renderer);
 	void DebugDraw() override;
 
+	void SpawnWaterDrops();
+	void ProcessParticles(float time);
+
+	void TestingFeatures(InputSystem& inputSystem);
+
 	int GetBackgroundHeight();
+
+	void OnEnter() override;
+	void OnExit() override;
+
 
 private:
 	float m_tileSize;
@@ -47,8 +59,15 @@ private:
 	FMOD::System* m_pFMODSystem;
 	int m_screenX;
 	float m_playerY;
+	float m_waterDropInterval = 1.0f;
+	float m_timer;
+	int m_activeDrops;
+
+	bool m_paused = false;
 
 	std::unique_ptr<UI> ui;
+
+	SoundSystem m_soundSystem;
 
 
 	//Particle System
@@ -56,6 +75,7 @@ private:
 	Sprite* m_pCoinSprite = nullptr;
 	Sprite* m_pDirtSprite = nullptr;
 	Sprite* m_pBreakBlockSprite = nullptr;
+	Sprite* m_pWaterDropSprite = nullptr;
 
 
 	std::list<ParticleSystem> m_particleSystems;
