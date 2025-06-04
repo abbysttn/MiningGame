@@ -1,7 +1,7 @@
 #include "block.h"
 
 #include "renderer.h"
-#include "sprite.h"
+#include "animatedsprite.h"
 
 #include <cstdlib>
 #include "inlinehelper.h"
@@ -9,7 +9,7 @@
 
 #include <string>
 
-Block::Block() : m_sprite(0) {}
+Block::Block() : m_sprite(0), m_isBroken(false) {}
 
 Block::~Block()
 {
@@ -22,7 +22,10 @@ bool Block::Initialise(Renderer& renderer, int depth)
 	m_depth = depth;
 	GetBlockType(m_depth, m_filepath);
 
-	m_sprite = renderer.CreateSprite(m_filepath);
+	m_sprite = renderer.CreateAnimatedSprite(m_filepath);
+	m_sprite->SetupFrames(8, 8);
+	m_sprite->SetLooping(false);
+	m_sprite->SetFrameDuration(m_animatingTime);
 
 	if (!m_sprite) {
 		LogManager::GetInstance().Log("Failed to load block.");
@@ -40,6 +43,24 @@ void Block::Process(float deltaTime)
 	if (m_active) {
 		m_sprite->SetX(static_cast<int>(m_position.x));
 		m_sprite->SetY(static_cast<int>(m_position.y));
+
+		if (m_isBreaking) {
+			if (m_isBreaking && m_currentTime == 0.0f) {
+				m_currentBlockStatus++;
+				m_sprite->SetCurrentFrame(m_currentBlockStatus);
+			}
+
+			m_currentTime += deltaTime;
+
+			if (m_currentTime >= m_animatingTime) {
+				m_isBreaking = false;
+				m_currentTime = 0.0f;
+				if (m_sprite->FramesFinished()) {
+					m_isBroken = true;
+					m_active = false;
+				}
+			}
+		}		
 	}
 	m_sprite->Process(deltaTime);
 }
@@ -59,6 +80,11 @@ void Block::SetColour(float red, float green, float blue)
 	m_sprite->SetRedTint(red);
 	m_sprite->SetGreenTint(green);
 	m_sprite->SetBlueTint(blue);
+}
+
+int Block::GetSpriteHeight()
+{
+	return m_sprite->GetHeight();
 }
 
 int Block::GetSpriteWidth() const
@@ -91,6 +117,13 @@ void Block::SetActive(bool active)
 	m_active = active;
 }
 
+void Block::BreakBlock()
+{
+	if (!m_isBroken && !m_isBreaking) {
+		m_isBreaking = true;
+	}
+}
+
 void Block::GetBlockType(int& depth, const char*& filepath)
 {
 	float percentage = 0.0f;
@@ -99,10 +132,10 @@ void Block::GetBlockType(int& depth, const char*& filepath)
 	if (depth < 40) {
 		percentage = 0.00f;
 	}
-	else if (depth < 50) {
+	else if (depth < 50 && depth > 40) {
 		percentage = 0.05f;
 	}
-	else if (depth < 70) {
+	else if (depth < 70 && depth > 50) {
 		percentage = 0.15f;
 	}
 	else if (depth >= 71) {
@@ -110,7 +143,6 @@ void Block::GetBlockType(int& depth, const char*& filepath)
 	}
 
 	float chance = GetRandomPercentage();
-	LogManager::GetInstance().Log(std::to_string(chance).c_str());
 
 	if (chance <= percentage) {
 		IsGem = true;

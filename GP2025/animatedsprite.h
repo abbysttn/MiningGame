@@ -32,6 +32,8 @@ public:
 	void DebugDraw();
 
 	void SetFlip(bool flipHorizontal) { m_flipHorizontal = flipHorizontal; }
+	void SetCurrentFrame(int frame);
+	bool FramesFinished();
 
 protected:
 

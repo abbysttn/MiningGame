@@ -3,6 +3,9 @@
 #include "sprite.h"
 #include "animatedsprite.h"
 
+#include "gridstate.h"
+#include "quadtree.h"
+
 #include "vector2.h"
 #include "xboxcontroller.h"
 
@@ -41,7 +44,8 @@ bool Player::Initialise(Renderer& renderer)
         return false;
     }
 
-    m_position = Vector2(m_pRenderer->GetWidth() * 0.4f, m_pRenderer->GetHeight() * 0.4f);
+    m_position = { 400, 300 };
+    //m_position = Vector2(m_pRenderer->GetWidth() * 0.4f, m_pRenderer->GetHeight() * 0.4f);
     m_bAlive = true;
     return true;
 }
@@ -75,6 +79,11 @@ void Player::HandleMovement(float deltaTime, InputSystem& inputSystem) {
 
     if (IsKeyHeld(inputSystem, SDL_SCANCODE_A) || IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT))  direction.x -= 1.0f;
     if (IsKeyHeld(inputSystem, SDL_SCANCODE_D) || IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) direction.x += 1.0f;
+
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_UP))    GridState::GetInstance().BreakBlock(m_position, 'U');
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN))  GridState::GetInstance().BreakBlock(m_position, 'D');
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT))  GridState::GetInstance().BreakBlock(m_position, 'L');
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) GridState::GetInstance().BreakBlock(m_position, 'R');
 
     //controller input
     if (inputSystem.GetNumberOfControllersAttached() > 0) {
@@ -171,6 +180,32 @@ void Player::ClampToScreen()
 
     float wallMarginX = screenWidth * 0.00f;  // 2% horizontal margin (for the walls)
     float wallMarginY = screenHeight * 0.00f; // PLayer can't move past the top 5%
+    //move the player
+    Vector2 testPos = m_position;
+
+    //fixes issue with player collision box
+    float paddingX = (m_pAnimSprite->GetWidth() / 2.0f) + 5.0f;
+    float paddingY = (m_pAnimSprite->GetHeight() / 3.0f) - 20.0f;
+
+    testPos += direction * m_speed * deltaTime;
+
+    Box testBoxX(testPos.x + paddingX, m_position.y + paddingY, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
+
+    if (!GridState::GetInstance().CheckCollision(testBoxX)) {
+        m_position.x = testPos.x;
+    }
+
+    Box testBoxY(m_position.x + paddingX, testPos.y + paddingY, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
+
+    if (!GridState::GetInstance().CheckCollision(testBoxY)) {
+        m_position.y = testPos.y;
+    }
+
+    //clamp to screen with halfWidth, to prevent clipping outside screen
+    
+
+    float wallMarginX = screenWidth * 0.00f;  //2% horizontal margin (for the walls)
+    float wallMarginY = screenHeight * 0.00f; //PLayer can't move past the top 5%
 
     float minX = wallMarginX + spriteHalfWidth;
     float maxX = screenWidth - wallMarginX - spriteHalfWidth;
