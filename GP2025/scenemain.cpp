@@ -69,6 +69,14 @@ SceneMain::~SceneMain()
 
 }
 
+void SceneMain::OnEnter() {
+    m_paused = false;
+};
+
+void SceneMain::OnExit()
+{
+};
+
 bool SceneMain::Initialise(Renderer& renderer)
 {
     LogManager::GetInstance().Log("SceneMain is Initialising!");
@@ -134,30 +142,44 @@ bool SceneMain::Initialise(Renderer& renderer)
 
 void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 {
-
-    m_timer += deltaTime;
-
-    if (m_pPlayer)
+    
+    //quit to menu
+    ButtonState escapeState = inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE);
+    if (escapeState == BS_PRESSED)
     {
-        m_pPlayer->Process(deltaTime, inputSystem);
-        m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
+        m_paused = true;
+        std::cout << "Escape pressed" << std::endl;
+        Game::GetInstance().SetCurrentScene(0);
     }
 
 
-    TestingFeatures(inputSystem);
+    if (!m_paused) {
+        m_timer += deltaTime;
+
+        if (m_pPlayer)
+        {
+            m_pPlayer->Process(deltaTime, inputSystem);
+            m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
+        }
 
 
-    SpawnWaterDrops();
-
-    GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
-
-    ui->Update(m_pPlayer, m_pRenderer);
+        TestingFeatures(inputSystem);
 
 
-    ProcessParticles(deltaTime);
+        SpawnWaterDrops();
+
+        GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
+
+        ui->Update(m_pPlayer, m_pRenderer);
 
 
-    m_soundSystem.Update();
+        ProcessParticles(deltaTime);
+
+
+        m_soundSystem.Update();
+    }
+
+
 
 }
 

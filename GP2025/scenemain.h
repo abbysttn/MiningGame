@@ -42,6 +42,9 @@ public:
 
 	int GetBackgroundHeight();
 
+	void OnEnter() override;
+	void OnExit() override;
+
 
 private:
 	float m_tileSize;
@@ -59,6 +62,8 @@ private:
 	float m_waterDropInterval = 1.0f;
 	float m_timer;
 	int m_activeDrops;
+
+	bool m_paused = false;
 
 	std::unique_ptr<UI> ui;
 

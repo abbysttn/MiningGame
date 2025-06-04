@@ -26,6 +26,9 @@ public:
 	virtual void Draw(Renderer& renderer);
 	virtual void DebugDraw();
 
+	void OnEnter() override;
+	void OnExit() override;
+
 private:
 	SceneTitlescreen(const SceneTitlescreen& scene);
 	SceneTitlescreen& operator=(const SceneTitlescreen& scene);

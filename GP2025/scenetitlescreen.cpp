@@ -64,6 +64,16 @@ SceneTitlescreen::~SceneTitlescreen()
 	m_tSoundSystem.Release();
 }
 
+void SceneTitlescreen::OnEnter() {
+	m_tSoundSystem.PlaySound("bgm");
+
+}
+
+void SceneTitlescreen::OnExit() {
+	m_tSoundSystem.StopSound("bgm");
+
+}
+
 bool SceneTitlescreen::Initialise(Renderer& renderer)
 {
 
@@ -72,7 +82,7 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 		return false;
 	}
 	m_tSoundSystem.LoadSound("click", "../assets/sound/Button_Click.mp3");
-	m_tSoundSystem.LoadSound("bgm", "../assets/sound/BGM_Titlescreen.mp3");
+	m_tSoundSystem.LoadSound("bgm", "../assets/sound/BGM_Titlescreen.mp3", true);
 
 
 
@@ -187,9 +197,6 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 
 			if (inputSystem.GetMouseButtonState(SDL_BUTTON_LEFT) == BS_PRESSED)
 			{
-
-				m_tSoundSystem.StopSound("bgm");
-
 
 				m_tSoundSystem.PlaySound("click");
 
