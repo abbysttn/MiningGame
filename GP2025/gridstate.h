@@ -43,9 +43,9 @@ private:
 	GridState& operator=(const GridState& gridState);
 
 public:
+	Grid* m_gameGrid;
 
 protected:
-	Grid* m_gameGrid;
 
 private:
 };

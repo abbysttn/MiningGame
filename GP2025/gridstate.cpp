@@ -1,5 +1,4 @@
 #include "gridstate.h"
-#include "gridstate.h"
 
 #include "gameobjectpool.h"
 #include "quadtree.h"
@@ -22,28 +21,29 @@ GameObjectPool* GridState::GetPool()
 
 void GridState::BreakBlock(Vector2 position, char direction)
 {
-	Vector2 gridCoords;
-	float blockWidth = m_gameGrid->GetBlockSize().x;
-	float blockHeight = m_gameGrid->GetBlockSize().y;
+	float blockSize = m_gameGrid->GetBlockSize().x; // equals tileSize
+	Vector2 offset = m_gameGrid->GetScreenOffsets();
 
-	int x = static_cast<int>((position.x - m_gameGrid->GetScreenOffsets().x + (blockWidth / 2)) / blockWidth);
-	int y = static_cast<int>((position.y - m_gameGrid->GetScreenOffsets().y + (blockHeight / 2)) / blockHeight);
+	Vector2 gridCoords;
+
+	int x = static_cast<int>((position.x - offset.x + (blockSize / 2)) / blockSize);
+	int y = static_cast<int>((position.y - offset.y + (blockSize / 2)) / blockSize);
+
+	int targetX = x;
+	int targetY = y;
 
 	if (y == 0) {
 		if (direction != 'D' || (x != 4 && x != 5)) {
 			return;
 		}
 
-		if (position.y >= m_gameGrid->GetScreenOffsets().y) {
+		if (position.y >= offset.y) {
 			y = 0;
 		}
 		else {
 			y = -1;
 		}
 	}
-
-	int targetX = x;
-	int targetY = y;
 
 	switch (direction) {
 	case 'L': targetX--; break;
@@ -102,8 +102,11 @@ bool GridState::CheckCollision(Box& box)
 	for (auto* object : potentialCollision) {
 		if (Block* block = dynamic_cast<Block*>(object)) {
 			if (block->IsActive()) {
-				Box blockBox(block->Position().x, block->Position().y, (float)block->GetSpriteWidth(),
-					(float)block->GetSpriteHeight());
+				float tileSize = m_gameGrid->GetBlockSize().x;
+				Box blockBox(block->Position().x,
+					block->Position().y,
+					tileSize,
+					tileSize);
 
 				if (CollisionHelper::IsColliding(blockBox, box)) {
 					return true;
@@ -117,5 +120,5 @@ bool GridState::CheckCollision(Box& box)
 
 float GridState::GetTileSize()
 {
-	return m_gameGrid->GetTileSize();
+	return m_gameGrid->GetBlockSize().x;
 }

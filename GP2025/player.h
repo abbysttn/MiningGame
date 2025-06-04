@@ -5,6 +5,7 @@
 #include "inputsystem.h"
 //#include "renderer.h"
 //#include "scenemain.h"
+#include "imgui/imgui.h"
 #include <cmath>
 #include <algorithm>
 
@@ -52,6 +53,8 @@ public:
 
 	void LoadAnimatedSprites();
 
+	void DrawCollision(float cameraX, float cameraY);
+
 private:
 	float m_speed;
 	Renderer* m_pRenderer;
@@ -67,7 +70,7 @@ private:
 
 	const float GRAVITY = 1000.0f; // Gravity in pixels per second squared
 	const float JUMP_FORCE = 500.0f; // Force applied when jumping
-	const float GROUND_Y = 700.0f; // Y position of temp ground
+	//const float GROUND_Y = 700.0f; // Y position of temp ground
 
 	Vector2 m_Velocity;
 	bool m_OnGround = false;

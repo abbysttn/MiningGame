@@ -2,7 +2,7 @@
 #include "renderer.h"
 #include "sprite.h"
 #include "animatedsprite.h"
-
+#include "imgui/imgui.h"
 #include "gridstate.h"
 #include "quadtree.h"
 
@@ -69,104 +69,139 @@ void Player::Draw(Renderer& renderer)
     }
 }
 
-void Player::HandleMovement(float deltaTime, InputSystem& inputSystem) {
+void Player::HandleMovement(float deltaTime, InputSystem& input)
+{
+    // 1) Read input into direction (X and Y for no-clip; X only if gravity is on).
     Vector2 direction(0.0f, 0.0f);
 
-	if (m_noClip == true) { // No up or down movement unless noclipping
-        if (IsKeyHeld(inputSystem, SDL_SCANCODE_W) || IsKeyHeld(inputSystem, SDL_SCANCODE_UP))    direction.y -= 1.0f;
-        if (IsKeyHeld(inputSystem, SDL_SCANCODE_S) || IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN))  direction.y += 1.0f;
+    if (m_noClip) {
+        if (IsKeyHeld(input, SDL_SCANCODE_W) || IsKeyHeld(input, SDL_SCANCODE_UP))    direction.y -= 1.0f;
+        if (IsKeyHeld(input, SDL_SCANCODE_S) || IsKeyHeld(input, SDL_SCANCODE_DOWN))  direction.y += 1.0f;
+    }
+    if (IsKeyHeld(input, SDL_SCANCODE_A) || IsKeyHeld(input, SDL_SCANCODE_LEFT))  direction.x -= 1.0f;
+    if (IsKeyHeld(input, SDL_SCANCODE_D) || IsKeyHeld(input, SDL_SCANCODE_RIGHT)) direction.x += 1.0f;
+
+    // Normalize diagonal movement:
+    if (direction.x != 0.0f || direction.y != 0.0f) {
+        float len = sqrtf(direction.x * direction.x + direction.y * direction.y);
+        direction.x /= len;
+        direction.y /= len;
     }
 
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_A) || IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT))  direction.x -= 1.0f;
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_D) || IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) direction.x += 1.0f;
+    // 2) Jump / Gravity (only if not nop-clip):
+    float spriteW = (float)m_pAnimSprite->GetWidth() * m_pAnimSprite->GetScale();
+    float spriteH = (float)m_pAnimSprite->GetHeight() * m_pAnimSprite->GetScale();
 
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_UP))    GridState::GetInstance().BreakBlock(m_position, 'U');
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN))  GridState::GetInstance().BreakBlock(m_position, 'D');
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT))  GridState::GetInstance().BreakBlock(m_position, 'L');
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) GridState::GetInstance().BreakBlock(m_position, 'R');
-
-    //controller input
-    if (inputSystem.GetNumberOfControllersAttached() > 0) {
-        XboxController* controller = inputSystem.GetController(0);
-        if (controller != nullptr && controller->IsConnected())
-        {
-            Vector2 stick = controller->GetLeftStick();
-
-            //normalise
-            const float MAX_AXIS = 32768.0f;
-            Vector2 controllerDir(stick.x / MAX_AXIS, stick.y / MAX_AXIS);
-
-            //deadzone handling
-            const float DEADZONE = 0.2f;
-            if (std::abs(controllerDir.x) > DEADZONE || std::abs(controllerDir.y) > DEADZONE)
-            {
-                direction = controllerDir;
-            }
-        }
-    }
-
-    //normalising to prevent faster diagonal movement
-    if (direction.x != 0.0f || direction.y != 0.0f)
-    {
-        float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-        direction.x /= length;
-        direction.y /= length;
-    }
-
-    // Jumping
-    if (m_noClip == false) {
-        if (m_OnGround && IsKeyHeld(inputSystem, SDL_SCANCODE_SPACE))
-        {
-            m_Velocity.y = -450.0f;
+    if (!m_noClip) {
+        // If on ground and space is pressed, give an initial upward velocity:
+        if (m_OnGround && IsKeyHeld(input, SDL_SCANCODE_SPACE)) {
+            m_Velocity.y = -450.0f;   // jump impulse
             m_OnGround = false;
-        }
-
-        if (!m_OnGround) {
-			// Play jump/fall animation
-            if (m_animationState != JUMP)
-            {
+            // switch to jumping animation...
+            if (m_animationState != JUMP) {
                 m_pAnimSprite = m_pJumpSprite;
-				m_pAnimSprite->Restart();
-                m_pAnimSprite->Animate();
+                m_pAnimSprite->Restart();
                 m_animationState = JUMP;
             }
-
-            // Apply gravity
-            m_Velocity.y += GRAVITY * deltaTime;
         }
 
-        // Apply Vertical Movement
-        m_position.y += m_Velocity.y * deltaTime;
+        // Only apply gravity if we are not on the ground:
+        if (!m_OnGround) {
+            m_Velocity.y += GRAVITY * deltaTime;
+        }
+    }
 
-        // Reset jump and velocity on ground
-        if (m_position.y >= GROUND_Y)
-        {
-            m_position.y = GROUND_Y;
+    // 3) Build the collision box parameters (we’ll reuse for both X and Y):
+    //    We want the box to be 70% as wide, 50% as tall, and flush with the bottom of the sprite:
+    float boxW = spriteW * 0.7f;
+    float boxH = spriteH;
+    float boxOffsetX = (spriteW - boxW) * 0.5f;   // center horizontally under sprite
+    float boxOffsetY = spriteH - boxH;            // push down so bottom half
+
+    Vector2 offset = GridState::GetInstance().m_gameGrid->GetScreenOffsets();
+    float   tileSize = GridState::GetInstance().GetTileSize();
+
+    // BREAKABLE BLOCKS:  
+    // If you hold arrow keys, break blocks in that direction:
+    if (!m_noClip) {
+        if (IsKeyHeld(input, SDL_SCANCODE_UP))    GridState::GetInstance().BreakBlock(m_position, 'U');
+        if (IsKeyHeld(input, SDL_SCANCODE_DOWN))  GridState::GetInstance().BreakBlock(m_position, 'D');
+        if (IsKeyHeld(input, SDL_SCANCODE_LEFT))  GridState::GetInstance().BreakBlock(m_position, 'L');
+        if (IsKeyHeld(input, SDL_SCANCODE_RIGHT)) GridState::GetInstance().BreakBlock(m_position, 'R');
+    }
+
+    // CONTROLLER (optional):
+    if (input.GetNumberOfControllersAttached() > 0) {
+        XboxController* c = input.GetController(0);
+        if (c && c->IsConnected()) {
+            Vector2 stick = c->GetLeftStick();
+            const float MAXAXIS = 32768.0f;
+            Vector2 cdir(stick.x / MAXAXIS, stick.y / MAXAXIS);
+            const float DEADZONE = 0.2f;
+            if (fabsf(cdir.x) > DEADZONE || fabsf(cdir.y) > DEADZONE) {
+                direction = cdir;
+                // If in no-clip mode, it overrides arrow keys; if gravity mode, we only care about X
+            }
+        }
+    }
+
+    // 4) HORIZONTAL MOVEMENT TEST:
+    float desiredX = m_position.x + direction.x * m_speed * deltaTime;
+    Box boxX(desiredX + boxOffsetX,
+        m_position.y + boxOffsetY,
+        boxW,
+        boxH);
+    if (!GridState::GetInstance().CheckCollision(boxX)) {
+        m_position.x = desiredX;
+    }
+    // face left/right:
+    if (direction.x < 0.0f)  m_facingLeft = true;
+    else if (direction.x > 0.0f) m_facingLeft = false;
+
+    // 5) VERTICAL MOVEMENT TEST:
+    float desiredY = m_position.y + m_Velocity.y * deltaTime;
+    Box boxY(m_position.x + boxOffsetX,
+        desiredY + boxOffsetY,
+        boxW, boxH);
+
+    if (!m_noClip) {
+        if (!GridState::GetInstance().CheckCollision(boxY)) {
+            m_position.y = desiredY;
+            m_OnGround = false;
+        }
+        else {
+            // We hit something vertically (either ground or ceiling).
+            // Figure out if this is a ground collision (player falling onto tile):
+            float boxBottom = desiredY + boxOffsetY + boxH;                    // world Y where box hits
+            int   collidedRow = static_cast<int>(floor((boxBottom - offset.y) / tileSize));
+            if (collidedRow < 0) collidedRow = 0;
+            // Top of that row in world Y:
+            float rowTopY = offset.y + (static_cast<float>(collidedRow) * tileSize);
+
+            // Snap so boxBottom == rowTopY:
+            float newY = rowTopY - boxH - boxOffsetY;
+            m_position.y = newY;
             m_Velocity.y = 0.0f;
             m_OnGround = true;
 
-            if (m_animationState != IDLE)
-            {
+            // Switch back to idle animation:
+            if (m_animationState != IDLE) {
                 m_pAnimSprite = m_pIdleSprite;
-				m_pAnimSprite->Restart();
+                m_pAnimSprite->Restart();
                 m_animationState = IDLE;
             }
         }
-        else
-        {
-            m_OnGround = false;
-        }
+    }
+    else {
+        // In no-clip, just move vertically without collision:
+        m_position.y = desiredY;
     }
 
-    //move the player
-    m_position += direction * m_speed * deltaTime;
+    // 6) CLAMP TO SCREEN (unchanged):
+    ClampToScreen();
 
-    if (direction.x < 0.0f) {
-        m_facingLeft = true;
-    }
-    else if (direction.x > 0.0f) {
-        m_facingLeft = false;
-    }
+    // 7) Finally, tell your sprite to animate:
+    m_pAnimSprite->Process(deltaTime);
 }
 
 void Player::ClampToScreen()
@@ -180,32 +215,6 @@ void Player::ClampToScreen()
 
     float wallMarginX = screenWidth * 0.00f;  // 2% horizontal margin (for the walls)
     float wallMarginY = screenHeight * 0.00f; // PLayer can't move past the top 5%
-    //move the player
-    Vector2 testPos = m_position;
-
-    //fixes issue with player collision box
-    float paddingX = (m_pAnimSprite->GetWidth() / 2.0f) + 5.0f;
-    float paddingY = (m_pAnimSprite->GetHeight() / 3.0f) - 20.0f;
-
-    testPos += direction * m_speed * deltaTime;
-
-    Box testBoxX(testPos.x + paddingX, m_position.y + paddingY, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
-
-    if (!GridState::GetInstance().CheckCollision(testBoxX)) {
-        m_position.x = testPos.x;
-    }
-
-    Box testBoxY(m_position.x + paddingX, testPos.y + paddingY, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
-
-    if (!GridState::GetInstance().CheckCollision(testBoxY)) {
-        m_position.y = testPos.y;
-    }
-
-    //clamp to screen with halfWidth, to prevent clipping outside screen
-    
-
-    float wallMarginX = screenWidth * 0.00f;  //2% horizontal margin (for the walls)
-    float wallMarginY = screenHeight * 0.00f; //PLayer can't move past the top 5%
 
     float minX = wallMarginX + spriteHalfWidth;
     float maxX = screenWidth - wallMarginX - spriteHalfWidth;
@@ -230,7 +239,7 @@ void Player::LoadAnimatedSprites() {
 
     m_pJumpSprite->SetupFrames(32, 32);
     m_pJumpSprite->SetLooping(false);
-    m_pJumpSprite->SetFrameDuration(0.1f);
+    m_pJumpSprite->SetFrameDuration(0.05f);
     m_pJumpSprite->Animate();
     m_pJumpSprite->SetScale(1.9f);
 
@@ -262,3 +271,31 @@ void Player::SetNoClip(bool noClip)
 }
 
 
+void Player::DrawCollision(float cameraX, float cameraY)
+{
+    float spriteW = static_cast<float>(m_pAnimSprite->GetWidth()) * m_pAnimSprite->GetScale();
+    float spriteH = static_cast<float>(m_pAnimSprite->GetHeight()) * m_pAnimSprite->GetScale();
+
+    float boxW = spriteW * 0.7f;
+    float boxH = 10.0f;
+
+    float boxOffsetX = (spriteW - boxW) * 0.5f;
+    float boxOffsetY = spriteH - boxH;
+    float worldRectX = m_position.x + boxOffsetX;
+    float worldRectY = m_position.y + boxOffsetY;
+
+    float screenRectX = worldRectX - cameraX;
+    float screenRectY = worldRectY - cameraY;
+
+    ImVec2 topLeft(
+        screenRectX,
+        screenRectY
+    );
+    ImVec2 bottomRight(
+        screenRectX + boxW,
+        screenRectY + boxH
+    );
+
+    ImU32 col = IM_COL32(255, 0, 0, 255);
+    ImGui::GetForegroundDrawList()->AddRect(topLeft, bottomRight, col);
+}

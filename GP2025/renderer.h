@@ -76,6 +76,8 @@ private:
 
 	// Member data:
 public:
+	float m_cameraX = 0.0f;
+	float m_cameraY = 0.0f;
 
 protected:
 	TextureManager* m_pTextureManager;
@@ -97,8 +99,6 @@ protected:
 
 private:
 	float m_zoom = 1.0f;
-	float m_cameraX = 0.0f;
-	float m_cameraY = 0.0f;
 };
 
 #endif // RENDERER_H

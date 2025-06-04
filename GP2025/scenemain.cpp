@@ -214,6 +214,8 @@ void SceneMain::Draw(Renderer& renderer){
         ps.Draw(renderer);
     }
 
+    m_pPlayer->DrawCollision(renderer.m_cameraX, renderer.m_cameraY);
+
     ui->Render(); // Draw Last
 }
 

@@ -7,7 +7,7 @@
 #include "renderer.h"
 #include "sprite.h"
 
-Grid::Grid() : m_tileSize(48.0f), m_grid(nullptr) {}
+Grid::Grid() : m_grid(nullptr) {}
 
 Grid::~Grid()
 {
@@ -23,6 +23,7 @@ bool Grid::Initialise(Renderer& renderer)
 	float screenHeight = (float)renderer.GetHeight();
 
 	m_tileSize = (screenWidth / ((float)m_cols));
+	m_blockWorldSize = m_tileSize; // actual on-screen size of tiles
 
 	float levelPixelWidth = m_cols * m_tileSize;
 	float levelPixelHeight = m_rows * m_tileSize;
@@ -38,9 +39,9 @@ bool Grid::Initialise(Renderer& renderer)
 		}
 	}
 
-	float fullScreenHeight = (float)renderer.GetHeight() + (m_rows * m_tileSize);
+	float fullScreenHeight = screenHeight + (m_rows * m_tileSize);
 
-	m_collisionTree = make_unique<QuadTree>(Box(0.0f, 0.0f, (float)renderer.GetWidth(), fullScreenHeight));
+	m_collisionTree = make_unique<QuadTree>(Box(0.0f, 0.0f, screenWidth, fullScreenHeight));
 
 	return true;
 }
@@ -57,13 +58,11 @@ void Grid::Process(float deltaTime, InputSystem& inputSystem)
 					block->Process(deltaTime);
 
 					if (block && block->IsActive()) {
-						float blockSize = (float)block->GetSpriteWidth();
 						Box blockRange(
 							block->Position().x,
 							block->Position().y,
-							blockSize,
-							blockSize
-						);
+							m_blockWorldSize,
+							m_blockWorldSize);
 
 						m_collisionTree->insert(block, blockRange);
 					}
@@ -96,7 +95,7 @@ QuadTree& Grid::GetCollisionTree()
 
 Vector2 Grid::GetBlockSize()
 {
-	return m_blockSize;
+	return Vector2(m_blockWorldSize, m_blockWorldSize);
 }
 
 Block* Grid::GetBlockFromGrid(const Vector2 position) const
@@ -145,9 +144,7 @@ bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 		}
 
 		float spriteWidth = (float)block->GetSpriteWidth();
-
 		float scaleFactor = m_tileSize / spriteWidth;
-
 		block->SetScale(scaleFactor);
 
 		block->Position().x = (x * m_tileSize) + screenOffsetX;
