@@ -116,7 +116,7 @@ bool Game::Initialise()
 	}
 	m_scenes.push_back(pTitleScene);
 
-	Scene* pMainScene = new SceneMain(m_pFMODSystem);
+	Scene* pMainScene = new SceneMain();
 	if (!pMainScene->Initialise(*m_pRenderer))
 	{
 		// Debugging stuff

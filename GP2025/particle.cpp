@@ -1,5 +1,9 @@
 #include "particle.h"
 
+#include "gridstate.h"
+#include "quadtree.h"
+
+
 #include <fmod.hpp>
 #include <fmod_errors.h>
 
@@ -11,8 +15,6 @@ Particle::Particle() {}
 void Particle::Initialise(Sprite* sprite, ParticleType type) {
     m_pSprite = sprite;
     m_type = type;
-
-
 }
 
 void Particle::Activate(Vector2 position) {
@@ -80,7 +82,7 @@ void Particle::Activate(Vector2 position) {
             m_pSprite->SetAlpha(0.35f);
         }
         m_speedMultiplier = 400.0f;
-        m_velocity = Vector2(0.0f, 0.0f);
+        m_velocity = Vector2(0.0f, 0.1f);
         m_maxLifetime = 4.0f;
         break;
     }
@@ -146,7 +148,9 @@ void Particle::Update(float deltaTime) {
     else if (m_type == ParticleType::DigDirt) {
         m_velocity.y += m_gravity * deltaTime;
         m_velocity.x *= 0.99f;
-        if (m_position.y <= (m_pPlayer->GetPosition().y + m_pPlayer->GetPlayerHeight()/2)) {
+        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2, m_position.y, 1.0f, GridState::GetInstance().GetTileSize() / 2);
+
+        if (!GridState::GetInstance().CheckCollision(pticle)) {
             m_position += m_velocity * deltaTime;
         }
 
@@ -158,10 +162,12 @@ void Particle::Update(float deltaTime) {
     else if (m_type == ParticleType::BlockBreak) {
         m_velocity.y += m_gravity * deltaTime;
         m_velocity.x *= 0.992f;
-        if (m_position.y <= (m_pPlayer->GetPosition().y + m_pPlayer->GetPlayerHeight() / 2)) {
-            m_position += m_velocity * deltaTime;
+        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2, m_position.y, 1.0f, GridState::GetInstance().GetTileSize() / 2);
 
+        if (!GridState::GetInstance().CheckCollision(pticle)) {
+            m_position += m_velocity * deltaTime;
         }
+
 
 
         if (m_lifetime > m_maxLifetime) {
@@ -169,13 +175,18 @@ void Particle::Update(float deltaTime) {
         }
     }
     else if (m_type == ParticleType::WaterDrop) {
-        m_velocity.y += m_gravity * deltaTime;
+        m_velocity.y += m_gravity * deltaTime * 3.5f;
         m_velocity.x *= 0.992f;
-        if (m_position.y <= (m_pPlayer->GetPosition().y + m_pPlayer->GetPlayerHeight() / 2)) {
+
+        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2, m_position.y, 1.0f, GridState::GetInstance().GetTileSize() / 2);
+
+        if (!GridState::GetInstance().CheckCollision(pticle)) {
             m_position += m_velocity * deltaTime;
-
         }
-
+        else {
+            m_velocity.y = 0.0f;
+            m_pSprite->SetAlpha(m_pSprite->GetAlpha() * 0.995f);
+        }
 
         if (m_lifetime > m_maxLifetime) {
             m_active = false;
@@ -187,6 +198,7 @@ void Particle::Update(float deltaTime) {
             m_active = false;
         }
     }
+
 }
 
 void Particle::Draw(Renderer& renderer) {
