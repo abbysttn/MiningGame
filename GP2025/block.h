@@ -12,7 +12,7 @@ public:
 	Block();
 	virtual ~Block();
 
-	bool Initialise(Renderer& renderer, int depth);
+	bool Initialise(Renderer& renderer, int depth, int x);
 	void Process(float deltaTime);
 	void Draw(Renderer& renderer);
 	Vector2& Position();
@@ -27,10 +27,17 @@ public:
 	void SetScale(float scale);
 	void SetActive(bool active);
 
+	void SetBreakable(bool canBreak);
+	bool CanBreak();
+
 	void BreakBlock();
+	bool BlockBroken();
+	char GetBlockType();
+	int GetResourceAmount();
+	bool ResourcesGiven();
 
 protected:
-	void GetBlockType(int& depth, const char*& filepath);
+	void GetBlockType(int& depth, const char*& filepath, int x);
 
 private:
 	Block(const Block& edge);
@@ -46,11 +53,14 @@ protected:
 
 	int m_depth;
 	const char* m_filepath;
+	char m_blockType;
+	bool m_resourceGiven = false;
+	bool m_canBreak = true;
 
 	bool m_isBroken;
 	bool m_isBreaking = false;
 	int m_currentBlockStatus = 0;
-	float m_animatingTime = 0.5f;
+	float m_animatingTime = 0.1f;
 	float m_currentTime = 0.0f;
 
 private:

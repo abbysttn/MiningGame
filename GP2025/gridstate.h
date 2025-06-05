@@ -36,6 +36,12 @@ public:
 
 	float GetTileSize();
 
+	int GetDirt() const { return m_dirtCount; }
+
+	int GetStone() const { return m_stoneCount; }
+
+	int GetGem() const { return m_gemCount; }
+
 protected:
 
 private:
@@ -46,6 +52,10 @@ public:
 
 protected:
 	Grid* m_gameGrid;
+
+	int m_dirtCount = 0;
+	int m_stoneCount = 0;
+	int m_gemCount = 0;
 
 private:
 };

@@ -137,7 +137,7 @@ bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 	if (GameObject* obj = m_grid->getObject()) {
 		Block* block = dynamic_cast<Block*>(obj);
 
-		block->Initialise(renderer, y);
+		block->Initialise(renderer, y, x);
 
 		if (!block) {
 			m_grid->release(block);
@@ -155,6 +155,10 @@ bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 
 		m_blockSize.x = static_cast<float>(block->GetSpriteWidth());
 		m_blockSize.y = static_cast<float>(block->GetSpriteHeight());
+
+		if (y == 0 && (x != 4 && x != 5 && x != 6)) {
+			block->SetBreakable(false);
+		}
 
 		return true;
 	}

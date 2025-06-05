@@ -9,6 +9,8 @@
 
 #include "logmanager.h"
 
+#include <string>
+
 void GridState::CreateGrid(Renderer& renderer)
 {
 	m_gameGrid = new Grid();
@@ -30,10 +32,6 @@ void GridState::BreakBlock(Vector2 position, char direction)
 	int y = static_cast<int>((position.y - m_gameGrid->GetScreenOffsets().y + (blockHeight / 2)) / blockHeight);
 
 	if (y == 0) {
-		if (direction != 'D' || (x != 4 && x != 5)) {
-			return;
-		}
-
 		if (position.y >= m_gameGrid->GetScreenOffsets().y) {
 			y = 0;
 		}
@@ -56,10 +54,6 @@ void GridState::BreakBlock(Vector2 position, char direction)
 		return;
 	}
 
-	if (targetY == 0 && direction != 'D') {
-		return;
-	}
-
 	targetX = max(0, min(targetX, m_gameGrid->GetColumns() - 1));
 	targetY = max(0, min(targetY, m_gameGrid->GetRows() - 1));
 
@@ -68,7 +62,25 @@ void GridState::BreakBlock(Vector2 position, char direction)
 	Block* block = m_gameGrid->GetBlockFromGrid(gridCoords);
 
 	if (block != nullptr) {
-		block->BreakBlock();
+		if (block->CanBreak()) {
+			block->BreakBlock();
+
+			if (block->ResourcesGiven()) {
+				return;
+			}
+
+			if (block->BlockBroken()) {
+				char blockType = block->GetBlockType();
+
+				switch (blockType) {
+
+				case 'G': m_gemCount += block->GetResourceAmount(); break;
+				case 'D': m_dirtCount += block->GetResourceAmount(); break;
+				case 'S': m_stoneCount += block->GetResourceAmount(); break;
+
+				}
+			}
+		}
 	}
 }
 

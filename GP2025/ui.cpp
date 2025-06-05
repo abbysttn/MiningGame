@@ -10,9 +10,7 @@
 #include "player.h"
 #include <iostream>
 
-UI::UI(Renderer* renderer)
-	: m_pRenderer(renderer)
-	, m_font(std::make_unique<Font>("../assets/fonts/joystix.otf", 24))
+UI::UI(Renderer* renderer) : m_pRenderer(renderer) , m_font(std::make_unique<Font>("../assets/fonts/joystix.otf", 24))
 {
 	m_screenWidth = static_cast<float>(m_pRenderer->GetWidth());
 	m_screenHeight = static_cast<float>(m_pRenderer->GetHeight());
