@@ -29,7 +29,7 @@ bool Spider::Initialise(Renderer& renderer, const char* filepath)
 	}
 
 	m_position.x = 500;
-	m_position.y = 550;
+	m_position.y = 300;
 	return true;
 }
 

@@ -43,6 +43,8 @@ protected:
 	float Distance(Vector2 a, Vector2 b);
 	Vector2 Normalise(Vector2 c);
 
+	void Move(Vector2 direction, float deltaTime);
+
 private:
 	SpiderState(const SpiderState& spiderState);
 	SpiderState& operator=(const SpiderState& spiderState);
@@ -58,6 +60,9 @@ protected:
 
 	Vector2 m_target;
 	float m_attackRange = 100.0f;
+
+	float m_spiderWidth;
+	float m_spiderHeight;
 
 private:
 };

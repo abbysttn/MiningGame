@@ -5,6 +5,7 @@
 #include "renderer.h"
 
 #include "collisionhelper.h"
+#include "gridstate.h"
 
 #include <string>
 
@@ -54,6 +55,9 @@ void SpiderState::InitialiseSpiders(Renderer& renderer)
 			if (i == m_currentState) {
 				spider->SetAlive(true);
 			}
+
+			m_spiderWidth = (float)spider->GetSpriteWidth();
+			m_spiderHeight = (float)spider->GetSpriteHeight();
 		}
 	}
 }
@@ -107,7 +111,7 @@ void SpiderState::UpdateAI(float deltaTime)
 		break;
 
 	case 1:
-		m_spiderPos += direction * 50.0f * deltaTime;
+		Move(direction, deltaTime);
 
 		if (distanceToTarget > 200.0f) {
 			SetState(IDLE);
@@ -189,16 +193,38 @@ float SpiderState::Distance(Vector2 a, Vector2 b)
 	float dx = b.x - a.x;
 	float dy = b.y - a.y;
 
-	return sqrt(dx * dx + dy * dy);
+	return sqrtf(dx * dx + dy * dy);
 }
 
 Vector2 SpiderState::Normalise(Vector2 c)
 {
-	float length = sqrt(c.x * c.x + c.y * c.y);
+	float length = sqrtf(c.x * c.x + c.y * c.y);
 	
 	if (length > 0) {
 		return Vector2(c.x / length, c.y / length);
 	}
 
 	return Vector2(0, 0);
+}
+
+void SpiderState::Move(Vector2 direction, float deltaTime)
+{
+	Vector2 testPos = m_spiderPos;
+
+	testPos += direction * 50.0f * deltaTime;
+
+	float paddingX = (m_spiderWidth / 2.0f) + 5.0f;
+	float paddingY = (m_spiderHeight / 2.0f) + 20.0f;
+
+	Box testBoxX(testPos.x + paddingX, m_spiderPos.y + paddingY, m_spiderWidth, m_spiderHeight);
+
+	if (!GridState::GetInstance().CheckCollision(testBoxX)) {
+		m_spiderPos.x = testPos.x;
+	}
+
+	Box testBoxY(m_spiderPos.x + paddingX, testPos.y + paddingY, m_spiderWidth, m_spiderHeight);
+
+	if (!GridState::GetInstance().CheckCollision(testBoxY)) {
+		m_spiderPos.y = testPos.y;
+	}
 }

@@ -129,7 +129,7 @@ bool SceneMain::Initialise(Renderer& renderer)
         }
     }
 
-    GridState::GetInstance().CreateGrid(renderer);
+    GridState::GetInstance().CreateGrid(renderer, scaledHeight);
 
     m_tileSize = GridState::GetInstance().GetTileSize();
 
