@@ -21,7 +21,7 @@
 #include <list>
 #include <string>
 
-class Grid;
+#include "spiderstate.h"
 
 class SceneMain : public Scene
 {
@@ -69,6 +69,7 @@ private:
 
 	SoundSystem m_soundSystem;
 
+	SpiderState* m_testSpider;
 
 	//Particle System
 

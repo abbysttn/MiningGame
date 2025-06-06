@@ -28,13 +28,16 @@ SceneMain::SceneMain()
     , m_pCoinSprite(nullptr)
     , m_pDirtSprite(nullptr)
     , m_pBreakBlockSprite(nullptr)
-    , ui(nullptr)
+    , ui(nullptr), m_testSpider(nullptr)
 {}
 
 SceneMain::~SceneMain()
 {
     delete m_pPlayer;
     m_pPlayer = nullptr;
+
+    delete m_testSpider;
+    m_testSpider = nullptr;
 
     GridState::GetInstance().ResetGrid();
 
@@ -111,6 +114,10 @@ bool SceneMain::Initialise(Renderer& renderer)
         return false;
     }
 
+    m_testSpider = new SpiderState();
+    m_testSpider->InitialiseSpiders(renderer);
+    m_testSpider->SetActive(true);
+
     GridState::GetInstance().CreateGrid(renderer);
 
     m_tileSize = GridState::GetInstance().GetTileSize();
@@ -168,6 +175,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
         SpawnWaterDrops();
 
+        m_testSpider->Update(deltaTime);
+
         GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
 
         ui->Update(m_pPlayer, m_pRenderer);
@@ -200,6 +209,8 @@ void SceneMain::Draw(Renderer& renderer){
     if (m_pPlayer) {
         m_pPlayer->Draw(renderer);
     }
+
+    m_testSpider->Draw(renderer);
 
     //draw active particles
     for (auto& ps : m_particleSystems) {
