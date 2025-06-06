@@ -40,7 +40,6 @@
     <ClCompile Include="soundsystem.cpp" />
     <ClCompile Include="spider.cpp" />
     <ClCompile Include="spiderstate.cpp" />
-    <ClCompile Include="spiderai.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animatedsprite.h" />
@@ -87,7 +86,6 @@
     <ClInclude Include="soundsystem.h" />
     <ClInclude Include="spiderstate.h" />
     <ClInclude Include="spider.h" />
-    <ClInclude Include="spiderai.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="game\shaders\sprite.frag" />

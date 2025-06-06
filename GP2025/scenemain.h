@@ -22,6 +22,7 @@
 #include <string>
 
 #include "spiderstate.h"
+#include "gameobjectpool.h"
 
 class SceneMain : public Scene
 {
@@ -69,7 +70,8 @@ private:
 
 	SoundSystem m_soundSystem;
 
-	SpiderState* m_testSpider;
+	GameObjectPool* m_testSpider;
+
 
 	//Particle System
 

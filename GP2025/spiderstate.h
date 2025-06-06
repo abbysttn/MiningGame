@@ -9,25 +9,39 @@ enum SpiderStates {
 	DIE = 4
 };
 
+#include "gameobject.h"
+#include "vector2.h"
+
 class Spider;
 class GameObjectPool;
 class Renderer;
 
-class SpiderState {
+class SpiderState : public GameObject {
 public:
 	SpiderState();
 	~SpiderState();
 
 	void InitialiseSpiders(Renderer& renderer);
 	void SetState(SpiderStates newState);
-	void Update(float deltaTime);
+	void Update(float deltaTime, Vector2 playerPos);
 	void Draw(Renderer& renderer);
 
+	void UpdateAI(float deltaTime);
+
+	virtual int GetSpriteWidth() const override;
+	virtual GameObject* Create() const override;
+	virtual bool IsActive() const override;
+	virtual void Reset() override;
+
 	void SetActive(bool active);
+	void SetPosition(Vector2 pos);
 
 protected:
 	void EnterState(SpiderStates newState);
 	void ExitState(SpiderStates oldState);
+
+	float Distance(Vector2 a, Vector2 b);
+	Vector2 Normalise(Vector2 c);
 
 private:
 	SpiderState(const SpiderState& spiderState);
@@ -38,8 +52,12 @@ public:
 protected:
 	GameObjectPool* m_spiderPool;
 	SpiderStates m_currentState;
+	Vector2 m_spiderPos;
 
 	bool m_active;
+
+	Vector2 m_target;
+	float m_attackRange = 100.0f;
 
 private:
 };

@@ -114,9 +114,20 @@ bool SceneMain::Initialise(Renderer& renderer)
         return false;
     }
 
-    m_testSpider = new SpiderState();
-    m_testSpider->InitialiseSpiders(renderer);
-    m_testSpider->SetActive(true);
+    m_testSpider = new GameObjectPool(SpiderState(), 2);
+
+    for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
+        if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
+            SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+            spider->InitialiseSpiders(renderer);
+            spider->SetActive(true);
+
+            if (i == 0) {
+                Vector2 pos = { 200, 300 };
+                spider->SetPosition(pos);
+            }
+        }
+    }
 
     GridState::GetInstance().CreateGrid(renderer);
 
@@ -175,7 +186,15 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
         SpawnWaterDrops();
 
-        m_testSpider->Update(deltaTime);
+        for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
+            if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
+                if (obj && dynamic_cast<SpiderState*>(obj)) {
+                    SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+
+                    spider->Update(deltaTime, m_pPlayer->GetPosition());
+                }
+            }
+        }
 
         GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
 
@@ -210,7 +229,14 @@ void SceneMain::Draw(Renderer& renderer){
         m_pPlayer->Draw(renderer);
     }
 
-    m_testSpider->Draw(renderer);
+    for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
+        if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
+            if (obj && obj->IsActive()) {
+                SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+                spider->Draw(renderer);
+            }
+        }
+    }
 
     //draw active particles
     for (auto& ps : m_particleSystems) {
