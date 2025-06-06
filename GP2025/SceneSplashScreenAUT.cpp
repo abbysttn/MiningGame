@@ -77,7 +77,6 @@ bool SceneSplashScreenAUT::Initialise(Renderer& renderer)
 
 	m_pAUTLogoSprite->SetX(screenWidth / 2);
 	m_pAUTLogoSprite->SetY(screenHeight / 2);
-	m_pAUTLogoSprite->SetAlpha(0.0f);
 
 	m_fTimer = 0.0f;
 	m_fAlpha = 0.0f;
@@ -151,6 +150,7 @@ void SceneSplashScreenAUT::Draw(Renderer& renderer)
 {
 	if (m_pAUTLogoSprite && m_eCurrentState != AUTSplashState::FINISHED)
 	{
+		m_pAUTLogoSprite->SetAngle(0.0f);
 		m_pAUTLogoSprite->Draw(renderer);
 	}
 }
