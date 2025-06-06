@@ -57,7 +57,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
         (m_position.y <= 528.0f);
 
     if (staminaRepletion) {
-        m_stamina = std::min(100.0f, m_stamina + deltaTime * 2.0f);
+        m_stamina = std::min(100.0f, m_stamina + deltaTime * 3.0f);
     }
     else {
         m_stamina = std::max(0.0f, m_stamina - deltaTime);

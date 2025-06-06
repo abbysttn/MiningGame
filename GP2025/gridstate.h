@@ -20,7 +20,7 @@ public:
 		return instance;
 	}
 
-	void CreateGrid(Renderer& renderer);
+	void CreateGrid(Renderer& renderer, float backgroundScale);
 	GameObjectPool* GetPool();
 
 	void BreakBlock(Vector2 position, char direction);

@@ -11,9 +11,10 @@
 
 #include <string>
 
-void GridState::CreateGrid(Renderer& renderer)
+void GridState::CreateGrid(Renderer& renderer, float backgroundScale)
 {
 	m_gameGrid = new Grid();
+	m_gameGrid->SetBackgroundHeight(backgroundScale);
 	m_gameGrid->Initialise(renderer);
 }
 

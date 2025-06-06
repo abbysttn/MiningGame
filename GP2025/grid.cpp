@@ -28,7 +28,7 @@ bool Grid::Initialise(Renderer& renderer)
 	float levelPixelHeight = m_rows * m_tileSize;
 
 	screenOffsetX = ((screenWidth - levelPixelWidth) / 2.0f) + (m_tileSize / 2.0f);
-	screenOffsetY = screenHeight * 0.67f + (m_tileSize / 2.0f);
+	screenOffsetY = (m_backgroundHeight / 2.0f) - (levelPixelHeight * 0.4f);
 
 	for (size_t y = 0; y < (size_t)m_rows; y++) {
 		for (size_t x = 0; x < (size_t)m_cols; x++) {
@@ -128,6 +128,11 @@ int Grid::GetColumns()
 Vector2 Grid::GetScreenOffsets()
 {
 	return Vector2(screenOffsetX, screenOffsetY);
+}
+
+void Grid::SetBackgroundHeight(float height)
+{
+	m_backgroundHeight = height;
 }
 
 bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
