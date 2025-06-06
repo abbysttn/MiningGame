@@ -38,6 +38,8 @@ public:
 
 	Vector2 GetScreenOffsets();
 
+	void SetBackgroundHeight(float height);
+
 
 protected:
 	bool InitObjects(Renderer& renderer, size_t x, size_t y);
@@ -55,9 +57,10 @@ private:
 	unique_ptr<QuadTree> m_collisionTree;
 
 	float m_tileSize;
+	float m_backgroundHeight;
 
 	int m_cols = 12;
-	int m_rows = 100;
+	int m_rows = 30;
 	int m_count = m_rows * m_cols;
 
 	float screenOffsetX;
