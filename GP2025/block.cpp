@@ -8,6 +8,7 @@
 #include "logmanager.h"
 
 #include <string>
+#include <cmath>
 
 Block::Block() : m_sprite(0), m_isBroken(false) {}
 
@@ -17,10 +18,10 @@ Block::~Block()
 	m_sprite = nullptr;
 }
 
-bool Block::Initialise(Renderer& renderer, int depth)
+bool Block::Initialise(Renderer& renderer, int depth, int x)
 {
 	m_depth = depth;
-	GetBlockType(m_depth, m_filepath);
+	GetBlockType(m_depth, m_filepath, x);
 
 	m_sprite = renderer.CreateAnimatedSprite(m_filepath);
 	m_sprite->SetupFrames(8, 8);
@@ -48,6 +49,10 @@ void Block::Process(float deltaTime)
 			if (m_isBreaking && m_currentTime == 0.0f) {
 				m_currentBlockStatus++;
 				m_sprite->SetCurrentFrame(m_currentBlockStatus);
+				if (m_sprite->FramesFinished()) {
+					m_isBroken = true;
+					m_active = false;
+				}
 			}
 
 			m_currentTime += deltaTime;
@@ -55,10 +60,6 @@ void Block::Process(float deltaTime)
 			if (m_currentTime >= m_animatingTime) {
 				m_isBreaking = false;
 				m_currentTime = 0.0f;
-				if (m_sprite->FramesFinished()) {
-					m_isBroken = true;
-					m_active = false;
-				}
 			}
 		}		
 	}
@@ -117,6 +118,16 @@ void Block::SetActive(bool active)
 	m_active = active;
 }
 
+void Block::SetBreakable(bool canBreak)
+{
+	m_canBreak = canBreak;
+}
+
+bool Block::CanBreak()
+{
+	return m_canBreak;
+}
+
 void Block::BreakBlock()
 {
 	if (!m_isBroken && !m_isBreaking) {
@@ -124,22 +135,60 @@ void Block::BreakBlock()
 	}
 }
 
-void Block::GetBlockType(int& depth, const char*& filepath)
+bool Block::BlockBroken()
 {
+	return m_isBroken;
+}
+
+char Block::GetBlockType()
+{
+	return m_blockType;
+}
+
+int Block::GetResourceAmount()
+{
+	if (!m_resourceGiven) {
+		m_resourceGiven = true;
+		if (m_depth == 0) {
+			return 1;
+		}
+		else {
+			return static_cast<int>(log2(m_depth)) + 1;
+		}
+	}
+	else {
+		return 0;
+	}
+}
+
+bool Block::ResourcesGiven()
+{
+	return m_resourceGiven;
+}
+
+void Block::GetBlockType(int& depth, const char*& filepath, int x)
+{
+	if (depth == 0 && (x != 4 && x != 5 && x != 6)) {
+		filepath = "../assets/brock.png";
+		return;
+	}
+
 	float percentage = 0.0f;
 	bool IsGem = false;
 
-	if (depth < 40) {
-		percentage = 0.00f;
+	if (depth < 5) {
+		filepath = "../assets/dirt.png";
+		m_blockType = 'D';
+		return;
 	}
-	else if (depth < 50 && depth > 40) {
-		percentage = 0.05f;
+	else if (depth < 15 && depth > 5) {
+		percentage = 0.02f;
 	}
-	else if (depth < 70 && depth > 50) {
-		percentage = 0.15f;
+	else if (depth < 20 && depth > 15) {
+		percentage = 0.08f;
 	}
-	else if (depth >= 71) {
-		percentage = 0.3f;
+	else if (depth >= 20) {
+		percentage = 0.1f;
 	}
 
 	float chance = GetRandomPercentage();
@@ -150,8 +199,25 @@ void Block::GetBlockType(int& depth, const char*& filepath)
 
 	if (IsGem) {
 		filepath = "../assets/gem.png";
+		m_blockType = 'G';
 	}
 	else {
-		filepath = "../assets/dirt.png";
+		float dirtChance = 0.8f * exp(-0.01f * m_depth);
+		float roll = GetRandomPercentage();
+
+		if (dirtChance <= 0.0f) {
+			dirtChance = 0.0f;
+		}
+
+		if (roll < dirtChance) {
+			filepath = "../assets/dirt.png";
+			m_blockType = 'D';
+			return;
+		}
+		else {
+			filepath = "../assets/stone.png";
+			m_blockType = 'S';
+			return;
+		}
 	}
 }

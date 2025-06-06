@@ -10,6 +10,8 @@
 #include "xboxcontroller.h"
 
 #include <algorithm>
+#include <string>
+#include "logmanager.h"
 
 
 Player::Player()
@@ -50,6 +52,20 @@ bool Player::Initialise(Renderer& renderer)
 void Player::Process(float deltaTime, InputSystem& inputSystem)
 {
     Vector2 direction(0.0f, 0.0f);
+
+    bool staminaRepletion = (m_position.x >= 1180.0f && m_position.x <= 1280.0f) &&
+        (m_position.y <= 528.0f);
+
+    if (staminaRepletion) {
+        m_stamina = std::min(100.0f, m_stamina + deltaTime * 3.0f);
+    }
+    else {
+        m_stamina = std::max(0.0f, m_stamina - deltaTime);
+    }
+
+    if (m_stamina <= 0.0f) {
+        LogManager::GetInstance().Log("DEAD!");
+    }
 
     if (IsKeyHeld(inputSystem, SDL_SCANCODE_W) || IsKeyHeld(inputSystem, SDL_SCANCODE_UP))    direction.y -= 1.0f;
     if (IsKeyHeld(inputSystem, SDL_SCANCODE_S) || IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN))  direction.y += 1.0f;
@@ -131,6 +147,10 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 
     m_position.x = std::max(minX, std::min(maxX, m_position.x));
     m_position.y = std::max(minY, std::min(maxY, m_position.y));
+
+    m_dirtCount = GridState::GetInstance().GetDirt();
+    m_stoneCount = GridState::GetInstance().GetStone();
+    m_gemCount = GridState::GetInstance().GetGem();
 
     m_pAnimSprite->Process(deltaTime);
 }
