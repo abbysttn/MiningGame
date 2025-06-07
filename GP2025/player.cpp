@@ -23,8 +23,6 @@ Player::Player()
 
 Player::~Player()
 {
-    delete m_pAnimSprite;
-    m_pAnimSprite = nullptr;
 
     delete m_pIdleSprite;
     delete m_pJumpSprite;
@@ -187,13 +185,16 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     testPos += direction * m_speed * deltaTime;
 	testPos.y += m_Velocity.y * deltaTime;
 
-    Box testBoxX(testPos.x, m_position.y, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
+    float paddingX = (m_pAnimSprite->GetWidth() / 3.3f);
+    float paddingY = (m_pAnimSprite->GetHeight() / 4.7f);
+
+    Box testBoxX(testPos.x + paddingX, m_position.y + paddingY, (float)m_pAnimSprite->GetWidth() * 0.45f, (float)m_pAnimSprite->GetHeight() * 0.7f);
 
     if (!GridState::GetInstance().CheckCollision(testBoxX)) {
         m_position.x = testPos.x;
     }
 
-    Box testBoxY(m_position.x, testPos.y, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
+    Box testBoxY(m_position.x + paddingX, testPos.y + paddingY, (float)m_pAnimSprite->GetWidth() * 0.45f, (float)m_pAnimSprite->GetHeight() * 0.7f);
 
     if (!GridState::GetInstance().CheckCollision(testBoxY)) {
         m_position.y = testPos.y;
@@ -254,23 +255,25 @@ void Player::LoadAnimatedSprites() {
 	m_pJumpSprite = m_pRenderer->CreateAnimatedSprite("../assets/Jump.png");
 	m_pMineSprite = m_pRenderer->CreateAnimatedSprite("../assets/Swing.png");
 
+    float scale = GridState::GetInstance().GetTileSize() / 35.0f;
+
     m_pIdleSprite->SetupFrames(32, 32);
 	m_pIdleSprite->SetLooping(true);
 	m_pIdleSprite->SetFrameDuration(0.1f);
 	m_pIdleSprite->Animate();
-    m_pIdleSprite->SetScale(1.9f);
+    m_pIdleSprite->SetScale(scale);
 
 	m_pJumpSprite->SetupFrames(32, 32);
 	m_pJumpSprite->SetLooping(false);
 	m_pJumpSprite->SetFrameDuration(0.05f);
 	m_pJumpSprite->Animate();
-	m_pJumpSprite->SetScale(1.9f);
+	m_pJumpSprite->SetScale(scale);
 
 	m_pMineSprite->SetupFrames(32, 32);
 	m_pMineSprite->SetLooping(true);
 	m_pMineSprite->SetFrameDuration(0.1f);
 	m_pMineSprite->Animate();
-	m_pMineSprite->SetScale(1.9f);
+	m_pMineSprite->SetScale(scale);
 
     // Default
     m_pAnimSprite = m_pIdleSprite;

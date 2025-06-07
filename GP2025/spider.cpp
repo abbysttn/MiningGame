@@ -44,9 +44,9 @@ void Spider::Process(float deltaTime)
 	}
 }
 
-void Spider::Draw(Renderer& renderer)
+void Spider::Draw(Renderer& renderer, bool facingLeft)
 {
-	m_sprite->Draw(renderer);
+	m_sprite->Draw(renderer, facingLeft);
 }
 
 Vector2& Spider::Position()

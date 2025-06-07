@@ -97,10 +97,16 @@ void SceneMain::CheckCollision(Player* player, SpiderState* spider)
             Vector2 pushDirection(spider->GetPosition().x - player->GetPosition().x,
                 spider->GetPosition().y - player->GetPosition().y);
 
-            if (spider->GetState() != DIE || spider->GetState() == HURT) {
-                spider->SetState(HURT);
-                spider->ApplyPushback(pushDirection);
-                m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 1.0f);
+            if (spider->GetState() != SpiderStates::DIE || spider->GetState() == SpiderStates::HURT) {
+                if (m_pPlayer->GetCurrentState() == PlayerAnimationState::MINE) {
+                    spider->SetState(SpiderStates::HURT);
+                    spider->ApplyPushback(pushDirection);
+                }
+                else {
+                    spider->SetState(SpiderStates::HURT);
+                    spider->ApplyPushback(pushDirection);
+                    m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 1.0f);
+                }
             }
         }
     }
@@ -139,6 +145,8 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_pMineBackground->SetY(static_cast<int>(scaledHeight / 2.0f));
     m_pMineBackground->SetScale(scale);
 
+    GridState::GetInstance().CreateGrid(renderer, scaledHeight);
+
     m_pPlayer = new Player();
     if (!m_pPlayer->Initialise(renderer))
     {
@@ -146,8 +154,6 @@ bool SceneMain::Initialise(Renderer& renderer)
         m_pPlayer = nullptr;
         return false;
     }
-
-    GridState::GetInstance().CreateGrid(renderer, scaledHeight);
 
     m_tileSize = GridState::GetInstance().GetTileSize();
 
@@ -446,17 +452,17 @@ void SceneMain::TestingFeatures(InputSystem& inputSystem) {
     if ((inputSystem.GetKeyState(SDL_SCANCODE_Y) == BS_PRESSED)&& m_pVisionLevel < m_visionLevels.size())
     {
         m_pVisionLevel++;
-        SetVisionLevel(m_pVisionLevel);
+        SetVisionLevel((int)m_pVisionLevel);
     }
     if ((inputSystem.GetKeyState(SDL_SCANCODE_T) == BS_PRESSED) && m_pVisionLevel > 1)
     {
         m_pVisionLevel--;
-        SetVisionLevel(m_pVisionLevel);
+        SetVisionLevel((int)m_pVisionLevel);
     }
 }
 
 void SceneMain::SetVisionLevel(int level) {
-    m_pVisionLevel = level;
+    m_pVisionLevel = (float)level;
     float newScale = m_visionLevels[level-1];
     m_pVignetteSprite->SetScale(newScale);
 }

@@ -2,7 +2,7 @@
 #define __SPIDERSTATE_H__
 
 enum SpiderStates {
-	IDLE = 0,
+	INACTIVE = 0,
 	CRAWL,
 	ATTACK = 2,
 	HURT,
@@ -74,6 +74,8 @@ protected:
 
 	float m_spiderWidth;
 	float m_spiderHeight;
+
+	bool m_facingLeft;
 
 	float m_spiderHealth = 100.0f;
 

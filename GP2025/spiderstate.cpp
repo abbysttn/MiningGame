@@ -11,7 +11,7 @@
 
 #include <string>
 
-SpiderState::SpiderState() : m_currentState(SpiderStates::IDLE), m_spiderPool(nullptr) {}
+SpiderState::SpiderState() : m_currentState(SpiderStates::INACTIVE), m_spiderPool(nullptr) {}
 
 SpiderState::~SpiderState()
 {
@@ -53,6 +53,7 @@ void SpiderState::InitialiseSpiders(Renderer& renderer, int screenWidth, int scr
 			}
 
 			spider->Initialise(renderer, filepath.c_str());
+			spider->SetScale(GridState::GetInstance().GetTileSize() / 40.0f);
 
 			if (i == m_currentState) {
 				spider->SetAlive(true);
@@ -98,7 +99,7 @@ void SpiderState::Draw(Renderer& renderer)
 {
 	if (GameObject* obj = m_spiderPool->getObjectAtIndex(m_currentState)) {
 		Spider* spider = dynamic_cast<Spider*>(obj);
-		spider->Draw(renderer);
+		spider->Draw(renderer, m_facingLeft);
 	}
 }
 
@@ -126,7 +127,7 @@ void SpiderState::UpdateAI(float deltaTime)
 		Move(direction, deltaTime, attackPos);
 
 		if (distanceToTarget > 500.0f) {
-			SetState(IDLE);
+			SetState(INACTIVE);
 		}
 
 		if (distanceToTarget < m_attackRange) {
@@ -208,7 +209,7 @@ bool SpiderState::IsActive() const
 
 void SpiderState::Reset()
 {
-	m_currentState = SpiderStates::IDLE;
+	m_currentState = SpiderStates::INACTIVE;
 }
 
 void SpiderState::SetActive(bool active)
@@ -299,8 +300,8 @@ void SpiderState::Move(Vector2 direction, float deltaTime, Vector2 attackPos)
 		testPos = attackPos;
 	}
 
-	float paddingX = (m_spiderWidth / 2.0f) + 5.0f;
-	float paddingY = (m_spiderHeight / 2.0f) + 20.0f;
+	float paddingX = (m_spiderWidth / 1.0f);
+	float paddingY = (m_spiderHeight / 1.0f);
 
 	Box testBoxX(testPos.x + paddingX, m_spiderPos.y + paddingY, m_spiderWidth, m_spiderHeight);
 	bool canMoveX = !GridState::GetInstance().CheckCollision(testBoxX);
@@ -338,6 +339,9 @@ void SpiderState::Move(Vector2 direction, float deltaTime, Vector2 attackPos)
 	if (GridState::GetInstance().CheckCollision(finalPos)) {
 		m_spiderPos.y -= 1.0f;
 	}
+
+	if (direction.x < 0.0f) m_facingLeft = true;
+	else if (direction.x > 0.0f) m_facingLeft = false;
 }
 
 bool SpiderState::IsPositionValid(Vector2 pos)
@@ -348,8 +352,8 @@ bool SpiderState::IsPositionValid(Vector2 pos)
 		return false;
 	}
 
-	float paddingX = (m_spiderWidth / 2.0f) + 5.0f;
-	float paddingY = (m_spiderHeight / 2.0f) + 20.0f;
+	float paddingX = (m_spiderWidth / 1.5f);
+	float paddingY = (m_spiderHeight / 1.8f);
 	Box testBox(pos.x + paddingX, pos.y + paddingY, m_spiderWidth, m_spiderHeight);
 
 	return !GridState::GetInstance().CheckCollision(testBox);
@@ -357,8 +361,8 @@ bool SpiderState::IsPositionValid(Vector2 pos)
 
 float SpiderState::FindGround(float x)
 {
-	float paddingX = (m_spiderWidth / 2.0f) + 5.0f;
-	float paddingY = (m_spiderHeight / 2.0f) + 20.0f;
+	float paddingX = (m_spiderWidth / 1.5f);
+	float paddingY = (m_spiderHeight / 1.8f);
 
 	float testY = m_spiderPos.y;
 	float lowestValidY = testY;

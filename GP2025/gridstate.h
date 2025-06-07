@@ -60,6 +60,7 @@ protected:
 	bool m_blockBroken = false;
 	Vector2 m_brokenBlockPos;
 	int m_brokenBlockTile;
+	Vector2 m_lastBrokenPos;
 
 	int m_dirtCount = 0;
 	int m_stoneCount = 0;

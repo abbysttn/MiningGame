@@ -14,7 +14,7 @@ public:
 
 	bool Initialise(Renderer& renderer, const char* filepath);
 	void Process(float deltaTime);
-	void Draw(Renderer& renderer);
+	void Draw(Renderer& renderer, bool facingLeft);
 	Vector2& Position();
 	void SetColour(float red, float green, float blue);
 

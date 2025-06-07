@@ -84,6 +84,7 @@ void GridState::BreakBlock(Vector2 position, char direction)
 				}
 
 				m_blockBroken = true;
+				m_lastBrokenPos = m_brokenBlockPos;
 				m_brokenBlockPos = block->Position();
 				m_brokenBlockTile = targetY;
 			}
@@ -152,18 +153,9 @@ bool GridState::IsBlockBroken()
 
 bool GridState::SpiderSpawn()
 {
-	if (m_brokenBlockTile < 10) return false;
+	if (m_brokenBlockTile < 1) return false;
 
-	float spiderChance = 0.2f * (1.0f - exp(-0.01f * (m_brokenBlockTile - 10.0f)));
-	float roll = GetRandomPercentage();
+	float spawnChance = 0.0005f;
 
-	if (spiderChance <= 0.0f) {
-		spiderChance = 0.0f;
-	}
-
-	if (roll < spiderChance) {
-		return true;
-	}
-
-	return false;
+	return (GetRandomPercentage() < spawnChance);
 }

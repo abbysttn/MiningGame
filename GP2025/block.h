@@ -60,7 +60,7 @@ protected:
 	bool m_isBroken;
 	bool m_isBreaking = false;
 	int m_currentBlockStatus = 0;
-	float m_animatingTime = 0.1f;
+	float m_animatingTime = 0.5f;
 	float m_currentTime = 0.0f;
 
 private:
