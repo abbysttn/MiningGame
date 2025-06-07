@@ -46,9 +46,15 @@ public:
 	void OnExit() override;
 
 
+	void SetVisionLevel(int level);
+
+
 private:
 	float m_tileSize;
 	int m_aboveGroundOffset = 11; // Change later to correct above ground size
+
+	float m_pVisionLevel;
+	std::vector<float> m_visionLevels;
 
 	float m_screenWidth;
 	float m_screenHeight;
