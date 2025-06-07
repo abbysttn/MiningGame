@@ -119,6 +119,7 @@ void Spider::ApplyPushback(Vector2 direction)
 	}
 
 	m_pushbackVelocity = direction.x * 600.0f;
+	m_yPushback = 1000.0f;
 	m_isPushed = true;
 }
 
@@ -126,11 +127,14 @@ void Spider::UpdatePushback(float deltaTime)
 {
 	if (m_isPushed) {
 		m_position.x += m_pushbackVelocity * deltaTime;
+		m_position.y -= m_yPushback * deltaTime;
 
 		m_pushbackVelocity *= 0.9f;
+		m_yPushback *= 0.9f;
 
 		if (fabs(m_pushbackVelocity) < 0.01f) {
 			m_pushbackVelocity = 0;
+			m_yPushback = 0;
 			m_isPushed = false;
 		}
 	}

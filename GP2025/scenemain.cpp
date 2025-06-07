@@ -163,7 +163,7 @@ bool SceneMain::Initialise(Renderer& renderer)
     for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
         if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
             SpiderState* spider = dynamic_cast<SpiderState*>(obj);
-            spider->InitialiseSpiders(renderer, m_screenX, scaledHeight);
+            spider->InitialiseSpiders(renderer, m_screenX, (int)scaledHeight);
             spider->SetActive(false);
         }
     }
@@ -204,11 +204,23 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
         SpawnWaterDrops();
 
+        if (GridState::GetInstance().IsBlockBroken() && GridState::GetInstance().SpiderSpawn()) {
+            if (m_testSpider->usedCount() != m_testSpider->totalCount()) {
+                if (GameObject* obj = m_testSpider->getObject()) {
+                    if (obj && dynamic_cast<SpiderState*>(obj)) {
+                        SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+
+                        spider->SetActive(true);
+                        spider->SetPosition(GridState::GetInstance().GetBrokenBlockPos());
+                    }
+                }
+            }
+        }
+
         for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
             if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
                 if (obj && dynamic_cast<SpiderState*>(obj)) {
                     SpiderState* spider = dynamic_cast<SpiderState*>(obj);
-
                     if (spider->IsActive()) {
 
                         Box spiderBox(

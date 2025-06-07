@@ -51,6 +51,7 @@ protected:
 	bool m_alive;
 
 	float m_pushbackVelocity;
+	float m_yPushback;
 	bool m_isPushed = false;
 
 private:

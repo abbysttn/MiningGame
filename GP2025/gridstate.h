@@ -42,6 +42,10 @@ public:
 
 	int GetGem() const { return m_gemCount; }
 
+	Vector2 GetBrokenBlockPos();
+	bool IsBlockBroken();
+	bool SpiderSpawn();
+
 protected:
 
 private:
@@ -52,6 +56,10 @@ public:
 
 protected:
 	Grid* m_gameGrid;
+
+	bool m_blockBroken = false;
+	Vector2 m_brokenBlockPos;
+	int m_brokenBlockTile;
 
 	int m_dirtCount = 0;
 	int m_stoneCount = 0;

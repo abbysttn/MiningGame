@@ -51,6 +51,7 @@ protected:
 	Vector2 Normalise(Vector2 c);
 
 	void Move(Vector2 direction, float deltaTime, Vector2 attackPos);
+	bool IsPositionValid(Vector2 pos);
 
 private:
 	SpiderState(const SpiderState& spiderState);
@@ -62,9 +63,11 @@ protected:
 	GameObjectPool* m_spiderPool;
 	SpiderStates m_currentState;
 	Vector2 m_spiderPos;
+	Vector2 m_spiderPrevPos;
 
 	bool m_active;
 	bool m_climbing;
+	bool m_pushed;
 
 	Vector2 m_target;
 	float m_attackRange = 200.0f;

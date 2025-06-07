@@ -10,6 +10,8 @@
 #include "logmanager.h"
 
 #include <string>
+#include <cmath>
+#include "inlinehelper.h"
 
 void GridState::CreateGrid(Renderer& renderer, float backgroundScale)
 {
@@ -80,6 +82,10 @@ void GridState::BreakBlock(Vector2 position, char direction)
 				case 'S': m_stoneCount += block->GetResourceAmount(); break;
 
 				}
+
+				m_blockBroken = true;
+				m_brokenBlockPos = block->Position();
+				m_brokenBlockTile = targetY;
 			}
 		}
 	}
@@ -131,4 +137,33 @@ bool GridState::CheckCollision(Box& box)
 float GridState::GetTileSize()
 {
 	return m_gameGrid->GetTileSize();
+}
+
+Vector2 GridState::GetBrokenBlockPos()
+{
+	m_blockBroken = false;
+	return m_brokenBlockPos;
+}
+
+bool GridState::IsBlockBroken()
+{
+	return m_blockBroken;
+}
+
+bool GridState::SpiderSpawn()
+{
+	if (m_brokenBlockTile < 10) return false;
+
+	float spiderChance = 0.2f * (1.0f - exp(-0.01f * (m_brokenBlockTile - 10.0f)));
+	float roll = GetRandomPercentage();
+
+	if (spiderChance <= 0.0f) {
+		spiderChance = 0.0f;
+	}
+
+	if (roll < spiderChance) {
+		return true;
+	}
+
+	return false;
 }

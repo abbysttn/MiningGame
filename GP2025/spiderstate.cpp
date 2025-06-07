@@ -109,6 +109,7 @@ void SpiderState::UpdateAI(float deltaTime)
 	Spider* spider = dynamic_cast<Spider*>(m_spiderPool->getObjectAtIndex(m_currentState));
 	if (!spider) return;
 
+	m_spiderPrevPos = m_spiderPos;
 	m_spiderPos = spider->Position();
 	float distanceToTarget = Distance(m_target, m_spiderPos);
 	Vector2 direction = Normalise(m_target - m_spiderPos);
@@ -154,6 +155,14 @@ void SpiderState::UpdateAI(float deltaTime)
 			m_active = false;
 		}
 	}
+
+	if (m_pushed) {
+		if (!IsPositionValid(m_spiderPos)) {
+			m_spiderPos = m_spiderPrevPos;
+		}
+	}
+
+	m_pushed = spider->IsPushed();
 
 	const int spriteHalfWidth = GetSpriteWidth() / 2;
 
@@ -224,7 +233,16 @@ void SpiderState::ApplyPushback(Vector2 direction)
 {
 	if (GameObject* obj = m_spiderPool->getObjectAtIndex(m_currentState)) {
 		Spider* spider = dynamic_cast<Spider*>(obj);
+
 		spider->ApplyPushback(direction);
+
+		Vector2 newPos = spider->Position();
+		m_pushed = true;
+
+		if (!IsPositionValid(newPos)) {
+			spider->Position() = m_spiderPos;
+			m_pushed = false;
+		}
 	}
 }
 
@@ -320,6 +338,21 @@ void SpiderState::Move(Vector2 direction, float deltaTime, Vector2 attackPos)
 	if (GridState::GetInstance().CheckCollision(finalPos)) {
 		m_spiderPos.y -= 1.0f;
 	}
+}
+
+bool SpiderState::IsPositionValid(Vector2 pos)
+{
+	float halfWidth = m_spiderWidth / 2.0f;
+
+	if (pos.x < halfWidth || pos.x > screenWidth - halfWidth) {
+		return false;
+	}
+
+	float paddingX = (m_spiderWidth / 2.0f) + 5.0f;
+	float paddingY = (m_spiderHeight / 2.0f) + 20.0f;
+	Box testBox(pos.x + paddingX, pos.y + paddingY, m_spiderWidth, m_spiderHeight);
+
+	return !GridState::GetInstance().CheckCollision(testBox);
 }
 
 float SpiderState::FindGround(float x)
