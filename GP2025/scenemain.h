@@ -87,6 +87,11 @@ private:
 	Sprite* m_pVignetteSprite = nullptr;
 
 
+	Sprite* m_pDirtPickupSprite = nullptr;
+	Sprite* m_pStonePickupSprite = nullptr;
+	Sprite* m_pGemPickupSprite = nullptr;
+
+
 	std::list<ParticleSystem> m_particleSystems;
 
 };

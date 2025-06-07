@@ -31,6 +31,8 @@ void Particle::Activate(Vector2 position) {
     switch (m_type) {
     case ParticleType::BlockPickup: //receive items/materials from block
         m_speedMultiplier = 15.0f;
+        m_pSprite->SetScale(0.1f);
+
         m_velocity = Vector2(
             (((rand() % 200) - 100) / 100.0f) * m_speedMultiplier,
             (((rand() % 200) - 100) / 100.0f) * m_speedMultiplier

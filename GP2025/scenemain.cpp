@@ -38,6 +38,11 @@ SceneMain::~SceneMain()
 
     GridState::GetInstance().ResetGrid();
 
+
+
+    //ADD: delete sprites function
+
+
     if (m_pMineBackground) {
         delete m_pMineBackground;
         m_pMineBackground = nullptr;
@@ -69,6 +74,16 @@ SceneMain::~SceneMain()
     if (m_pVignetteSprite) {
         delete m_pVignetteSprite;
         m_pVignetteSprite = nullptr;
+    }
+
+    if (m_pDirtPickupSprite) {
+        delete m_pDirtPickupSprite;
+        m_pDirtPickupSprite = nullptr;
+    }
+
+    if (m_pStonePickupSprite) {
+        delete m_pStonePickupSprite;
+        m_pStonePickupSprite = nullptr;
     }
     
     m_soundSystem.Release();
@@ -138,13 +153,12 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_pCoinSprite->SetScale(0.05f);
 
     m_pDirtSprite = renderer.CreateSprite("../assets/dirtparticle.png");
-    m_pDirtSprite->SetScale(5.0f);
-
     m_pBreakBlockSprite = renderer.CreateSprite("../assets/dirtparticle.png");
-    m_pBreakBlockSprite->SetScale(5.0f);
-
     m_pWaterDropSprite = renderer.CreateSprite("../assets/particle.png");
-    m_pWaterDropSprite->SetScale(5.0f);
+
+    m_pDirtPickupSprite = renderer.CreateSprite("../assets/dirt_icon.png");
+    m_pStonePickupSprite = renderer.CreateSprite("../assets/stone_icon.png");
+    m_pGemPickupSprite = renderer.CreateSprite("../assets/gem_icon.png");
 
     renderer.SetCameraPosition(static_cast<float>(m_screenX/2), m_pMineBackground->GetHeight() * 0.1f);
 
@@ -198,6 +212,11 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
             ps.Initialise(m_pBreakBlockSprite, m_pPlayer, 35, ParticleType::BlockBreak);
             ps.ActivateAt(pPos);
             m_particleSystems.push_back(std::move(ps));
+
+            ParticleSystem ps2;
+            ps2.Initialise(m_pDirtPickupSprite, m_pPlayer, 5);
+            ps2.ActivateAt(m_pPlayer->GetPosition());
+            m_particleSystems.push_back(std::move(ps2));
         }
 
 
