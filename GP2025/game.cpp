@@ -13,7 +13,11 @@
 #include "inputsystem.h"
 #include "xboxcontroller.h"
 #include "fmod.hpp"
+
+// Scenes
 #include "scenetitlescreen.h"
+#include "SceneSplashScreenAUT.h"
+#include "SceneSplashScreenFMOD.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -92,7 +96,7 @@ bool Game::Initialise()
 	bbHeight = m_pRenderer->GetHeight();
 
 	m_iLastTime = SDL_GetPerformanceCounter();
-	m_pRenderer->SetClearColour(0, 255, 255);
+	m_pRenderer->SetClearColour(0, 0, 0);
 
 	// Initialise FMOD
 	FMOD::System_Create(&m_pFMODSystem);
@@ -106,12 +110,36 @@ bool Game::Initialise()
 		return false;
 	}
 
+	// SPlash screens
+	Scene* pSplashSceneAUT = new SceneSplashScreenAUT();
+	if (!pSplashSceneAUT->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("AUT Splash screen failed to load!");
+		delete pSplashSceneAUT;
+		return false;
+	}
+	m_scenes.push_back(pSplashSceneAUT);
+	
+	Scene* pSplashSceneFMOD = new SceneSplashScreenFMOD();
+	if (!pSplashSceneFMOD->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("FMOD Splash screen failed to load!");
+		delete pSplashSceneFMOD;
+		delete pSplashSceneAUT;
+		m_scenes.clear();
+		return false;
+	}
+	m_scenes.push_back(pSplashSceneFMOD);
+
 	// Titlescreen stuffz
 	Scene* pTitleScene = new SceneTitlescreen(m_pFMODSystem);
 	if (!pTitleScene->Initialise(*m_pRenderer))
 	{
 		LogManager::GetInstance().Log("Titlescreen fialed to load!!");
+		delete pSplashSceneFMOD;
+		delete pSplashSceneAUT;
 		delete pTitleScene;
+		m_scenes.clear();
 		return false;
 	}
 	m_scenes.push_back(pTitleScene);
@@ -121,13 +149,17 @@ bool Game::Initialise()
 	{
 		// Debugging stuff
 		LogManager::GetInstance().Log("TItle screne failed to load!");
-		delete pMainScene;
+		delete pSplashSceneFMOD;
+		delete pSplashSceneAUT;
 		delete pTitleScene;
+		delete pMainScene;
 		m_scenes.clear();
+		return false;
 	}
 	m_scenes.push_back(pMainScene);
 
 	m_iCurrentScene = 0;
+	SetCurrentScene(m_iCurrentScene);
 
 	return true;
 }
@@ -194,6 +226,36 @@ void Game::Process(float deltaTime)
 		std::cout << "Backspace pressed" << std::endl;
 		ToggleDebugWindow();
 	}
+
+	/*
+	* Scenes Order
+	* AUT Splash = 0
+	* FMOD Splash = 1
+	* Title screen = 2
+	* (Instructions scene)
+	* (Loading maybe) 
+	* Main Scene = 3
+	*/
+
+	if (m_iCurrentScene == 0)
+	{
+		SceneSplashScreenAUT* autSplash = dynamic_cast<SceneSplashScreenAUT*>(m_scenes[m_iCurrentScene]);
+		if (autSplash && autSplash->IsFinished())
+		{
+			SetCurrentScene(1); // Move to FMOD splash screen
+		}
+	}
+
+	else if (m_iCurrentScene == 1)
+	{
+		SceneSplashScreenFMOD* fmodSplash = dynamic_cast<SceneSplashScreenFMOD*>(m_scenes[m_iCurrentScene]);
+		if (fmodSplash && fmodSplash->IsFinished())
+		{
+			SetCurrentScene(2); // Move to title screen
+		}
+	}
+
+	// loading screen?
 
 }
 
@@ -274,7 +336,7 @@ void Game::SetCurrentScene(int sceneIndex)
 
 		if (m_pInputSystem)
 		{
-			if (m_iCurrentScene == 0)
+			if (m_iCurrentScene == 2)
 			{
 				m_pInputSystem->ShowMouseCursor(true);
 				m_pInputSystem->SetRelativeMode(false);

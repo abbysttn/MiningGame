@@ -137,7 +137,7 @@ SceneCheckerboards::Draw(Renderer& renderer)
 	m_pCentre->Draw(renderer);
 
 	// Animated Sprite
-	m_pAnimatedSprite->Draw(renderer);
+	m_pAnimatedSprite->Draw(renderer, false);
 }
 
 void SceneCheckerboards::DebugDraw
