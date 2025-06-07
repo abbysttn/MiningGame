@@ -105,6 +105,14 @@ char GridState::GetBlockType(Block* block)
 
 void GridState::ProcessGrid(float deltaTime, InputSystem& inputSystem)
 {
+	if (update1) {
+		m_blockBroken = false;
+		update1 = false;
+	}
+	else {
+		update1 = true;
+	}
+
 	m_gameGrid->Process(deltaTime, inputSystem);
 }
 
@@ -155,7 +163,7 @@ bool GridState::SpiderSpawn()
 {
 	if (m_brokenBlockTile < 1) return false;
 
-	float spawnChance = 0.0005f;
+	float spawnChance = 0.05f;
 
 	return (GetRandomPercentage() < spawnChance);
 }

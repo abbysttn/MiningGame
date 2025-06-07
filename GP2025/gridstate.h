@@ -62,6 +62,8 @@ protected:
 	int m_brokenBlockTile;
 	Vector2 m_lastBrokenPos;
 
+	bool update1 = true;
+
 	int m_dirtCount = 0;
 	int m_stoneCount = 0;
 	int m_gemCount = 0;

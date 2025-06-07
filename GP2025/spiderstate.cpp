@@ -151,6 +151,7 @@ void SpiderState::UpdateAI(float deltaTime)
 		break;
 
 	case 4:
+		DeadFall(deltaTime);
 		if (spider->IsDead()) {
 			spider->SetAlive(false);
 			m_active = false;
@@ -342,6 +343,34 @@ void SpiderState::Move(Vector2 direction, float deltaTime, Vector2 attackPos)
 
 	if (direction.x < 0.0f) m_facingLeft = true;
 	else if (direction.x > 0.0f) m_facingLeft = false;
+}
+
+void SpiderState::DeadFall(float deltaTime)
+{
+	float paddingX = (m_spiderWidth / 1.0f);
+	float paddingY = (m_spiderHeight / 1.0f);
+
+	float finalGroundY = FindGround(m_spiderPos.x);
+
+	if (abs(m_spiderPos.y - finalGroundY) > 1.0f) {
+		float adjustSpeed = 300.0f * deltaTime;
+
+		if (m_spiderPos.y < finalGroundY) {
+			m_spiderPos.y = std::min(m_spiderPos.y + adjustSpeed, finalGroundY);
+		}
+		else {
+			m_spiderPos.y = std::max(m_spiderPos.y - adjustSpeed, finalGroundY);
+		}
+	}
+	else {
+		m_spiderPos.y = finalGroundY;
+	}
+
+	Box finalPos(m_spiderPos.x + paddingX, m_spiderPos.y + paddingY, m_spiderWidth, m_spiderHealth);
+
+	if (GridState::GetInstance().CheckCollision(finalPos)) {
+		m_spiderPos.y -= 1.0f;
+	}
 }
 
 bool SpiderState::IsPositionValid(Vector2 pos)

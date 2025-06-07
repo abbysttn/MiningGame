@@ -51,6 +51,7 @@ protected:
 	Vector2 Normalise(Vector2 c);
 
 	void Move(Vector2 direction, float deltaTime, Vector2 attackPos);
+	void DeadFall(float deltaTime);
 	bool IsPositionValid(Vector2 pos);
 
 private:
