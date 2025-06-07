@@ -134,12 +134,14 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_pVisionLevel = 1;
     m_visionLevels = { 1.0f, 1.2f, 1.3f, 1.5f, 2.0f };
 
-    m_dirtParticleCooldown = 0.5f;
+    m_dirtParticleCooldown = 1.2f;
     if (!m_soundSystem.Initialise()) {
         std::cerr << "Failed to initialise FMOD system!" << std::endl;
         return false;
     }
     m_soundSystem.LoadSound("waterdrop", "../assets/sound/waterDrop.wav");
+    m_soundSystem.LoadSound("pickaxeHit", "../assets/sound/pickaxeHit.wav");
+    m_soundSystem.LoadSound("blockBreak", "../assets/sound/blockBreak.wav");
 
     m_pRenderer = &renderer;
     m_screenWidth = static_cast<float>(renderer.GetWidth());
@@ -235,7 +237,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         TestingFeatures(inputSystem);
 
         float pX = m_pPlayer->GetPosition().x;
-        float pY = m_pPlayer->GetPosition().y/* - m_pPlayer->GetPlayerHeight() / 4.0f*/;
+        float pY = m_pPlayer->GetPosition().y;
         Vector2 pPos = Vector2(pX, pY);
 
 
@@ -267,15 +269,16 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         m_dirtParticleCooldown -= deltaTime;
         if (GridState::GetInstance().CheckBlockDig() && m_dirtParticleCooldown <= 0.0f) {
 
-
+            m_soundSystem.PlaySound("pickaxeHit");
             ParticleSystem ps;
-            ps.Initialise(m_pDirtSprite, m_pPlayer, 1, ParticleType::DigDirt);
+            ps.Initialise(m_pDirtSprite, m_pPlayer, 3, ParticleType::DigDirt);
             ps.ActivateAt(pPos);
             m_particleSystems.push_back(std::move(ps));
-            m_dirtParticleCooldown = 0.35f;
+            m_dirtParticleCooldown = 0.6f;
         }
 
         if (GridState::GetInstance().CheckBlockBreak()) {
+            m_soundSystem.PlaySound("blockBreak");
             ParticleSystem ps;
             ps.Initialise(m_pBreakBlockSprite, m_pPlayer, 35, ParticleType::BlockBreak);
             ps.ActivateAt(pPos);
