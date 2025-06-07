@@ -51,9 +51,15 @@ public:
 	void CheckCollision(Player* player, SpiderState* spider);
 
 
+	void SetVisionLevel(int level);
+
+
 private:
 	float m_tileSize;
 	int m_aboveGroundOffset = 11; // Change later to correct above ground size
+
+	float m_pVisionLevel;
+	std::vector<float> m_visionLevels;
 
 	float m_screenWidth;
 	float m_screenHeight;
@@ -83,6 +89,7 @@ private:
 	Sprite* m_pDirtSprite = nullptr;
 	Sprite* m_pBreakBlockSprite = nullptr;
 	Sprite* m_pWaterDropSprite = nullptr;
+	Sprite* m_pVignetteSprite = nullptr;
 
 
 	std::list<ParticleSystem> m_particleSystems;

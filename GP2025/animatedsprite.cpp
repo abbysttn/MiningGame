@@ -162,12 +162,12 @@ AnimatedSprite::Process(float deltaTime)
 }
 
 void
-AnimatedSprite::Draw(Renderer& renderer)
+AnimatedSprite::Draw(Renderer& renderer, bool flipHorizontal)
 {
 	assert(m_pVertexData);
 	m_pTexture->SetActive();
 	m_pVertexData->SetActive();
-	renderer.DrawAnimatedSprite(*this, m_iCurrentFrame);
+	renderer.DrawAnimatedSprite(*this, m_iCurrentFrame, flipHorizontal);
 }
 
 void AnimatedSprite::Animate

@@ -20,7 +20,7 @@ public:
 	bool Initialise(Texture& texture);
 	void SetupFrames(int fixedFrameWidth, int fixedFrameHeight);
 	void Process(float deltaTime);
-	void Draw(Renderer& renderer);
+	void Draw(Renderer& renderer, bool flipHorizontal);
 
 	void SetLooping(bool loop);
 	void Animate();

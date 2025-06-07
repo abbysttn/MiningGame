@@ -59,7 +59,7 @@ private:
 	float m_tileSize;
 	float m_backgroundHeight;
 
-	int m_cols = 12;
+	int m_cols = 20;
 	int m_rows = 30;
 	int m_count = m_rows * m_cols;
 

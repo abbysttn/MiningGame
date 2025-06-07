@@ -169,6 +169,8 @@
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scenecheckerboards.cpp" />
+    <ClCompile Include="SceneSplashScreenAUT.cpp" />
+    <ClCompile Include="SceneSplashScreenFMOD.cpp" />
     <ClCompile Include="scenetitlescreen.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="soundsystem.cpp" />
@@ -214,6 +216,8 @@
     <ClInclude Include="scene.h" />
     <ClInclude Include="scenecheckerboards.h" />
     <ClInclude Include="scenemain.h" />
+    <ClInclude Include="SceneSplashScreenAUT.h" />
+    <ClInclude Include="SceneSplashScreenFMOD.h" />
     <ClInclude Include="scenetitlescreen.h" />
     <ClInclude Include="SDL_ttf.h" />
     <ClInclude Include="shader.h" />

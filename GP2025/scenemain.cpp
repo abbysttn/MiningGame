@@ -69,6 +69,12 @@ SceneMain::~SceneMain()
         m_pWaterDropSprite = nullptr;
     }
 
+
+    if (m_pVignetteSprite) {
+        delete m_pVignetteSprite;
+        m_pVignetteSprite = nullptr;
+    }
+    
     m_soundSystem.Release();
 
 }
@@ -104,6 +110,10 @@ bool SceneMain::Initialise(Renderer& renderer)
 {
     LogManager::GetInstance().Log("SceneMain is Initialising!");
 
+    m_pVisionLevel = 1;
+    m_visionLevels = { 1.0f, 1.2f, 1.3f, 1.5f, 1.7f };
+
+
     if (!m_soundSystem.Initialise()) {
         std::cerr << "Failed to initialise FMOD system!" << std::endl;
         return false;
@@ -116,6 +126,9 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     m_pMineBackground = renderer.CreateSprite("../assets/background.png");
    
+    m_pVignetteSprite = renderer.CreateSprite("../assets/vignette.png");
+    m_pVignetteSprite->SetScale(m_pVisionLevel);
+
 
     float scaleX = static_cast<float>(renderer.GetWidth()) / m_pMineBackground->GetWidth();
     float scaleY = static_cast<float>(renderer.GetHeight()) / m_pMineBackground->GetHeight();
@@ -242,6 +255,10 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
         GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
 
+
+        m_pVignetteSprite->SetX(static_cast<int>(m_pPlayer->GetPosition().x));
+        m_pVignetteSprite->SetY(static_cast<int>(m_pPlayer->GetPosition().y));
+
         ui->Update(m_pPlayer, m_pRenderer);
 
 
@@ -287,6 +304,10 @@ void SceneMain::Draw(Renderer& renderer){
     //draw active particles
     for (auto& ps : m_particleSystems) {
         ps.Draw(renderer);
+    }
+
+    if (m_pVignetteSprite) {
+        m_pVignetteSprite->Draw(renderer);
     }
 
     ui->Render(); // Draw Last
@@ -422,8 +443,20 @@ void SceneMain::TestingFeatures(InputSystem& inputSystem) {
         ps.ActivateAt(m_pPlayer->GetPosition());
         m_particleSystems.push_back(std::move(ps));
     }
-    if (inputSystem.GetKeyState(SDL_SCANCODE_Y) == BS_PRESSED)
+    if ((inputSystem.GetKeyState(SDL_SCANCODE_Y) == BS_PRESSED)&& m_pVisionLevel < m_visionLevels.size())
     {
-
+        m_pVisionLevel++;
+        SetVisionLevel(m_pVisionLevel);
     }
+    if ((inputSystem.GetKeyState(SDL_SCANCODE_T) == BS_PRESSED) && m_pVisionLevel > 1)
+    {
+        m_pVisionLevel--;
+        SetVisionLevel(m_pVisionLevel);
+    }
+}
+
+void SceneMain::SetVisionLevel(int level) {
+    m_pVisionLevel = level;
+    float newScale = m_visionLevels[level-1];
+    m_pVignetteSprite->SetScale(newScale);
 }

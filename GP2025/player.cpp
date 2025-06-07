@@ -25,18 +25,20 @@ Player::~Player()
 {
     delete m_pAnimSprite;
     m_pAnimSprite = nullptr;
+
+    delete m_pIdleSprite;
+    delete m_pJumpSprite;
+    delete m_pMineSprite;
+	m_pIdleSprite = nullptr;
+	m_pJumpSprite = nullptr;
+	m_pMineSprite = nullptr;
 }
 
 bool Player::Initialise(Renderer& renderer)
 {
-
     m_pRenderer = &renderer;
-    m_pAnimSprite = m_pRenderer->CreateAnimatedSprite("../assets/playerAnimSprite2.png");
-    m_pAnimSprite->SetupFrames(72, 125);
-    m_pAnimSprite->SetLooping(true);
-    m_pAnimSprite->SetFrameDuration(0.07f);
-    m_pAnimSprite->Animate();
-    m_pAnimSprite->SetScale(0.8f);
+
+	LoadAnimatedSprites();
 
     if (m_pAnimSprite == nullptr)
     {
@@ -44,7 +46,6 @@ bool Player::Initialise(Renderer& renderer)
     }
 
     m_position = { 400, 300 };
-    //m_position = Vector2(m_pRenderer->GetWidth() * 0.4f, m_pRenderer->GetHeight() * 0.4f);
     m_bAlive = true;
     return true;
 }
@@ -67,15 +68,47 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
         LogManager::GetInstance().Log("DEAD!");
     }
 
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_W) || IsKeyHeld(inputSystem, SDL_SCANCODE_UP))    direction.y -= 1.0f;
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_S) || IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN))  direction.y += 1.0f;
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_A) || IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT))  direction.x -= 1.0f;
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_D) || IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) direction.x += 1.0f;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_W))    direction.y -= 1.0f;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_S))  direction.y += 1.0f;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_A))  direction.x -= 1.0f;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_D)) direction.x += 1.0f;
+    if (m_noClip) {
+        if (IsKeyHeld(inputSystem, SDL_SCANCODE_W))  direction.y -= 1.0f;
+        if (IsKeyHeld(inputSystem, SDL_SCANCODE_S))  direction.y += 1.0f;
+    }
 
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_UP))    GridState::GetInstance().BreakBlock(m_position, 'U');
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN))  GridState::GetInstance().BreakBlock(m_position, 'D');
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT))  GridState::GetInstance().BreakBlock(m_position, 'L');
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) GridState::GetInstance().BreakBlock(m_position, 'R');
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_A))      direction.x -= 1.0f;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_D))      direction.x += 1.0f;
+
+
+    m_isMining = false;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_UP)) {
+        GridState::GetInstance().BreakBlock(m_position, 'U');
+        m_isMining = true;
+    }
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN)) {
+        GridState::GetInstance().BreakBlock(m_position, 'D');
+        m_isMining = true;
+    }
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT)) {
+        GridState::GetInstance().BreakBlock(m_position, 'L');
+        m_isMining = true;
+    }
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) {
+        GridState::GetInstance().BreakBlock(m_position, 'R');
+        m_isMining = true;
+    }
+
+	if (m_isMining && m_animationState != MINE) {
+		m_pAnimSprite = m_pMineSprite;
+		m_animationState = MINE;
+		m_pMineSprite->Animate();
+	}
+	else if (!m_isMining && m_animationState == MINE) {
+		m_pAnimSprite = m_pIdleSprite;
+		m_animationState = IDLE;
+        m_pAnimSprite->Animate();
+	}
 
     //controller input
     if (inputSystem.GetNumberOfControllersAttached() > 0) {
@@ -97,7 +130,6 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
         }
     }
 
-
     //normalising to prevent faster diagonal movement
     if (direction.x != 0.0f || direction.y != 0.0f)
     {
@@ -112,31 +144,72 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     const int spriteHalfWidth = m_pAnimSprite->GetWidth() / 2;
     const int spriteHalfHeight = m_pAnimSprite->GetHeight() / 2;
 
+	float spriteW = static_cast<float>(m_pAnimSprite->GetWidth());
+	float spriteH = static_cast<float>(m_pAnimSprite->GetHeight());
+
+    // Gravity
+	if (!m_noClip) {
+        // If on ground and space is pressed, jump
+        if (m_OnGround && IsKeyHeld(inputSystem, SDL_SCANCODE_SPACE)) {
+			m_Velocity.y = -JUMP_FORCE;
+			m_OnGround = false;
+
+            // Change animation to jump/fall
+            if (m_animationState != JUMP) {
+                m_pAnimSprite = m_pJumpSprite;
+                m_animationState = JUMP;
+                m_pJumpSprite->SetCurrentFrame(0);
+                m_pJumpSprite->Animate();
+            }
+        }
+
+        // If not on ground, apply gravity
+		if (!m_OnGround) {
+			m_Velocity.y += GRAVITY * deltaTime;
+
+		}
+        else {
+			// If on ground, reset vertical velocity
+			m_Velocity.y = 0.0f;
+
+			// Change animation to idle 
+            if (m_isMining == false && m_animationState != IDLE) {
+                m_pAnimSprite = m_pIdleSprite;
+                m_animationState = IDLE;
+            }
+
+        }
+	}
+
     //move the player
     Vector2 testPos = m_position;
 
-    //fixes issue with player collision box
-    float paddingX = (m_pAnimSprite->GetWidth() / 2.0f) + 5.0f;
-    float paddingY = (m_pAnimSprite->GetHeight() / 3.0f) - 20.0f;
-
     testPos += direction * m_speed * deltaTime;
+	testPos.y += m_Velocity.y * deltaTime;
 
-    Box testBoxX(testPos.x + paddingX, m_position.y + paddingY, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
+    Box testBoxX(testPos.x, m_position.y, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
 
     if (!GridState::GetInstance().CheckCollision(testBoxX)) {
         m_position.x = testPos.x;
     }
 
-    Box testBoxY(m_position.x + paddingX, testPos.y + paddingY, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
+    Box testBoxY(m_position.x, testPos.y, (float)m_pAnimSprite->GetWidth(), (float)m_pAnimSprite->GetHeight());
 
     if (!GridState::GetInstance().CheckCollision(testBoxY)) {
         m_position.y = testPos.y;
+        m_OnGround = false;
+    }
+    else {
+        if (m_Velocity.y > 0.0f) {
+            // Moving down - landed on ground
+            m_OnGround = true;
+        }
+
+		m_Velocity.y = 0.0f; 
     }
 
     //clamp to screen with halfWidth, to prevent clipping outside screen
-    
-
-    float wallMarginX = screenWidth * 0.00f;  //2% horizontal margin (for the walls)
+    float wallMarginX = screenWidth * 0.005f;  //0.5% horizontal margin (for the walls)
     float wallMarginY = screenHeight * 0.00f; //PLayer can't move past the top 5%
 
     float minX = wallMarginX + spriteHalfWidth;
@@ -144,13 +217,15 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     float minY = wallMarginY + spriteHalfHeight;
     float maxY = static_cast<float>(screenHeight - spriteHalfHeight);
 
-
     m_position.x = std::max(minX, std::min(maxX, m_position.x));
     m_position.y = std::max(minY, std::min(maxY, m_position.y));
 
     m_dirtCount = GridState::GetInstance().GetDirt();
     m_stoneCount = GridState::GetInstance().GetStone();
     m_gemCount = GridState::GetInstance().GetGem();
+
+	if (direction.x < 0.0f) m_facingLeft = true;
+	else if (direction.x > 0.0f) m_facingLeft = false;
 
     m_pAnimSprite->Process(deltaTime);
 }
@@ -161,7 +236,7 @@ void Player::Draw(Renderer& renderer)
     {
         m_pAnimSprite->SetX(static_cast<int>(m_position.x));
         m_pAnimSprite->SetY(static_cast<int>(m_position.y));
-        m_pAnimSprite->Draw(renderer);
+        m_pAnimSprite->Draw(renderer, m_facingLeft);
     }
 }
 
@@ -174,5 +249,31 @@ bool Player::IsKeyHeld(InputSystem& input, SDL_Scancode key)
     return input.GetKeyState(key) == BS_HELD;
 }
 
+void Player::LoadAnimatedSprites() {
+	m_pIdleSprite = m_pRenderer->CreateAnimatedSprite("../assets/Idle.png");
+	m_pJumpSprite = m_pRenderer->CreateAnimatedSprite("../assets/Jump.png");
+	m_pMineSprite = m_pRenderer->CreateAnimatedSprite("../assets/Swing.png");
 
+    m_pIdleSprite->SetupFrames(32, 32);
+	m_pIdleSprite->SetLooping(true);
+	m_pIdleSprite->SetFrameDuration(0.1f);
+	m_pIdleSprite->Animate();
+    m_pIdleSprite->SetScale(1.9f);
+
+	m_pJumpSprite->SetupFrames(32, 32);
+	m_pJumpSprite->SetLooping(false);
+	m_pJumpSprite->SetFrameDuration(0.05f);
+	m_pJumpSprite->Animate();
+	m_pJumpSprite->SetScale(1.9f);
+
+	m_pMineSprite->SetupFrames(32, 32);
+	m_pMineSprite->SetLooping(true);
+	m_pMineSprite->SetFrameDuration(0.1f);
+	m_pMineSprite->Animate();
+	m_pMineSprite->SetScale(1.9f);
+
+    // Default
+    m_pAnimSprite = m_pIdleSprite;
+	m_animationState = IDLE;
+}
 
