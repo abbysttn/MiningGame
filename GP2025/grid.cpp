@@ -28,7 +28,7 @@ bool Grid::Initialise(Renderer& renderer)
 	float levelPixelHeight = m_rows * m_tileSize;
 
 	screenOffsetX = ((screenWidth - levelPixelWidth) / 2.0f) + (m_tileSize / 2.0f);
-	screenOffsetY = (m_backgroundHeight / 2.0f) - (levelPixelHeight * 0.4f);
+	screenOffsetY = (m_backgroundHeight / 7.05f);
 
 	for (size_t y = 0; y < (size_t)m_rows; y++) {
 		for (size_t x = 0; x < (size_t)m_cols; x++) {

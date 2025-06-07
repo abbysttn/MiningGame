@@ -210,3 +210,8 @@ bool AnimatedSprite::FramesFinished()
 {
 	return (m_iCurrentFrame >= m_iTotalFrames);
 }
+
+int AnimatedSprite::GetCurrentFrame()
+{
+	return m_iCurrentFrame;
+}
