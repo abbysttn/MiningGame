@@ -144,7 +144,7 @@ void Particle::Update(float deltaTime) {
     else if (m_type == ParticleType::DigDirt) {
         m_velocity.y += m_gravity * deltaTime;
         m_velocity.x *= 0.99f;
-        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2, m_position.y, 1.0f, GridState::GetInstance().GetTileSize() / 2);
+        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2.0f, m_position.y, 1.0f, GridState::GetInstance().GetTileSize() / 2.0f);
 
         if (!GridState::GetInstance().CheckCollision(pticle)) {
             m_position += m_velocity * deltaTime;
@@ -158,7 +158,7 @@ void Particle::Update(float deltaTime) {
     else if (m_type == ParticleType::BlockBreak) {
         m_velocity.y += m_gravity * deltaTime;
         m_velocity.x *= 0.992f;
-        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2, m_position.y, 1.0f, GridState::GetInstance().GetTileSize() / 2);
+        Box pticle(m_position.x + GridState::GetInstance().GetTileSize()/2.0f, m_position.y, 1.0f, GridState::GetInstance().GetTileSize()/2.0f);
 
         if (!GridState::GetInstance().CheckCollision(pticle)) {
             m_position += m_velocity * deltaTime;
@@ -174,7 +174,7 @@ void Particle::Update(float deltaTime) {
         m_velocity.y += m_gravity * deltaTime * 3.5f;
         m_velocity.x *= 0.992f;
 
-        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2, m_position.y, 1.0f, GridState::GetInstance().GetTileSize() / 2);
+        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2.0f, m_position.y, 1.0f, GridState::GetInstance().GetTileSize() / 2);
 
         if (!GridState::GetInstance().CheckCollision(pticle)) {
             m_position += m_velocity * deltaTime;

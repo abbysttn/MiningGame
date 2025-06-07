@@ -79,9 +79,9 @@ void GridState::BreakBlock(Vector2 position, char direction)
 				m_breakBlock = true;
 				switch (blockType) {
 
-				case 'G': m_gemCount += block->GetResourceAmount(); break;
-				case 'D': m_dirtCount += block->GetResourceAmount(); break;
-				case 'S': m_stoneCount += block->GetResourceAmount(); break;
+				case 'G': m_gemCount += block->GetResourceAmount(); m_lastBlockType = 2; break;
+				case 'D': m_dirtCount += block->GetResourceAmount(); m_lastBlockType = 0; break;
+				case 'S': m_stoneCount += block->GetResourceAmount(); m_lastBlockType = 1; break;
 
 				}
 
@@ -159,6 +159,10 @@ bool GridState::CheckBlockDig() {
 	else {
 		return false;
 	}
+}
+
+int GridState::GetLastBlockType() {
+	return m_lastBlockType;
 }
 
 bool GridState::CheckBlockBreak() {

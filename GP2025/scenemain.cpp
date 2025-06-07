@@ -235,8 +235,34 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         TestingFeatures(inputSystem);
 
         float pX = m_pPlayer->GetPosition().x;
-        float pY = m_pPlayer->GetPosition().y - m_pPlayer->GetPlayerHeight() / 4.0f;
+        float pY = m_pPlayer->GetPosition().y/* - m_pPlayer->GetPlayerHeight() / 4.0f*/;
         Vector2 pPos = Vector2(pX, pY);
+
+
+        int type = GridState::GetInstance().GetLastBlockType();
+
+        Sprite* pickupSprite = m_pDirtPickupSprite;
+
+
+        switch (type) {
+        case 0: 
+            pickupSprite = m_pDirtPickupSprite;
+
+            break;
+
+        case 1: 
+            pickupSprite = m_pStonePickupSprite;
+
+            break;
+        case 2:
+            pickupSprite = m_pGemPickupSprite;
+
+            break;
+        default:
+
+            break;
+        }
+
 
         m_dirtParticleCooldown -= deltaTime;
         if (GridState::GetInstance().CheckBlockDig() && m_dirtParticleCooldown <= 0.0f) {
@@ -256,7 +282,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
             m_particleSystems.push_back(std::move(ps));
 
             ParticleSystem ps2;
-            ps2.Initialise(m_pDirtPickupSprite, m_pPlayer, 5);
+            ps2.Initialise(pickupSprite, m_pPlayer, 5);
             ps2.ActivateAt(m_pPlayer->GetPosition());
             m_particleSystems.push_back(std::move(ps2));
         }
