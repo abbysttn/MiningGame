@@ -91,9 +91,11 @@ void SceneMain::CheckCollision(Player* player, SpiderState* spider)
             Vector2 pushDirection(spider->GetPosition().x - player->GetPosition().x,
                 spider->GetPosition().y - player->GetPosition().y);
 
-            spider->SetState(HURT);
-            spider->ApplyPushback(pushDirection);
-            m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 1.0f);
+            if (spider->GetState() != DIE || spider->GetState() == HURT) {
+                spider->SetState(HURT);
+                spider->ApplyPushback(pushDirection);
+                m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 1.0f);
+            }
         }
     }
 }
@@ -156,18 +158,13 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     renderer.SetCameraPosition(static_cast<float>(m_screenX/2), m_pMineBackground->GetHeight() * 0.1f);
 
-    m_testSpider = new GameObjectPool(SpiderState(), 2);
+    m_testSpider = new GameObjectPool(SpiderState(), 10);
 
     for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
         if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
             SpiderState* spider = dynamic_cast<SpiderState*>(obj);
-            spider->InitialiseSpiders(renderer);
-            spider->SetActive(true);
-
-            if (i == 0) {
-                Vector2 pos = { 200, 300 };
-                spider->SetPosition(pos);
-            }
+            spider->InitialiseSpiders(renderer, m_screenX, scaledHeight);
+            spider->SetActive(false);
         }
     }
 
@@ -212,18 +209,21 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
                 if (obj && dynamic_cast<SpiderState*>(obj)) {
                     SpiderState* spider = dynamic_cast<SpiderState*>(obj);
 
-                    Box spiderBox(
-                        spider->GetPosition().x,
-                        spider->GetPosition().y,
-                        (float)spider->GetSpriteWidth(),
-                        (float)spider->GetSpriteHeight()
-                    );
+                    if (spider->IsActive()) {
 
-                    m_collisionTree->insert(spider, spiderBox);
+                        Box spiderBox(
+                            spider->GetPosition().x,
+                            spider->GetPosition().y,
+                            (float)spider->GetSpriteWidth(),
+                            (float)spider->GetSpriteHeight()
+                        );
 
-                    CheckCollision(m_pPlayer, spider);
+                        m_collisionTree->insert(spider, spiderBox);
 
-                    spider->Update(deltaTime, m_pPlayer->GetPosition());
+                        CheckCollision(m_pPlayer, spider);
+
+                        spider->Update(deltaTime, m_pPlayer->GetPosition());
+                    }
                 }
             }
         }
@@ -265,7 +265,9 @@ void SceneMain::Draw(Renderer& renderer){
         if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
             if (obj && obj->IsActive()) {
                 SpiderState* spider = dynamic_cast<SpiderState*>(obj);
-                spider->Draw(renderer);
+                if (spider->IsActive()) {
+                    spider->Draw(renderer);
+                }
             }
         }
     }

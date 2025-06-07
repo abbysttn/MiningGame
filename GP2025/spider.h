@@ -34,6 +34,8 @@ public:
 
 	bool IsPushed();
 
+	bool IsDead();
+
 protected:
 
 private:

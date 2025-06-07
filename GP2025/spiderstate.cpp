@@ -5,6 +5,7 @@
 #include "renderer.h"
 
 #include "collisionhelper.h"
+#include "logmanager.h"
 #include "gridstate.h"
 #include <algorithm>
 
@@ -18,7 +19,7 @@ SpiderState::~SpiderState()
 	m_spiderPool = nullptr;
 }
 
-void SpiderState::InitialiseSpiders(Renderer& renderer)
+void SpiderState::InitialiseSpiders(Renderer& renderer, int screenWidth, int screenHeight)
 {
 	if (m_spiderPool) return;
 
@@ -62,8 +63,8 @@ void SpiderState::InitialiseSpiders(Renderer& renderer)
 		}
 	}
 
-	//screenWidth = renderer.GetWidth();
-	//screenHeight = renderer.GetWorldHeight();
+	this->screenWidth = screenWidth;
+	this->screenHeight = screenHeight;
 }
 
 void SpiderState::SetState(SpiderStates newState)
@@ -77,6 +78,10 @@ void SpiderState::SetState(SpiderStates newState)
 void SpiderState::Update(float deltaTime, Vector2 playerPos)
 {
 	if (m_active) {
+		if (m_spiderHealth <= 0.0f) {
+			SetState(DIE);
+		}
+
 		m_target = playerPos;
 		UpdateAI(deltaTime);
 
@@ -142,26 +147,22 @@ void SpiderState::UpdateAI(float deltaTime)
 			SetState(CRAWL);
 		}
 		break;
+
+	case 4:
+		if (spider->IsDead()) {
+			spider->SetAlive(false);
+			m_active = false;
+		}
 	}
 
-	if (m_spiderHealth <= 0.0f) {
-		SetState(DIE);
-	}
-
-	/*const int spriteHalfWidth = GetSpriteWidth() / 2;
-	const int spriteHalfHeight = GetSpriteHeight() / 2;
+	const int spriteHalfWidth = GetSpriteWidth() / 2;
 
 	float wallMarginX = screenWidth * 0.00f;
-	float wallMarginY = screenHeight * 0.00f;
 
 	float minX = wallMarginX + spriteHalfWidth;
 	float maxX = screenWidth - wallMarginX - spriteHalfWidth;
-	float minY = wallMarginY + spriteHalfHeight;
-	float maxY = static_cast<float>(screenHeight - spriteHalfHeight);*/
 
-
-	//m_spiderPos.x = std::max(minX, std::min(maxX, m_spiderPos.x));
-	//m_spiderPos.y = std::max(minY, std::min(maxY, m_spiderPos.y));
+	m_spiderPos.x = std::max(minX, std::min(maxX, m_spiderPos.x));
 }
 
 int SpiderState::GetSpriteHeight()
@@ -227,6 +228,11 @@ void SpiderState::ApplyPushback(Vector2 direction)
 	}
 }
 
+SpiderStates SpiderState::GetState()
+{
+	return m_currentState;
+}
+
 void SpiderState::EnterState(SpiderStates newState)
 {
 	if (GameObject* obj = m_spiderPool->getObjectAtIndex(newState)) {
@@ -269,7 +275,7 @@ void SpiderState::Move(Vector2 direction, float deltaTime, Vector2 attackPos)
 {
 	Vector2 testPos = m_spiderPos;
 
-	testPos += direction * 50.0f * deltaTime;
+	testPos.x += direction.x * 50.0f * deltaTime;
 
 	if (m_currentState == SpiderStates::ATTACK) {
 		testPos = attackPos;
@@ -279,14 +285,65 @@ void SpiderState::Move(Vector2 direction, float deltaTime, Vector2 attackPos)
 	float paddingY = (m_spiderHeight / 2.0f) + 20.0f;
 
 	Box testBoxX(testPos.x + paddingX, m_spiderPos.y + paddingY, m_spiderWidth, m_spiderHeight);
+	bool canMoveX = !GridState::GetInstance().CheckCollision(testBoxX);
 
-	if (!GridState::GetInstance().CheckCollision(testBoxX)) {
+	m_climbing = false;
+
+	if (canMoveX) {
 		m_spiderPos.x = testPos.x;
 	}
-
-	Box testBoxY(m_spiderPos.x + paddingX, testPos.y + paddingY, m_spiderWidth, m_spiderHeight);
-
-	if (!GridState::GetInstance().CheckCollision(testBoxY)) {
-		m_spiderPos.y = testPos.y;
+	else {
+		m_spiderPos.y -= 25.0f * deltaTime;
+		m_climbing = true;
 	}
+
+	if (!m_climbing) {
+		float finalGroundY = FindGround(m_spiderPos.x);
+
+		if (abs(m_spiderPos.y - finalGroundY) > 1.0f) {
+			float adjustSpeed = 150.0f * deltaTime;
+
+			if (m_spiderPos.y < finalGroundY) {
+				m_spiderPos.y = std::min(m_spiderPos.y + adjustSpeed, finalGroundY);
+			}
+			else {
+				m_spiderPos.y = std::max(m_spiderPos.y - adjustSpeed, finalGroundY);
+			}
+		}
+		else {
+			m_spiderPos.y = finalGroundY;
+		}
+	}
+
+	Box finalPos(m_spiderPos.x + paddingX, m_spiderPos.y + paddingY, m_spiderWidth, m_spiderHealth);
+
+	if (GridState::GetInstance().CheckCollision(finalPos)) {
+		m_spiderPos.y -= 1.0f;
+	}
+}
+
+float SpiderState::FindGround(float x)
+{
+	float paddingX = (m_spiderWidth / 2.0f) + 5.0f;
+	float paddingY = (m_spiderHeight / 2.0f) + 20.0f;
+
+	float testY = m_spiderPos.y;
+	float lowestValidY = testY;
+
+	Box testBox(x + paddingX, testY + paddingY, m_spiderWidth, m_spiderHeight);
+
+	while (GridState::GetInstance().CheckCollision(testBox) && testY > 0) {
+		testY -= 1.0f;
+		testBox.y = testY + paddingY;
+		lowestValidY = testY;
+	}
+
+	testBox.y = testY + paddingY;
+	while (!GridState::GetInstance().CheckCollision(testBox) && testY < screenHeight) {
+		lowestValidY = testY;
+		testY += 1.0f;
+		testBox.y = testY + paddingY;
+	}
+
+	return lowestValidY;
 }

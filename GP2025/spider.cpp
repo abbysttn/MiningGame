@@ -140,3 +140,12 @@ bool Spider::IsPushed()
 {
 	return m_isPushed;
 }
+
+bool Spider::IsDead()
+{
+	if (m_sprite->GetCurrentFrame() >= 8) {
+		return true;
+	}
+
+	return false;
+}

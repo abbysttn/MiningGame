@@ -21,7 +21,7 @@ public:
 	SpiderState();
 	~SpiderState();
 
-	void InitialiseSpiders(Renderer& renderer);
+	void InitialiseSpiders(Renderer& renderer, int screenWidth, int screenHeight);
 	void SetState(SpiderStates newState);
 	void Update(float deltaTime, Vector2 playerPos);
 	void Draw(Renderer& renderer);
@@ -39,6 +39,9 @@ public:
 
 	Vector2 GetPosition();
 	void ApplyPushback(Vector2 direction);
+
+	SpiderStates GetState();
+	float FindGround(float x);
 
 protected:
 	void EnterState(SpiderStates newState);
@@ -61,6 +64,7 @@ protected:
 	Vector2 m_spiderPos;
 
 	bool m_active;
+	bool m_climbing;
 
 	Vector2 m_target;
 	float m_attackRange = 200.0f;
