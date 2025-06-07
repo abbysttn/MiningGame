@@ -43,9 +43,6 @@ void Particle::Activate(Vector2 position) {
             float scale = 5.0f + static_cast<float>(rand()) / RAND_MAX * 3.0f;
             float colourVariation = 0.4f + static_cast<float>(rand()) / RAND_MAX * 0.25f;
             m_pSprite->SetScale(7.0f);
-            m_pSprite->SetRedTint(0.5f);
-            m_pSprite->SetGreenTint(0.40f);
-            m_pSprite->SetBlueTint(0.25f);
         }
         m_speedMultiplier = 200.0f;
         m_velocity = Vector2(
@@ -60,9 +57,6 @@ void Particle::Activate(Vector2 position) {
             float scale = 8.0f + static_cast<float>(rand()) / RAND_MAX * 5.0f;
             float colourVariation = 0.5f + static_cast<float>(rand()) / RAND_MAX * 0.35f;
             m_pSprite->SetScale(scale);
-            m_pSprite->SetRedTint(0.55f);
-            m_pSprite->SetGreenTint(0.40f);
-            m_pSprite->SetBlueTint(0.25f);
         }
         m_speedMultiplier = 400.0f;
         m_velocity = Vector2(

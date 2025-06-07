@@ -90,7 +90,7 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_pVisionLevel = 1;
     m_visionLevels = { 1.0f, 1.2f, 1.3f, 1.5f, 2.0f };
 
-
+    m_dirtParticleCooldown = 0.5f;
     if (!m_soundSystem.Initialise()) {
         std::cerr << "Failed to initialise FMOD system!" << std::endl;
         return false;
@@ -137,10 +137,10 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_pCoinSprite = renderer.CreateSprite("../assets/ball.png");
     m_pCoinSprite->SetScale(0.05f);
 
-    m_pDirtSprite = renderer.CreateSprite("../assets/particle.png");
+    m_pDirtSprite = renderer.CreateSprite("../assets/dirtparticle.png");
     m_pDirtSprite->SetScale(5.0f);
 
-    m_pBreakBlockSprite = renderer.CreateSprite("../assets/particle.png");
+    m_pBreakBlockSprite = renderer.CreateSprite("../assets/dirtparticle.png");
     m_pBreakBlockSprite->SetScale(5.0f);
 
     m_pWaterDropSprite = renderer.CreateSprite("../assets/particle.png");
@@ -178,19 +178,29 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
         TestingFeatures(inputSystem);
 
+        float pX = m_pPlayer->GetPosition().x;
+        float pY = m_pPlayer->GetPosition().y - m_pPlayer->GetPlayerHeight() / 4.0f;
+        Vector2 pPos = Vector2(pX, pY);
 
-        
-        //i did the x and y the swrong way around
-        if (GridState::GetInstance().CheckBlockDig()) {
-            float pX = m_pPlayer->GetPosition().x;
-            float pY = m_pPlayer->GetPosition().y + m_pPlayer->GetPlayerWidth() / 2.0f;
+        m_dirtParticleCooldown -= deltaTime;
+        if (GridState::GetInstance().CheckBlockDig() && m_dirtParticleCooldown <= 0.0f) {
 
-            Vector2 pPos = Vector2(pX, pY);
+
             ParticleSystem ps;
-            ps.Initialise(m_pDirtSprite, m_pPlayer, 5, ParticleType::DigDirt);
+            ps.Initialise(m_pDirtSprite, m_pPlayer, 1, ParticleType::DigDirt);
+            ps.ActivateAt(pPos);
+            m_particleSystems.push_back(std::move(ps));
+            m_dirtParticleCooldown = 0.35f;
+        }
+
+        if (GridState::GetInstance().CheckBlockBreak()) {
+            ParticleSystem ps;
+            ps.Initialise(m_pBreakBlockSprite, m_pPlayer, 35, ParticleType::BlockBreak);
             ps.ActivateAt(pPos);
             m_particleSystems.push_back(std::move(ps));
         }
+
+
 
 
 

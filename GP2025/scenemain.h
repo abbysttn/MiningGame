@@ -56,6 +56,8 @@ private:
 	float m_pVisionLevel;
 	std::vector<float> m_visionLevels;
 
+	float m_dirtParticleCooldown;
+
 	float m_screenWidth;
 	float m_screenHeight;
 	Player* m_pPlayer;

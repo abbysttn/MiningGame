@@ -43,6 +43,7 @@ public:
 	int GetGem() const { return m_gemCount; }
 
 	bool CheckBlockDig();
+	bool CheckBlockBreak();
 
 protected:
 
@@ -62,6 +63,7 @@ protected:
 private:
 
 	bool m_digBlock;
+	bool m_breakBlock;
 };
 
 #endif // !__GRIDSTATE_H__

@@ -74,7 +74,7 @@ void GridState::BreakBlock(Vector2 position, char direction)
 
 			if (block->BlockBroken()) {
 				char blockType = block->GetBlockType();
-
+				m_breakBlock = true;
 				switch (blockType) {
 
 				case 'G': m_gemCount += block->GetResourceAmount(); break;
@@ -140,6 +140,16 @@ float GridState::GetTileSize()
 bool GridState::CheckBlockDig() {
 	if (m_digBlock == true) {
 		m_digBlock = false;
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+bool GridState::CheckBlockBreak() {
+	if (m_breakBlock == true) {
+		m_breakBlock = false;
 		return true;
 	}
 	else {
