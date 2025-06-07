@@ -38,8 +38,6 @@ SceneTitlescreen::SceneTitlescreen(FMOD::System* fmodSystem)
 
 SceneTitlescreen::~SceneTitlescreen()
 {
-
-
 	delete m_pStartBtnSprite;
 	m_pStartBtnSprite = nullptr;
 
@@ -64,12 +62,14 @@ SceneTitlescreen::~SceneTitlescreen()
 	m_tSoundSystem.Release();
 }
 
-void SceneTitlescreen::OnEnter() {
+void SceneTitlescreen::OnEnter() 
+{
 	m_tSoundSystem.PlaySound("bgm");
 
 }
 
-void SceneTitlescreen::OnExit() {
+void SceneTitlescreen::OnExit() 
+{
 	m_tSoundSystem.StopSound("bgm");
 
 }
@@ -77,14 +77,13 @@ void SceneTitlescreen::OnExit() {
 bool SceneTitlescreen::Initialise(Renderer& renderer)
 {
 
-	if (!m_tSoundSystem.Initialise()) {
+	if (!m_tSoundSystem.Initialise()) 
+	{
 		std::cerr << "Failed to initialise FMOD system!" << std::endl;
 		return false;
 	}
 	m_tSoundSystem.LoadSound("click", "../assets/sound/Button_Click.mp3");
 	m_tSoundSystem.LoadSound("bgm", "../assets/sound/BGM_Titlescreen.mp3", true);
-
-
 
 	m_screenWidth = static_cast<float>(renderer.GetWidth());
 	m_screenHeight = static_cast<float>(renderer.GetHeight());
@@ -178,7 +177,6 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 
 	m_tSoundSystem.PlaySound("bgm");
 
-
 	return true;
 }
 
@@ -197,10 +195,9 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 
 			if (inputSystem.GetMouseButtonState(SDL_BUTTON_LEFT) == BS_PRESSED)
 			{
-
 				m_tSoundSystem.PlaySound("click");
 
-				Game::GetInstance().SetCurrentScene(1);
+				Game::GetInstance().SetCurrentScene(3);
 			}
 		}
 		else
@@ -224,11 +221,6 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 
 			if (inputSystem.GetMouseButtonState(SDL_BUTTON_LEFT) == BS_PRESSED)
 			{
-				if (m_pClickSound)
-				{
-					m_tSoundSystem.PlaySound("click");
-				}
-
 				m_tSoundSystem.StopSound("bgm");
 
 				Game::GetInstance().Quit();
