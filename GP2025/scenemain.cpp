@@ -12,6 +12,7 @@
 #include "logmanager.h"
 
 #include "gridstate.h"
+#include "collisionhelper.h"
 
 #include <fmod.hpp>
 #include <fmod_errors.h>
@@ -28,13 +29,16 @@ SceneMain::SceneMain()
     , m_pCoinSprite(nullptr)
     , m_pDirtSprite(nullptr)
     , m_pBreakBlockSprite(nullptr)
-    , ui(nullptr)
+    , ui(nullptr), m_testSpider(nullptr)
 {}
 
 SceneMain::~SceneMain()
 {
     delete m_pPlayer;
     m_pPlayer = nullptr;
+
+    delete m_testSpider;
+    m_testSpider = nullptr;
 
     GridState::GetInstance().ResetGrid();
 
@@ -96,7 +100,32 @@ void SceneMain::OnEnter() {
 
 void SceneMain::OnExit()
 {
-};
+}
+void SceneMain::CheckCollision(Player* player, SpiderState* spider)
+{
+    Box playerBox(m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPlayerHeight(), m_pPlayer->GetPlayerHeight());
+
+    auto potentialCollisions = m_collisionTree->queryRange(playerBox);
+
+    for (auto* obj : potentialCollisions) {
+        if (SpiderState* spider = dynamic_cast<SpiderState*>(obj)) {
+            Vector2 pushDirection(spider->GetPosition().x - player->GetPosition().x,
+                spider->GetPosition().y - player->GetPosition().y);
+
+            if (spider->GetState() != SpiderStates::DIE || spider->GetState() == SpiderStates::HURT) {
+                if (m_pPlayer->GetCurrentState() == PlayerAnimationState::MINE) {
+                    spider->SetState(SpiderStates::HURT);
+                    spider->ApplyPushback(pushDirection);
+                }
+                else {
+                    spider->SetState(SpiderStates::HURT);
+                    spider->ApplyPushback(pushDirection);
+                    m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 1.0f);
+                }
+            }
+        }
+    }
+}
 
 bool SceneMain::Initialise(Renderer& renderer)
 {
@@ -131,6 +160,8 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_pMineBackground->SetY(static_cast<int>(scaledHeight / 2.0f));
     m_pMineBackground->SetScale(scale);
 
+    GridState::GetInstance().CreateGrid(renderer, scaledHeight);
+
     m_pPlayer = new Player();
     if (!m_pPlayer->Initialise(renderer))
     {
@@ -138,8 +169,6 @@ bool SceneMain::Initialise(Renderer& renderer)
         m_pPlayer = nullptr;
         return false;
     }
-
-    GridState::GetInstance().CreateGrid(renderer, scaledHeight);
 
     m_tileSize = GridState::GetInstance().GetTileSize();
 
@@ -162,6 +191,18 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     renderer.SetCameraPosition(static_cast<float>(m_screenX/2), m_pMineBackground->GetHeight() * 0.1f);
 
+    m_testSpider = new GameObjectPool(SpiderState(), 10);
+
+    for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
+        if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
+            SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+            spider->InitialiseSpiders(renderer, m_screenX, (int)scaledHeight);
+            spider->SetActive(false);
+        }
+    }
+
+    m_collisionTree = make_unique<QuadTree>(Box(0.0f, 0.0f, (float)renderer.GetWidth(), scaledHeight));
+
     m_bIsInitialised = true;
     LogManager::GetInstance().Log("SceneMain Initialized complete");
     return true;
@@ -169,6 +210,7 @@ bool SceneMain::Initialise(Renderer& renderer)
 
 void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 {
+    m_collisionTree->clear();
     
     //quit to menu
     ButtonState escapeState = inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE);
@@ -225,6 +267,42 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
         SpawnWaterDrops();
 
+        if (GridState::GetInstance().IsBlockBroken() && GridState::GetInstance().SpiderSpawn()) {
+            if (m_testSpider->usedCount() != m_testSpider->totalCount()) {
+                if (GameObject* obj = m_testSpider->getObject()) {
+                    if (obj && dynamic_cast<SpiderState*>(obj)) {
+                        SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+
+                        spider->SetActive(true);
+                        spider->SetPosition(GridState::GetInstance().GetBrokenBlockPos());
+                    }
+                }
+            }
+        }
+
+        for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
+            if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
+                if (obj && dynamic_cast<SpiderState*>(obj)) {
+                    SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+                    if (spider->IsActive()) {
+
+                        Box spiderBox(
+                            spider->GetPosition().x,
+                            spider->GetPosition().y,
+                            (float)spider->GetSpriteWidth(),
+                            (float)spider->GetSpriteHeight()
+                        );
+
+                        m_collisionTree->insert(spider, spiderBox);
+
+                        CheckCollision(m_pPlayer, spider);
+
+                        spider->Update(deltaTime, m_pPlayer->GetPosition());
+                    }
+                }
+            }
+        }
+
         GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
 
 
@@ -260,6 +338,17 @@ void SceneMain::Draw(Renderer& renderer){
 
     if (m_pPlayer) {
         m_pPlayer->Draw(renderer);
+    }
+
+    for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
+        if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
+            if (obj && obj->IsActive()) {
+                SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+                if (spider->IsActive()) {
+                    spider->Draw(renderer);
+                }
+            }
+        }
     }
 
     //draw active particles
@@ -407,17 +496,17 @@ void SceneMain::TestingFeatures(InputSystem& inputSystem) {
     if ((inputSystem.GetKeyState(SDL_SCANCODE_Y) == BS_PRESSED)&& m_pVisionLevel < m_visionLevels.size())
     {
         m_pVisionLevel++;
-        SetVisionLevel(m_pVisionLevel);
+        SetVisionLevel((int)m_pVisionLevel);
     }
     if ((inputSystem.GetKeyState(SDL_SCANCODE_T) == BS_PRESSED) && m_pVisionLevel > 1)
     {
         m_pVisionLevel--;
-        SetVisionLevel(m_pVisionLevel);
+        SetVisionLevel((int)m_pVisionLevel);
     }
 }
 
 void SceneMain::SetVisionLevel(int level) {
-    m_pVisionLevel = level;
+    m_pVisionLevel = (float)level;
     float newScale = m_visionLevels[level-1];
     m_pVignetteSprite->SetScale(newScale);
 }

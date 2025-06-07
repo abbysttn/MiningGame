@@ -8,13 +8,13 @@
 #include <cmath>
 #include <algorithm>
 
-class Player : public Entity {
+enum PlayerAnimationState {
+	IDLE,
+	JUMP,
+	MINE
+};
 
-	enum PlayerAnimationState {
-		IDLE,
-		JUMP,
-		MINE
-	};
+class Player : public Entity {
 
 public:
 	Player();
@@ -53,6 +53,7 @@ public:
 	void LoadAnimatedSprites();
 
 	bool IsPlayerMining() { return m_isMining; }
+	PlayerAnimationState GetCurrentState() { return m_animationState; }
 
 private:
 	float m_speed;

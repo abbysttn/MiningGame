@@ -10,6 +10,8 @@
 #include "logmanager.h"
 
 #include <string>
+#include <cmath>
+#include "inlinehelper.h"
 
 void GridState::CreateGrid(Renderer& renderer, float backgroundScale)
 {
@@ -84,6 +86,10 @@ void GridState::BreakBlock(Vector2 position, char direction)
 				}
 
 				//blockbreak particle activate
+				m_blockBroken = true;
+				m_lastBrokenPos = m_brokenBlockPos;
+				m_brokenBlockPos = block->Position();
+				m_brokenBlockTile = targetY;
 			}
 		}
 	}
@@ -102,6 +108,14 @@ char GridState::GetBlockType(Block* block)
 
 void GridState::ProcessGrid(float deltaTime, InputSystem& inputSystem)
 {
+	if (update1) {
+		m_blockBroken = false;
+		update1 = false;
+	}
+	else {
+		update1 = true;
+	}
+
 	m_gameGrid->Process(deltaTime, inputSystem);
 }
 
@@ -155,4 +169,23 @@ bool GridState::CheckBlockBreak() {
 	else {
 		return false;
 	}
+}
+Vector2 GridState::GetBrokenBlockPos()
+{
+	m_blockBroken = false;
+	return m_brokenBlockPos;
+}
+
+bool GridState::IsBlockBroken()
+{
+	return m_blockBroken;
+}
+
+bool GridState::SpiderSpawn()
+{
+	if (m_brokenBlockTile < 1) return false;
+
+	float spawnChance = 0.05f;
+
+	return (GetRandomPercentage() < spawnChance);
 }

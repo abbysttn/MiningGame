@@ -44,6 +44,9 @@ public:
 
 	bool CheckBlockDig();
 	bool CheckBlockBreak();
+	Vector2 GetBrokenBlockPos();
+	bool IsBlockBroken();
+	bool SpiderSpawn();
 
 protected:
 
@@ -55,6 +58,13 @@ public:
 
 protected:
 	Grid* m_gameGrid;
+
+	bool m_blockBroken = false;
+	Vector2 m_brokenBlockPos;
+	int m_brokenBlockTile;
+	Vector2 m_lastBrokenPos;
+
+	bool update1 = true;
 
 	int m_dirtCount = 0;
 	int m_stoneCount = 0;

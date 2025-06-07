@@ -21,7 +21,10 @@
 #include <list>
 #include <string>
 
-class Grid;
+#include "spiderstate.h"
+#include "gameobjectpool.h"
+
+#include "quadtree.h"
 
 class SceneMain : public Scene
 {
@@ -44,6 +47,8 @@ public:
 
 	void OnEnter() override;
 	void OnExit() override;
+
+	void CheckCollision(Player* player, SpiderState* spider);
 
 
 	void SetVisionLevel(int level);
@@ -77,6 +82,8 @@ private:
 
 	SoundSystem m_soundSystem;
 
+	GameObjectPool* m_testSpider;
+
 
 	//Particle System
 
@@ -93,6 +100,7 @@ private:
 
 
 	std::list<ParticleSystem> m_particleSystems;
+	unique_ptr<QuadTree> m_collisionTree;
 
 };
 
