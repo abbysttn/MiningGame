@@ -208,6 +208,13 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 		}
 	}
 
+	if (inputSystem.GetKeyState(SDL_SCANCODE_RETURN) == BS_PRESSED)
+	{
+		m_tSoundSystem.PlaySound("click");
+		Game::GetInstance().SetCurrentScene(3);
+	}
+
+
 	// Exit button
 	if (m_pExitBtnSprite)
 	{
@@ -232,6 +239,13 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 			m_pExitBtnSprite->SetGreenTint(m_defaultGreen);
 			m_pExitBtnSprite->SetBlueTint(m_defaultBlue);
 		}
+	}
+
+	if (inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE) == BS_PRESSED)
+	{
+		m_tSoundSystem.StopSound("bgm");
+
+		Game::GetInstance().Quit();
 	}
 
 	if (m_pFMODSystem)
