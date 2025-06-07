@@ -18,10 +18,18 @@
 #include "scenetitlescreen.h"
 #include "SceneSplashScreenAUT.h"
 #include "SceneSplashScreenFMOD.h"
+#include "scenepause.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
 FMOD::System* m_pFMODSystem = nullptr;
+
+// Scenes
+const int AUT_SPLASH_INDEX = 0;
+const int FMOD_SPLASH_INDEX = 1;
+const int TITLESCREEN_INDEX = 2;
+const int MAIN_SCENE_INDEX = 3;
+const int PAUSE_SCENE_INDEX = 4;
 
 Game& Game::GetInstance()
 {
@@ -48,6 +56,8 @@ Game::Game()
 	, m_iFrameCount(0)
 	, m_iFPS(0)
 	, m_iCurrentScene(0)
+	, m_iSceneBeforePause(0)
+	, m_pPauseSceneInstance(nullptr)
 	, m_pInputSystem(nullptr)
 	, m_bShowDebugWindow(false)
 	, m_pFMODSystem(nullptr)
@@ -158,8 +168,27 @@ bool Game::Initialise()
 	}
 	m_scenes.push_back(pMainScene);
 
-	m_iCurrentScene = 0;
-	SetCurrentScene(m_iCurrentScene);
+	// Pause scene
+	m_pPauseSceneInstance = new ScenePause();
+	if (!m_pPauseSceneInstance->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("Pause scene failed to load!");
+		for (Scene* s : m_scenes) delete s;
+		m_scenes.clear();
+		return false;
+	}
+	m_scenes.push_back(m_pPauseSceneInstance);
+
+	m_iCurrentScene = AUT_SPLASH_INDEX;
+	if (m_iCurrentScene >= 0 && m_iCurrentScene < static_cast<int>(m_scenes.size()) && m_scenes[m_iCurrentScene]) 
+	{
+		m_scenes[m_iCurrentScene]->OnEnter();
+	}
+	else 
+	{
+		LogManager::GetInstance().Log("Initial scene setup error!");
+		return false;
+	}
 
 	return true;
 }
@@ -217,7 +246,13 @@ void Game::Process(float deltaTime)
 {
 	ProcessFrameCounting(deltaTime);
 
-	m_scenes[m_iCurrentScene]->Process(deltaTime, *m_pInputSystem);
+	//m_scenes[m_iCurrentScene]->Process(deltaTime, *m_pInputSystem);
+
+	if (m_iCurrentScene >= 0 && m_iCurrentScene < static_cast<int>(m_scenes.size()) && m_scenes[m_iCurrentScene])
+	{
+		m_scenes[m_iCurrentScene]->Process(deltaTime, *m_pInputSystem);
+	}
+
 
 	// Toggle Debug Window
 	ButtonState backspaceState = m_pInputSystem->GetKeyState(SDL_SCANCODE_BACKSPACE);
@@ -227,31 +262,21 @@ void Game::Process(float deltaTime)
 		ToggleDebugWindow();
 	}
 
-	/*
-	* Scenes Order
-	* AUT Splash = 0
-	* FMOD Splash = 1
-	* Title screen = 2
-	* (Instructions scene)
-	* (Loading maybe) 
-	* Main Scene = 3
-	*/
-
-	if (m_iCurrentScene == 0)
+	if (m_iCurrentScene == AUT_SPLASH_INDEX)
 	{
 		SceneSplashScreenAUT* autSplash = dynamic_cast<SceneSplashScreenAUT*>(m_scenes[m_iCurrentScene]);
 		if (autSplash && autSplash->IsFinished())
 		{
-			SetCurrentScene(1); // Move to FMOD splash screen
+			SetCurrentScene(FMOD_SPLASH_INDEX); // Move to FMOD splash screen
 		}
 	}
 
-	else if (m_iCurrentScene == 1)
+	else if (m_iCurrentScene == FMOD_SPLASH_INDEX)
 	{
 		SceneSplashScreenFMOD* fmodSplash = dynamic_cast<SceneSplashScreenFMOD*>(m_scenes[m_iCurrentScene]);
 		if (fmodSplash && fmodSplash->IsFinished())
 		{
-			SetCurrentScene(2); // Move to title screen
+			SetCurrentScene(TITLESCREEN_INDEX); // Move to title screen
 		}
 	}
 
@@ -261,16 +286,23 @@ void Game::Process(float deltaTime)
 
 void Game::Draw(Renderer& renderer)
 {
-
 	++m_iFrameCount;
-
 	renderer.Clear();
 
+	if (m_iCurrentScene == PAUSE_SCENE_INDEX && m_iSceneBeforePause != -1 &&
+		m_iSceneBeforePause < static_cast<int>(m_scenes.size()) &&
+		m_scenes[m_iSceneBeforePause])
+	{
+		m_scenes[m_iSceneBeforePause]->Draw(renderer); // SHould draw game behind pause menu
+	}
+
 	//Draw Current Scene
-	m_scenes[m_iCurrentScene]->Draw(renderer);
+	if (m_iCurrentScene >= 0 && m_iCurrentScene < static_cast<int>(m_scenes.size()) && m_scenes[m_iCurrentScene])
+	{
+		m_scenes[m_iCurrentScene]->Draw(renderer);
+	}
 
 	DebugDraw();
-
 	renderer.Present();
 }
 
@@ -292,7 +324,8 @@ Game::ProcessFrameCounting(float deltaTime)
 void Game::DebugDraw
 ()
 {
-	if (m_bShowDebugWindow) {
+	if (m_bShowDebugWindow) 
+	{
 		bool open = true;
 
 		ImGui::Begin("Debug Window", &open, ImGuiWindowFlags_MenuBar);
@@ -326,26 +359,62 @@ void Game::SetCurrentScene(int sceneIndex)
 {
 	if (sceneIndex >= 0 && sceneIndex < static_cast<int>(m_scenes.size()))
 	{
-		m_scenes[m_iCurrentScene]->OnExit();
-		m_iCurrentScene = sceneIndex;
-		m_scenes[m_iCurrentScene]->OnEnter();
+		if (m_iCurrentScene >= 0 && m_iCurrentScene < static_cast<int>(m_scenes.size()) && m_scenes[m_iCurrentScene])
+		{
+			m_scenes[m_iCurrentScene]->OnExit();
+		}
 
+		m_iCurrentScene = sceneIndex;
+
+		if (m_iCurrentScene >= 0 && m_iCurrentScene < static_cast<int>(m_scenes.size()) && m_scenes[m_iCurrentScene]) {
+			m_scenes[m_iCurrentScene]->OnEnter();
+		}
 
 		SceneMain* mainScene = dynamic_cast<SceneMain*>(m_scenes[m_iCurrentScene]);
 		m_pRenderer->SetSceneMain(mainScene);
 
 		if (m_pInputSystem)
 		{
-			if (m_iCurrentScene == 2)
-			{
-				m_pInputSystem->ShowMouseCursor(true);
-				m_pInputSystem->SetRelativeMode(false);
-			}
-			else
-			{
-				m_pInputSystem->ShowMouseCursor(m_bShowDebugWindow);
-				m_pInputSystem->SetRelativeMode(false);
-			}
+			bool showCursor = m_bShowDebugWindow ||
+				(m_iCurrentScene == TITLESCREEN_INDEX) ||
+				(m_iCurrentScene == AUT_SPLASH_INDEX);
+
+			m_pInputSystem->ShowMouseCursor(showCursor);
+			m_pInputSystem->SetRelativeMode(!showCursor);
+		}
+		else
+		{
+			LogManager::GetInstance().Log("Game::SetCurrentScene error!");
 		}
 	}
+}
+
+void Game::PauseGame()
+{
+	if (m_iCurrentScene != PAUSE_SCENE_INDEX && m_iCurrentScene != TITLESCREEN_INDEX
+		&& m_iCurrentScene != AUT_SPLASH_INDEX && m_iCurrentScene != FMOD_SPLASH_INDEX)
+	{
+		LogManager::GetInstance().Log("Pausing Game");
+		m_iSceneBeforePause = m_iCurrentScene;
+		SetCurrentScene(PAUSE_SCENE_INDEX);
+	}
+}
+
+void Game::ResumeGame()
+{
+	if (m_iCurrentScene == PAUSE_SCENE_INDEX && m_iSceneBeforePause != -1)
+	{
+		LogManager::GetInstance().Log("Resuming Game");
+		SetCurrentScene(m_iSceneBeforePause);
+		m_iSceneBeforePause = -1; // Reset to no scene before pause
+	}
+	else
+	{
+		LogManager::GetInstance().Log("Cannot resume game, not in pause scene!");
+	}
+}
+
+bool Game::IsPaused() const
+{
+	return m_iCurrentScene == PAUSE_SCENE_INDEX;
 }

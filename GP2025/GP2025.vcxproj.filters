@@ -40,6 +40,9 @@
     <ClCompile Include="soundsystem.cpp" />
     <ClCompile Include="SceneSplashScreenAUT.cpp" />
     <ClCompile Include="SceneSplashScreenFMOD.cpp" />
+    <ClCompile Include="spider.cpp" />
+    <ClCompile Include="spiderstate.cpp" />
+    <ClCompile Include="scenepause.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animatedsprite.h" />
@@ -86,6 +89,9 @@
     <ClInclude Include="soundsystem.h" />
     <ClInclude Include="SceneSplashScreenAUT.h" />
     <ClInclude Include="SceneSplashScreenFMOD.h" />
+    <ClInclude Include="spider.h" />
+    <ClInclude Include="spiderstate.h" />
+    <ClInclude Include="scenepause.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="game\shaders\sprite.frag" />

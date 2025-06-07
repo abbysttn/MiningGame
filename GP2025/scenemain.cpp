@@ -204,7 +204,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     {
         m_paused = true;
         std::cout << "Escape pressed" << std::endl;
-        Game::GetInstance().SetCurrentScene(0);
+        Game::GetInstance().PauseGame();
     }
 
 
@@ -465,4 +465,11 @@ void SceneMain::SetVisionLevel(int level) {
     m_pVisionLevel = (float)level;
     float newScale = m_visionLevels[level-1];
     m_pVignetteSprite->SetScale(newScale);
+}
+
+
+void SceneMain::OnEnter()
+{
+	LogManager::GetInstance().Log("Entering SceneMain...");
+	Game& game = Game::GetInstance();
 }

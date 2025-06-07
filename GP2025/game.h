@@ -10,6 +10,7 @@ class Renderer;
 class Sprite;
 class Scene;
 class InputSystem;
+class ScenePause;
 
 class Game
 {
@@ -24,6 +25,10 @@ public:
 	void ToggleDebugWindow();
 
 	void SetCurrentScene(int index);
+
+	void PauseGame();
+	void ResumeGame();
+	bool IsPaused() const;
 
 protected:
 	void Process(float deltaTime);
@@ -73,6 +78,9 @@ protected:
 
 	std::vector<Scene*> m_scenes;
 	int m_iCurrentScene;
+	// Pause scene stuff
+	int m_iSceneBeforePause;
+	ScenePause* m_pPauseSceneInstance;
 
 	bool m_bShowDebugWindow;
 
