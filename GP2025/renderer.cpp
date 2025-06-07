@@ -406,7 +406,7 @@ Renderer::CreateAnimatedSprite(const char* pcFilename)
 }
 
 void
-Renderer::DrawAnimatedSprite(AnimatedSprite& sprite, int frame)
+Renderer::DrawAnimatedSprite(AnimatedSprite& sprite, int frame, bool flipHorizontal)
 {
 	m_pSpriteShader->SetActive();
 	float angleInDegrees = sprite.GetAngle();
@@ -416,10 +416,15 @@ Renderer::DrawAnimatedSprite(AnimatedSprite& sprite, int frame)
 	float angleInRadians = (angleInDegrees * PI) / 180.0f;
 	Matrix4 world;
 	SetIdentity(world);
-	world.m[0][0] = cosf(angleInRadians) * (sizeX);
-	world.m[0][1] = -sinf(angleInRadians) * sizeY;
-	world.m[1][0] = sinf(angleInRadians) * (sizeX);
-	world.m[1][1] = cosf(angleInRadians) * sizeY;
+
+	float scaleX = flipHorizontal ? -1.0f : 1.0f; 
+	float scaleY = 1.0f; 
+
+	world.m[0][0] = cosf(angleInRadians) * (scaleX * sizeX);
+	world.m[0][1] = -sinf(angleInRadians) * (scaleY * sizeY);
+	world.m[1][0] = sinf(angleInRadians) * (scaleX * sizeX);
+	world.m[1][1] = cosf(angleInRadians) * (scaleY * sizeY);
+
 	world.m[3][0] = static_cast<float>(sprite.GetX());
 	world.m[3][1] = static_cast<float>(sprite.GetY());
 	m_pSpriteShader->SetMatrixUniform("uWorldTransform", world);

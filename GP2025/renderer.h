@@ -46,7 +46,7 @@ public:
 	void DrawSpriteScreenSpace(Sprite& sprite);
 
 	AnimatedSprite* CreateAnimatedSprite(const char* pcFilename);
-	void DrawAnimatedSprite(AnimatedSprite& sprite, int frame);
+	void DrawAnimatedSprite(AnimatedSprite& sprite, int frame, bool flipHorizontal);
 
 	void SetCameraPosition(float x, float y);
 	

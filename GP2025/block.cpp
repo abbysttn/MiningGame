@@ -68,7 +68,7 @@ void Block::Process(float deltaTime)
 
 void Block::Draw(Renderer& renderer)
 {
-	m_sprite->Draw(renderer);
+	m_sprite->Draw(renderer, false);
 }
 
 Vector2& Block::Position()
