@@ -66,6 +66,8 @@ void GridState::BreakBlock(Vector2 position, char direction)
 		if (block->CanBreak()) {
 			block->BreakBlock();
 
+			m_digBlock = true;
+
 			if (block->ResourcesGiven()) {
 				return;
 			}
@@ -80,6 +82,8 @@ void GridState::BreakBlock(Vector2 position, char direction)
 				case 'S': m_stoneCount += block->GetResourceAmount(); break;
 
 				}
+
+				//blockbreak particle activate
 			}
 		}
 	}
@@ -131,4 +135,14 @@ bool GridState::CheckCollision(Box& box)
 float GridState::GetTileSize()
 {
 	return m_gameGrid->GetTileSize();
+}
+
+bool GridState::CheckBlockDig() {
+	if (m_digBlock == true) {
+		m_digBlock = false;
+		return true;
+	}
+	else {
+		return false;
+	}
 }

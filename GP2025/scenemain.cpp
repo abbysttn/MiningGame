@@ -88,7 +88,7 @@ bool SceneMain::Initialise(Renderer& renderer)
     LogManager::GetInstance().Log("SceneMain is Initialising!");
 
     m_pVisionLevel = 1;
-    m_visionLevels = { 1.0f, 1.2f, 1.3f, 1.5f, 1.7f };
+    m_visionLevels = { 1.0f, 1.2f, 1.3f, 1.5f, 2.0f };
 
 
     if (!m_soundSystem.Initialise()) {
@@ -177,6 +177,21 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
 
         TestingFeatures(inputSystem);
+
+
+        
+        //i did the x and y the swrong way around
+        if (GridState::GetInstance().CheckBlockDig()) {
+            float pX = m_pPlayer->GetPosition().x;
+            float pY = m_pPlayer->GetPosition().y + m_pPlayer->GetPlayerWidth() / 2.0f;
+
+            Vector2 pPos = Vector2(pX, pY);
+            ParticleSystem ps;
+            ps.Initialise(m_pDirtSprite, m_pPlayer, 5, ParticleType::DigDirt);
+            ps.ActivateAt(pPos);
+            m_particleSystems.push_back(std::move(ps));
+        }
+
 
 
         SpawnWaterDrops();
