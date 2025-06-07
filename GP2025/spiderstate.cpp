@@ -6,6 +6,7 @@
 
 #include "collisionhelper.h"
 #include "gridstate.h"
+#include <algorithm>
 
 #include <string>
 
@@ -60,6 +61,9 @@ void SpiderState::InitialiseSpiders(Renderer& renderer)
 			m_spiderHeight = (float)spider->GetSpriteHeight();
 		}
 	}
+
+	//screenWidth = renderer.GetWidth();
+	//screenHeight = renderer.GetWorldHeight();
 }
 
 void SpiderState::SetState(SpiderStates newState)
@@ -78,6 +82,7 @@ void SpiderState::Update(float deltaTime, Vector2 playerPos)
 
 		if (GameObject* obj = m_spiderPool->getObjectAtIndex(m_currentState)) {
 			Spider* spider = dynamic_cast<Spider*>(obj);
+
 			spider->Position() = m_spiderPos;
 			spider->Process(deltaTime);
 		}
@@ -102,18 +107,19 @@ void SpiderState::UpdateAI(float deltaTime)
 	m_spiderPos = spider->Position();
 	float distanceToTarget = Distance(m_target, m_spiderPos);
 	Vector2 direction = Normalise(m_target - m_spiderPos);
+	Vector2 attackPos = spider->Attack(direction, deltaTime);
 
 	switch (m_currentState) {
 	case 0:
-		if (distanceToTarget < 200.0f) {
+		if (distanceToTarget < 500.0f) {
 			SetState(CRAWL);
 		}
 		break;
 
 	case 1:
-		Move(direction, deltaTime);
+		Move(direction, deltaTime, attackPos);
 
-		if (distanceToTarget > 200.0f) {
+		if (distanceToTarget > 500.0f) {
 			SetState(IDLE);
 		}
 
@@ -123,11 +129,50 @@ void SpiderState::UpdateAI(float deltaTime)
 		break;
 
 	case 2:
+		Move(direction, deltaTime, attackPos);
+
 		if (distanceToTarget > m_attackRange) {
 			SetState(CRAWL);
 		}
 		break;
+
+	case 3:
+		if (!spider->IsPushed()) {
+			m_spiderHealth -= 50.0f;
+			SetState(CRAWL);
+		}
+		break;
 	}
+
+	if (m_spiderHealth <= 0.0f) {
+		SetState(DIE);
+	}
+
+	/*const int spriteHalfWidth = GetSpriteWidth() / 2;
+	const int spriteHalfHeight = GetSpriteHeight() / 2;
+
+	float wallMarginX = screenWidth * 0.00f;
+	float wallMarginY = screenHeight * 0.00f;
+
+	float minX = wallMarginX + spriteHalfWidth;
+	float maxX = screenWidth - wallMarginX - spriteHalfWidth;
+	float minY = wallMarginY + spriteHalfHeight;
+	float maxY = static_cast<float>(screenHeight - spriteHalfHeight);*/
+
+
+	//m_spiderPos.x = std::max(minX, std::min(maxX, m_spiderPos.x));
+	//m_spiderPos.y = std::max(minY, std::min(maxY, m_spiderPos.y));
+}
+
+int SpiderState::GetSpriteHeight()
+{
+	int height = 0;
+	if (GameObject* obj = m_spiderPool->getObjectAtIndex(m_currentState)) {
+		Spider* spider = dynamic_cast<Spider*>(obj);
+		height = spider->GetSpriteHeight();
+	}
+
+	return height;
 }
 
 int SpiderState::GetSpriteWidth() const
@@ -169,6 +214,19 @@ void SpiderState::SetPosition(Vector2 pos)
 	}
 }
 
+Vector2 SpiderState::GetPosition()
+{
+	return m_spiderPos;
+}
+
+void SpiderState::ApplyPushback(Vector2 direction)
+{
+	if (GameObject* obj = m_spiderPool->getObjectAtIndex(m_currentState)) {
+		Spider* spider = dynamic_cast<Spider*>(obj);
+		spider->ApplyPushback(direction);
+	}
+}
+
 void SpiderState::EnterState(SpiderStates newState)
 {
 	if (GameObject* obj = m_spiderPool->getObjectAtIndex(newState)) {
@@ -207,11 +265,15 @@ Vector2 SpiderState::Normalise(Vector2 c)
 	return Vector2(0, 0);
 }
 
-void SpiderState::Move(Vector2 direction, float deltaTime)
+void SpiderState::Move(Vector2 direction, float deltaTime, Vector2 attackPos)
 {
 	Vector2 testPos = m_spiderPos;
 
 	testPos += direction * 50.0f * deltaTime;
+
+	if (m_currentState == SpiderStates::ATTACK) {
+		testPos = attackPos;
+	}
 
 	float paddingX = (m_spiderWidth / 2.0f) + 5.0f;
 	float paddingY = (m_spiderHeight / 2.0f) + 20.0f;

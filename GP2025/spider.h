@@ -27,6 +27,13 @@ public:
 	void SetScale(float scale);
 	void SetAlive(bool alive);
 
+	Vector2 Attack(Vector2 direction, float deltaTime);
+
+	void ApplyPushback(Vector2 direction);
+	void UpdatePushback(float deltaTime);
+
+	bool IsPushed();
+
 protected:
 
 private:
@@ -40,6 +47,9 @@ protected:
 	AnimatedSprite* m_sprite;
 
 	bool m_alive;
+
+	float m_pushbackVelocity;
+	bool m_isPushed = false;
 
 private:
 

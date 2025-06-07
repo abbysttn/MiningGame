@@ -36,6 +36,8 @@ bool Spider::Initialise(Renderer& renderer, const char* filepath)
 void Spider::Process(float deltaTime)
 {
 	if (m_alive) {
+		UpdatePushback(deltaTime);
+
 		m_sprite->SetX(static_cast<int>(m_position.x));
 		m_sprite->SetY(static_cast<int>(m_position.y));
 		m_sprite->Process(deltaTime);
@@ -92,4 +94,49 @@ void Spider::SetScale(float scale)
 void Spider::SetAlive(bool alive)
 {
 	m_alive = alive;
+}
+
+Vector2 Spider::Attack(Vector2 direction, float deltaTime)
+{
+	Vector2 testPos = m_position;
+
+	int currentFrame = m_sprite->GetCurrentFrame();
+
+	if (currentFrame >= 3 && currentFrame <= 5) {
+		testPos += direction * 50.0f * deltaTime;
+	}
+
+	return testPos;
+}
+
+void Spider::ApplyPushback(Vector2 direction)
+{
+	float length = sqrtf(direction.x * direction.x + direction.y * direction.y);
+
+	if (length != 0) {
+		direction.x /= length;
+		direction.y /= length;
+	}
+
+	m_pushbackVelocity = direction.x * 600.0f;
+	m_isPushed = true;
+}
+
+void Spider::UpdatePushback(float deltaTime)
+{
+	if (m_isPushed) {
+		m_position.x += m_pushbackVelocity * deltaTime;
+
+		m_pushbackVelocity *= 0.9f;
+
+		if (fabs(m_pushbackVelocity) < 0.01f) {
+			m_pushbackVelocity = 0;
+			m_isPushed = false;
+		}
+	}
+}
+
+bool Spider::IsPushed()
+{
+	return m_isPushed;
 }

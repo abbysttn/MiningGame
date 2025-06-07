@@ -12,6 +12,7 @@
 #include "logmanager.h"
 
 #include "gridstate.h"
+#include "collisionhelper.h"
 
 #include <fmod.hpp>
 #include <fmod_errors.h>
@@ -78,7 +79,24 @@ void SceneMain::OnEnter() {
 
 void SceneMain::OnExit()
 {
-};
+}
+void SceneMain::CheckCollision(Player* player, SpiderState* spider)
+{
+    Box playerBox(m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPlayerHeight(), m_pPlayer->GetPlayerHeight());
+
+    auto potentialCollisions = m_collisionTree->queryRange(playerBox);
+
+    for (auto* obj : potentialCollisions) {
+        if (SpiderState* spider = dynamic_cast<SpiderState*>(obj)) {
+            Vector2 pushDirection(spider->GetPosition().x - player->GetPosition().x,
+                spider->GetPosition().y - player->GetPosition().y);
+
+            spider->SetState(HURT);
+            spider->ApplyPushback(pushDirection);
+            m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 1.0f);
+        }
+    }
+}
 
 bool SceneMain::Initialise(Renderer& renderer)
 {
@@ -114,21 +132,6 @@ bool SceneMain::Initialise(Renderer& renderer)
         return false;
     }
 
-    m_testSpider = new GameObjectPool(SpiderState(), 2);
-
-    for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
-        if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
-            SpiderState* spider = dynamic_cast<SpiderState*>(obj);
-            spider->InitialiseSpiders(renderer);
-            spider->SetActive(true);
-
-            if (i == 0) {
-                Vector2 pos = { 200, 300 };
-                spider->SetPosition(pos);
-            }
-        }
-    }
-
     GridState::GetInstance().CreateGrid(renderer, scaledHeight);
 
     m_tileSize = GridState::GetInstance().GetTileSize();
@@ -153,6 +156,23 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     renderer.SetCameraPosition(static_cast<float>(m_screenX/2), m_pMineBackground->GetHeight() * 0.1f);
 
+    m_testSpider = new GameObjectPool(SpiderState(), 2);
+
+    for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
+        if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
+            SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+            spider->InitialiseSpiders(renderer);
+            spider->SetActive(true);
+
+            if (i == 0) {
+                Vector2 pos = { 200, 300 };
+                spider->SetPosition(pos);
+            }
+        }
+    }
+
+    m_collisionTree = make_unique<QuadTree>(Box(0.0f, 0.0f, (float)renderer.GetWidth(), scaledHeight));
+
     m_bIsInitialised = true;
     LogManager::GetInstance().Log("SceneMain Initialized complete");
     return true;
@@ -160,6 +180,7 @@ bool SceneMain::Initialise(Renderer& renderer)
 
 void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 {
+    m_collisionTree->clear();
     
     //quit to menu
     ButtonState escapeState = inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE);
@@ -190,6 +211,17 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
             if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
                 if (obj && dynamic_cast<SpiderState*>(obj)) {
                     SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+
+                    Box spiderBox(
+                        spider->GetPosition().x,
+                        spider->GetPosition().y,
+                        (float)spider->GetSpriteWidth(),
+                        (float)spider->GetSpriteHeight()
+                    );
+
+                    m_collisionTree->insert(spider, spiderBox);
+
+                    CheckCollision(m_pPlayer, spider);
 
                     spider->Update(deltaTime, m_pPlayer->GetPosition());
                 }

@@ -28,6 +28,7 @@ public:
 
 	void UpdateAI(float deltaTime);
 
+	int GetSpriteHeight();
 	virtual int GetSpriteWidth() const override;
 	virtual GameObject* Create() const override;
 	virtual bool IsActive() const override;
@@ -36,6 +37,9 @@ public:
 	void SetActive(bool active);
 	void SetPosition(Vector2 pos);
 
+	Vector2 GetPosition();
+	void ApplyPushback(Vector2 direction);
+
 protected:
 	void EnterState(SpiderStates newState);
 	void ExitState(SpiderStates oldState);
@@ -43,7 +47,7 @@ protected:
 	float Distance(Vector2 a, Vector2 b);
 	Vector2 Normalise(Vector2 c);
 
-	void Move(Vector2 direction, float deltaTime);
+	void Move(Vector2 direction, float deltaTime, Vector2 attackPos);
 
 private:
 	SpiderState(const SpiderState& spiderState);
@@ -59,10 +63,15 @@ protected:
 	bool m_active;
 
 	Vector2 m_target;
-	float m_attackRange = 100.0f;
+	float m_attackRange = 200.0f;
 
 	float m_spiderWidth;
 	float m_spiderHeight;
+
+	float m_spiderHealth = 100.0f;
+
+	int screenWidth;
+	int screenHeight;
 
 private:
 };

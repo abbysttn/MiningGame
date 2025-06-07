@@ -33,6 +33,7 @@ public:
 
 	void SetCurrentFrame(int frame);
 	bool FramesFinished();
+	int GetCurrentFrame();
 
 protected:
 
