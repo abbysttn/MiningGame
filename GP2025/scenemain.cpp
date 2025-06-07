@@ -65,6 +65,12 @@ SceneMain::~SceneMain()
         m_pWaterDropSprite = nullptr;
     }
 
+
+    if (m_pVignetteSprite) {
+        delete m_pVignetteSprite;
+        m_pVignetteSprite = nullptr;
+    }
+    
     m_soundSystem.Release();
 
 }
