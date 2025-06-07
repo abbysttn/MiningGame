@@ -68,6 +68,10 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
         LogManager::GetInstance().Log("DEAD!");
     }
 
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_W))    direction.y -= 1.0f;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_S))  direction.y += 1.0f;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_A))  direction.x -= 1.0f;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_D)) direction.x += 1.0f;
     if (m_noClip) {
         if (IsKeyHeld(inputSystem, SDL_SCANCODE_W))  direction.y -= 1.0f;
         if (IsKeyHeld(inputSystem, SDL_SCANCODE_S))  direction.y += 1.0f;
