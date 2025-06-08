@@ -10,15 +10,13 @@
 #include "game.h"
 #include "logmanager.h"
 
-
-
 int main(int argc, char* argv[])
 {
 	srand(static_cast<unsigned>(time(0)));
 	Game& gameInstance = Game::GetInstance();
 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//_CrtSetBreakAlloc(5926);
+	//_CrtSetBreakAlloc(256);
 
 	if (!gameInstance.Initialise())
 	{

@@ -44,6 +44,9 @@ private:
 	};
 
 	AUTSplashState m_eCurrentState;
+
+	SceneSplashScreenAUT(const SceneSplashScreenAUT&);
+	SceneSplashScreenAUT& operator=(const SceneSplashScreenAUT&);
 };
 
 #endif // !__SCENESPLASHSCREENAUT_H__

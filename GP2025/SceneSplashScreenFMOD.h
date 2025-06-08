@@ -44,6 +44,9 @@ private:
 	};
 
 	FMODSplashState m_eCurrentState;
+
+	SceneSplashScreenFMOD(const SceneSplashScreenFMOD&);
+	SceneSplashScreenFMOD& operator=(const SceneSplashScreenFMOD&);
 };
 
 #endif // !__SCENESPLASHSCREENFMOD_H__

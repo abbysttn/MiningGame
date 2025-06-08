@@ -42,10 +42,7 @@ SceneMain::~SceneMain()
 
     GridState::GetInstance().ResetGrid();
 
-
-
     //ADD: delete sprites function
-
 
     if (m_pMineBackground) {
         delete m_pMineBackground;
@@ -89,6 +86,11 @@ SceneMain::~SceneMain()
         delete m_pStonePickupSprite;
         m_pStonePickupSprite = nullptr;
     }
+
+    if (m_pGemPickupSprite) {
+        delete m_pGemPickupSprite;
+        m_pGemPickupSprite = nullptr;
+    }
     
     m_soundSystem.Release();
 
@@ -121,7 +123,6 @@ void SceneMain::CheckCollision(Player* player, SpiderState* spider)
                     spider->ApplyPushback(pushDirection);
                 }
                 else {
-                    spider->SetState(SpiderStates::HURT);
                     spider->ApplyPushback(pushDirection);
                     m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 1.0f);
                 }

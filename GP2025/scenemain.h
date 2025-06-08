@@ -69,7 +69,6 @@ private:
 
 	Renderer* m_pRenderer;
 	Sprite* m_pMineBackground;
-	FMOD::System* m_pFMODSystem;
 	int m_screenX;
 	float m_playerY;
 	float m_waterDropInterval = 1.0f;
@@ -100,7 +99,7 @@ private:
 
 
 	std::list<ParticleSystem> m_particleSystems;
-	unique_ptr<QuadTree> m_collisionTree;
+	std::unique_ptr<QuadTree> m_collisionTree;
 
 };
 

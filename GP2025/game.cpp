@@ -73,6 +73,12 @@ Game::~Game()
 
 	delete m_pRenderer;
 	m_pRenderer = nullptr;
+
+	m_pFMODSystem->release();
+	m_pFMODSystem = nullptr;
+
+	m_pSound->release();
+	m_pSound = nullptr;
 }
 
 void Game::Quit()
@@ -82,18 +88,18 @@ void Game::Quit()
 
 bool Game::Initialise()
 {
-	int bbWidth = 0;
-	int bbHeight = 0;
+	bbWidth = 0;
+	bbHeight = 0;
 
 	m_pRenderer = new Renderer();
-	if (!m_pRenderer->Initialise(false, bbWidth, bbHeight))
+	if (!m_pRenderer->Initialise(false, (int)bbWidth, (int)bbHeight))
 	{
 		LogManager::GetInstance().Log("Renderer failed to initialise!");
 		return false;
 	}
 
-	bbWidth = m_pRenderer->GetWidth();
-	bbHeight = m_pRenderer->GetHeight();
+	bbWidth = (float)m_pRenderer->GetWidth();
+	bbHeight = (float)m_pRenderer->GetHeight();
 
 	m_iLastTime = SDL_GetPerformanceCounter();
 	m_pRenderer->SetClearColour(0, 0, 0);
@@ -148,7 +154,7 @@ bool Game::Initialise()
 	if (!pMainScene->Initialise(*m_pRenderer))
 	{
 		// Debugging stuff
-		LogManager::GetInstance().Log("TItle screne failed to load!");
+		LogManager::GetInstance().Log("Title scene failed to load!");
 		delete pSplashSceneFMOD;
 		delete pSplashSceneAUT;
 		delete pTitleScene;
