@@ -44,7 +44,7 @@ private:
     float m_maxLifetime = 1.0f;
     bool m_active = false;
     float m_speedMultiplier = 1.0f;
-    float m_burstDuration = 2.0f;
+    float m_burstDuration = 1.25f;
     bool m_seekingTarget = false;
     Vector2 m_targetPosition;
     ParticleType m_type;

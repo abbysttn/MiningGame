@@ -175,7 +175,6 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 	m_pExitBtnSprite->SetGreenTint(m_defaultGreen);
 	m_pExitBtnSprite->SetBlueTint(m_defaultBlue);
 
-	m_tSoundSystem.PlaySound("bgm");
 
 	return true;
 }

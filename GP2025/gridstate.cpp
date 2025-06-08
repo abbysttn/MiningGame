@@ -68,21 +68,24 @@ void GridState::BreakBlock(Vector2 position, char direction)
 		if (block->CanBreak()) {
 			block->BreakBlock();
 
+			m_digBlock = true;
+
 			if (block->ResourcesGiven()) {
 				return;
 			}
 
 			if (block->BlockBroken()) {
 				char blockType = block->GetBlockType();
-
+				m_breakBlock = true;
 				switch (blockType) {
 
-				case 'G': m_gemCount += block->GetResourceAmount(); break;
-				case 'D': m_dirtCount += block->GetResourceAmount(); break;
-				case 'S': m_stoneCount += block->GetResourceAmount(); break;
+				case 'G': m_gemCount += block->GetResourceAmount(); m_lastBlockType = 2; break;
+				case 'D': m_dirtCount += block->GetResourceAmount(); m_lastBlockType = 0; break;
+				case 'S': m_stoneCount += block->GetResourceAmount(); m_lastBlockType = 1; break;
 
 				}
 
+				//blockbreak particle activate
 				m_blockBroken = true;
 				m_lastBrokenPos = m_brokenBlockPos;
 				m_brokenBlockPos = block->Position();
@@ -148,6 +151,29 @@ float GridState::GetTileSize()
 	return m_gameGrid->GetTileSize();
 }
 
+bool GridState::CheckBlockDig() {
+	if (m_digBlock == true) {
+		m_digBlock = false;
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+int GridState::GetLastBlockType() {
+	return m_lastBlockType;
+}
+
+bool GridState::CheckBlockBreak() {
+	if (m_breakBlock == true) {
+		m_breakBlock = false;
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 Vector2 GridState::GetBrokenBlockPos()
 {
 	m_blockBroken = false;

@@ -42,6 +42,9 @@ public:
 
 	int GetGem() const { return m_gemCount; }
 
+	bool CheckBlockDig();
+	bool CheckBlockBreak();
+	int GetLastBlockType();
 	Vector2 GetBrokenBlockPos();
 	bool IsBlockBroken();
 	bool SpiderSpawn();
@@ -69,6 +72,10 @@ protected:
 	int m_gemCount = 0;
 
 private:
+
+	bool m_digBlock;
+	bool m_breakBlock;
+	int m_lastBlockType;
 };
 
 #endif // !__GRIDSTATE_H__

@@ -38,6 +38,7 @@ public:
 	void SetDepth(int depth) { m_depth = depth; }
 
 	float GetPlayerHeight();
+	float GetPlayerWidth();
 	int GetDirt() const { return m_dirtCount; }
 	void SetDirt(int dirt) { m_dirtCount = std::max(0, dirt); }
 
@@ -51,6 +52,7 @@ public:
 
 	void LoadAnimatedSprites();
 
+	bool IsPlayerMining() { return m_isMining; }
 	PlayerAnimationState GetCurrentState() { return m_animationState; }
 
 private:

@@ -61,6 +61,8 @@ private:
 	float m_pVisionLevel;
 	std::vector<float> m_visionLevels;
 
+	float m_dirtParticleCooldown;
+
 	float m_screenWidth;
 	float m_screenHeight;
 	Player* m_pPlayer;
@@ -90,6 +92,11 @@ private:
 	Sprite* m_pBreakBlockSprite = nullptr;
 	Sprite* m_pWaterDropSprite = nullptr;
 	Sprite* m_pVignetteSprite = nullptr;
+
+
+	Sprite* m_pDirtPickupSprite = nullptr;
+	Sprite* m_pStonePickupSprite = nullptr;
+	Sprite* m_pGemPickupSprite = nullptr;
 
 
 	std::list<ParticleSystem> m_particleSystems;

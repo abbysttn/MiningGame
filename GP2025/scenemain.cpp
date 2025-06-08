@@ -42,6 +42,11 @@ SceneMain::~SceneMain()
 
     GridState::GetInstance().ResetGrid();
 
+
+
+    //ADD: delete sprites function
+
+
     if (m_pMineBackground) {
         delete m_pMineBackground;
         m_pMineBackground = nullptr;
@@ -74,6 +79,16 @@ SceneMain::~SceneMain()
         delete m_pVignetteSprite;
         m_pVignetteSprite = nullptr;
     }
+
+    if (m_pDirtPickupSprite) {
+        delete m_pDirtPickupSprite;
+        m_pDirtPickupSprite = nullptr;
+    }
+
+    if (m_pStonePickupSprite) {
+        delete m_pStonePickupSprite;
+        m_pStonePickupSprite = nullptr;
+    }
     
     m_soundSystem.Release();
 
@@ -81,10 +96,13 @@ SceneMain::~SceneMain()
 
 void SceneMain::OnEnter() {
     m_paused = false;
+    m_soundSystem.PlaySound("cavebgm");
 };
 
 void SceneMain::OnExit()
 {
+    m_soundSystem.StopSound("cavebgm");
+
 }
 void SceneMain::CheckCollision(Player* player, SpiderState* spider)
 {
@@ -117,14 +135,17 @@ bool SceneMain::Initialise(Renderer& renderer)
     LogManager::GetInstance().Log("SceneMain is Initialising!");
 
     m_pVisionLevel = 1;
-    m_visionLevels = { 1.0f, 1.2f, 1.3f, 1.5f, 1.7f };
+    m_visionLevels = { 1.0f, 1.2f, 1.3f, 1.5f, 2.0f };
 
-
+    m_dirtParticleCooldown = 1.2f;
     if (!m_soundSystem.Initialise()) {
         std::cerr << "Failed to initialise FMOD system!" << std::endl;
         return false;
     }
     m_soundSystem.LoadSound("waterdrop", "../assets/sound/waterDrop.wav");
+    m_soundSystem.LoadSound("pickaxeHit", "../assets/sound/pickaxeHit.wav");
+    m_soundSystem.LoadSound("blockBreak", "../assets/sound/blockBreak.wav");
+    m_soundSystem.LoadSound("cavebgm", "../assets/sound/cavebgm.mp3");
 
     m_pRenderer = &renderer;
     m_screenWidth = static_cast<float>(renderer.GetWidth());
@@ -166,14 +187,13 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_pCoinSprite = renderer.CreateSprite("../assets/ball.png");
     m_pCoinSprite->SetScale(0.05f);
 
-    m_pDirtSprite = renderer.CreateSprite("../assets/particle.png");
-    m_pDirtSprite->SetScale(5.0f);
-
-    m_pBreakBlockSprite = renderer.CreateSprite("../assets/particle.png");
-    m_pBreakBlockSprite->SetScale(5.0f);
-
+    m_pDirtSprite = renderer.CreateSprite("../assets/dirtparticle.png");
+    m_pBreakBlockSprite = renderer.CreateSprite("../assets/dirtparticle.png");
     m_pWaterDropSprite = renderer.CreateSprite("../assets/particle.png");
-    m_pWaterDropSprite->SetScale(5.0f);
+
+    m_pDirtPickupSprite = renderer.CreateSprite("../assets/dirt_icon.png");
+    m_pStonePickupSprite = renderer.CreateSprite("../assets/stone_icon.png");
+    m_pGemPickupSprite = renderer.CreateSprite("../assets/gem_icon.png");
 
     renderer.SetCameraPosition(static_cast<float>(m_screenX/2), m_pMineBackground->GetHeight() * 0.1f);
 
@@ -219,6 +239,66 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
 
         TestingFeatures(inputSystem);
+
+        float pX = m_pPlayer->GetPosition().x;
+        float pY = m_pPlayer->GetPosition().y;
+        Vector2 pPos = Vector2(pX, pY);
+
+
+        int type = GridState::GetInstance().GetLastBlockType();
+
+        Sprite* pickupSprite = m_pDirtPickupSprite;
+
+
+        switch (type) {
+        case 0: 
+            pickupSprite = m_pDirtPickupSprite;
+
+            break;
+
+        case 1: 
+            pickupSprite = m_pStonePickupSprite;
+
+            break;
+        case 2:
+            pickupSprite = m_pGemPickupSprite;
+
+            break;
+        default:
+
+            break;
+        }
+
+
+        m_dirtParticleCooldown -= deltaTime;
+        if (GridState::GetInstance().CheckBlockDig() && m_dirtParticleCooldown <= 0.0f) {
+
+            m_soundSystem.PlaySound("pickaxeHit");
+            ParticleSystem ps;
+            ps.Initialise(m_pDirtSprite, m_pPlayer, 3, ParticleType::DigDirt);
+            ps.ActivateAt(pPos);
+            m_particleSystems.push_back(std::move(ps));
+            m_dirtParticleCooldown = 0.6f;
+        }
+
+        if (GridState::GetInstance().CheckBlockBreak()) {
+            m_soundSystem.PlaySound("blockBreak");
+            ParticleSystem ps;
+            ps.Initialise(m_pBreakBlockSprite, m_pPlayer, 35, ParticleType::BlockBreak);
+            ps.ActivateAt(pPos);
+            m_particleSystems.push_back(std::move(ps));
+
+            ParticleSystem ps2;
+            ps2.Initialise(pickupSprite, m_pPlayer, 5);
+            ps2.ActivateAt(m_pPlayer->GetPosition());
+            m_particleSystems.push_back(std::move(ps2));
+        }
+        if (!m_pPlayer->IsPlayerMining()) {
+            m_soundSystem.StopSound("pickaxeHit");
+        }
+
+
+
 
 
         SpawnWaterDrops();

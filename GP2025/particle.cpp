@@ -31,6 +31,8 @@ void Particle::Activate(Vector2 position) {
     switch (m_type) {
     case ParticleType::BlockPickup: //receive items/materials from block
         m_speedMultiplier = 15.0f;
+        m_pSprite->SetScale(0.075f);
+
         m_velocity = Vector2(
             (((rand() % 200) - 100) / 100.0f) * m_speedMultiplier,
             (((rand() % 200) - 100) / 100.0f) * m_speedMultiplier
@@ -43,9 +45,6 @@ void Particle::Activate(Vector2 position) {
             float scale = 5.0f + static_cast<float>(rand()) / RAND_MAX * 3.0f;
             float colourVariation = 0.4f + static_cast<float>(rand()) / RAND_MAX * 0.25f;
             m_pSprite->SetScale(7.0f);
-            m_pSprite->SetRedTint(0.5f);
-            m_pSprite->SetGreenTint(0.40f);
-            m_pSprite->SetBlueTint(0.25f);
         }
         m_speedMultiplier = 200.0f;
         m_velocity = Vector2(
@@ -60,9 +59,6 @@ void Particle::Activate(Vector2 position) {
             float scale = 8.0f + static_cast<float>(rand()) / RAND_MAX * 5.0f;
             float colourVariation = 0.5f + static_cast<float>(rand()) / RAND_MAX * 0.35f;
             m_pSprite->SetScale(scale);
-            m_pSprite->SetRedTint(0.55f);
-            m_pSprite->SetGreenTint(0.40f);
-            m_pSprite->SetBlueTint(0.25f);
         }
         m_speedMultiplier = 400.0f;
         m_velocity = Vector2(
@@ -117,7 +113,7 @@ void Particle::Update(float deltaTime) {
             float length = std::sqrt(toTarget.x * toTarget.x + toTarget.y * toTarget.y);
 
             //deactivate if close enough
-            float deactivateDistance = 150.0f;
+            float deactivateDistance = 80.0f;
             if (length < deactivateDistance) {
                 m_active = false;
                 return;
@@ -148,7 +144,7 @@ void Particle::Update(float deltaTime) {
     else if (m_type == ParticleType::DigDirt) {
         m_velocity.y += m_gravity * deltaTime;
         m_velocity.x *= 0.99f;
-        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2, m_position.y, 1.0f, GridState::GetInstance().GetTileSize() / 2);
+        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2.0f, m_position.y + GridState::GetInstance().GetTileSize() / 2.0f, 1.0f, 1.0f);
 
         if (!GridState::GetInstance().CheckCollision(pticle)) {
             m_position += m_velocity * deltaTime;
@@ -162,7 +158,7 @@ void Particle::Update(float deltaTime) {
     else if (m_type == ParticleType::BlockBreak) {
         m_velocity.y += m_gravity * deltaTime;
         m_velocity.x *= 0.992f;
-        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2, m_position.y, 1.0f, GridState::GetInstance().GetTileSize() / 2);
+        Box pticle(m_position.x + GridState::GetInstance().GetTileSize()/2.0f, m_position.y + GridState::GetInstance().GetTileSize() / 2.0f, 1.0f, 1.0f);
 
         if (!GridState::GetInstance().CheckCollision(pticle)) {
             m_position += m_velocity * deltaTime;
@@ -178,7 +174,7 @@ void Particle::Update(float deltaTime) {
         m_velocity.y += m_gravity * deltaTime * 3.5f;
         m_velocity.x *= 0.992f;
 
-        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2, m_position.y, 1.0f, GridState::GetInstance().GetTileSize() / 2);
+        Box pticle(m_position.x + GridState::GetInstance().GetTileSize() / 2.0f, m_position.y + GridState::GetInstance().GetTileSize() / 2.0f, 1.0f, 1.0f);
 
         if (!GridState::GetInstance().CheckCollision(pticle)) {
             m_position += m_velocity * deltaTime;

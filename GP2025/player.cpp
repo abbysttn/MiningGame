@@ -244,6 +244,10 @@ void Player::Draw(Renderer& renderer)
 float Player::GetPlayerHeight(){
     return static_cast<float>(m_pAnimSprite->GetHeight());
 }
+float Player::GetPlayerWidth() {
+    return static_cast<float>(m_pAnimSprite->GetWidth());
+}
+
 
 bool Player::IsKeyHeld(InputSystem& input, SDL_Scancode key)
 {
