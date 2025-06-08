@@ -113,7 +113,7 @@ void Particle::Update(float deltaTime) {
             float length = std::sqrt(toTarget.x * toTarget.x + toTarget.y * toTarget.y);
 
             //deactivate if close enough
-            float deactivateDistance = 150.0f;
+            float deactivateDistance = 80.0f;
             if (length < deactivateDistance) {
                 m_active = false;
                 return;

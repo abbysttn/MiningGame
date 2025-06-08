@@ -96,10 +96,13 @@ SceneMain::~SceneMain()
 
 void SceneMain::OnEnter() {
     m_paused = false;
+    m_soundSystem.PlaySound("cavebgm");
 };
 
 void SceneMain::OnExit()
 {
+    m_soundSystem.StopSound("cavebgm");
+
 }
 void SceneMain::CheckCollision(Player* player, SpiderState* spider)
 {
@@ -142,6 +145,7 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_soundSystem.LoadSound("waterdrop", "../assets/sound/waterDrop.wav");
     m_soundSystem.LoadSound("pickaxeHit", "../assets/sound/pickaxeHit.wav");
     m_soundSystem.LoadSound("blockBreak", "../assets/sound/blockBreak.wav");
+    m_soundSystem.LoadSound("cavebgm", "../assets/sound/cavebgm.mp3");
 
     m_pRenderer = &renderer;
     m_screenWidth = static_cast<float>(renderer.GetWidth());
