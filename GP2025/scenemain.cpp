@@ -289,6 +289,9 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
             ps2.ActivateAt(m_pPlayer->GetPosition());
             m_particleSystems.push_back(std::move(ps2));
         }
+        if (!m_pPlayer->IsPlayerMining()) {
+            m_soundSystem.StopSound("pickaxeHit");
+        }
 
 
 
