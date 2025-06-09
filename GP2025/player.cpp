@@ -331,3 +331,4 @@ int Player::GetResourceCount(ResourceType type) const
     }
     return 0;
 }
+

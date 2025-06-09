@@ -3,6 +3,9 @@
 
 // Lib
 #include <iostream>
+#include <string>
+#include <iomanip>
+#include <sstream>
 #include <cmath>
 
 UpgradeManager::UpgradeManager() 
@@ -30,30 +33,31 @@ void UpgradeManager::DefineUpgrades()
     // Mining Strength Upgrade
     m_availableUpgrades.push_back(Upgrade
     {
-        "mining_strength",
+        "mining_strength",     // ID
         "Mining Strength",     // Display Name
         5,                     // Max Level
         [](int targetLevel) -> UpgradeCost 
         {
+            // How much the next level would cost
             return {ResourceType::STONE, 50 * targetLevel};
         },
         [this](Player& player, int newLevel) 
         {
-            player.SetMiningStrengthLevel(newLevel);
-            m_statusMessage = "Mining Strength upgraded to Lvl" + std::to_string(newLevel) + "!";
+			// Sets the mining strength level for the player
+            player.SetMiningStrengthLevel(newLevel); // Maybe the blocks will have like 'needs miningstr 2 or something'
+            m_statusMessage = "Mining Strength upgraded to Lvl " + std::to_string(newLevel) + "!";
         },
         [](int currentLevel, int costAmount, const std::string& costType) -> std::string 
         {
             if (currentLevel == 0) return "Increases mining strength to mine tougher blocks!";
-            return "Current Mining Strength: Lvl" + std::to_string(currentLevel) +
-                   ". Next level increases mining strength";
+            return "Current Mining Strength: Lvl " + std::to_string(currentLevel) + ". Next level increases mining strength";
         }
 	});
 
     // Max Stamina Upgrade
     m_availableUpgrades.push_back(Upgrade
     {
-        "max_stamina",        // Unique ID
+        "max_stamina",        // ID
         "Max Stamina",        // Display Name
         5,                    // Max Level
         [](int targetLevel) -> UpgradeCost 
@@ -63,22 +67,22 @@ void UpgradeManager::DefineUpgrades()
         [this](Player& player, int newLevel) 
         {
             float baseMaxStamina = 100.0f;
-            player.SetMaxStamina(baseMaxStamina + ((float)newLevel * 20.0f));
-            player.SetCurrentStamina(player.GetCurrentStamina() + 20.0f);
+			float newUpgradedStamina = baseMaxStamina + ((float)newLevel * 20.0f);
+            player.SetMaxStamina(newUpgradedStamina);
+            player.SetCurrentStamina(player.GetMaxStamina());
             m_statusMessage = "Max Stamina upgraded to " + std::to_string(static_cast<int>(player.GetMaxStamina())) + "!";
         },
         [](int currentLevel, int costAmount, const std::string& costType) -> std::string 
         {
             if (currentLevel == 0) return "Increases your maximum stamina for deeper depths";
-            return "Current Max Stamina: " + std::to_string(static_cast<int>(100.0f + currentLevel * 20.0f)) +
-                   ". Next level increases max stamina by 20.";
+            return "Current Max Stamina: " + std::to_string(static_cast<int>(100.0f + currentLevel * 20.0f)) + ". Next level increases max stamina by 20.";
         }
     });
 
     // Jump Height Upgrade
     m_availableUpgrades.push_back(Upgrade
     {
-        "jump_height",        
+        "jump_height",        // ID
         "Jump Height",        // Display Name
         3,                    // Max Level
         [](int targetLevel) -> UpgradeCost 
@@ -93,9 +97,20 @@ void UpgradeManager::DefineUpgrades()
         },
         [](int currentLevel, int costAmount, const std::string& costType) -> std::string 
         {
-            if (currentLevel == 0) return "Allows you to jump higher.";
-            return "Current Jump Multiplier: " + std::to_string(1.0f + currentLevel * 0.1f) + "x. " +
-               "Next level further increases jump height.";
+			float currentMultiplier = 1.0f + currentLevel * 0.1f;
+
+            std::ostringstream oss;
+            oss << std::fixed << std::setprecision(1);
+
+            if (currentLevel == 0)
+            {
+                oss << "Allows you to jump higher.";
+            }
+            else
+            {
+                oss << "Current Jump Multiplier: " << currentMultiplier << "x. " << "Next level further increases jump height.";
+            }
+            return oss.str();
         }
     });
 }

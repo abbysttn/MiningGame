@@ -35,7 +35,7 @@ public:
 
 	// Stam
 	float GetCurrentStamina() const { return m_stamina; }
-	void SetCurrentStamina(float newStamina) { m_stamina = std::max(0.0f, std::min(newStamina, 100.0f));	}
+	void SetCurrentStamina(float newStamina) { m_stamina = std::max(0.0f, std::min(newStamina, m_maxStamina));	}
 	float GetMaxStamina() const { return m_maxStamina; }
 	void SetMaxStamina(float newMaxStamina);
 
