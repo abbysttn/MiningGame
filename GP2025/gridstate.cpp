@@ -1,4 +1,5 @@
 #include "gridstate.h"
+#include "player.h"
 
 #include "gameobjectpool.h"
 #include "quadtree.h"
@@ -25,7 +26,7 @@ GameObjectPool* GridState::GetPool()
 	return nullptr;
 }
 
-void GridState::BreakBlock(Vector2 position, char direction)
+void GridState::BreakBlock(Vector2 position, char direction, Player* player)
 {
 	Vector2 gridCoords;
 	float blockWidth = m_gameGrid->GetBlockSize().x;
@@ -76,17 +77,48 @@ void GridState::BreakBlock(Vector2 position, char direction)
 
 			if (block->BlockBroken()) {
 				char blockType = block->GetBlockType();
-				m_breakBlock = true;
-				switch (blockType) {
+				int resourceAmount = block->GetResourceAmount();
 
-				case 'G': m_gemCount += block->GetResourceAmount(); m_lastBlockType = 2; break;
-				case 'D': m_dirtCount += block->GetResourceAmount(); m_lastBlockType = 0; break;
-				case 'S': m_stoneCount += block->GetResourceAmount(); m_lastBlockType = 1; break;
-				case 'O': 
-					block->GetResourceAmount();  
-					m_pPlayer->AddOxygen(5.0f);
-					m_lastBlockType = 3; 
+				m_breakBlock = true;
+
+				ResourceType type;
+				bool recognizedType = true;
+
+				switch (blockType) 
+				{
+
+				case 'G': 
+					type = ResourceType::GEM; 
+					m_lastBlockType = 2; 
+					m_gemCount += resourceAmount;
 					break;
+				case 'D': 
+					type = ResourceType::DIRT;
+					m_lastBlockType = 0; 
+					m_dirtCount += resourceAmount;
+					break;
+				case 'S': 
+					type = ResourceType::STONE; 
+					m_lastBlockType = 1; 
+					m_stoneCount += resourceAmount;
+					break;
+				case 'O': 
+					if (player != nullptr) 
+					{
+						player->AddOxygen(5.0f);
+					}
+					m_lastBlockType = 3;
+					recognizedType = false;
+					break;
+
+				default: 
+					recognizedType = false; 
+					break;
+				}
+
+				if (recognizedType && resourceAmount > 0 && player != nullptr)
+				{
+					player->AddResource(type, resourceAmount);
 				}
 
 				//blockbreak particle activate

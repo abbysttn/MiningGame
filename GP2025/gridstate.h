@@ -8,6 +8,7 @@
 
 class GameObjectPool;
 class Renderer;
+class Player;
 
 using namespace std;
 
@@ -24,7 +25,7 @@ public:
 	void CreateGrid(Renderer& renderer, float backgroundScale);
 	GameObjectPool* GetPool();
 
-	void BreakBlock(Vector2 position, char direction);
+	void BreakBlock(Vector2 position, char direction, Player* player);
 
 	void ResetGrid();
 

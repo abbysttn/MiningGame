@@ -180,6 +180,7 @@
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="texturemanager.cpp" />
     <ClCompile Include="ui.cpp" />
+    <ClCompile Include="upgrademanager.cpp" />
     <ClCompile Include="vector2.cpp" />
     <ClCompile Include="vertexarray.cpp" />
     <ClCompile Include="xboxcontroller.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="quadtree.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="resourcetype.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="scenecheckerboards.h" />
     <ClInclude Include="scenemain.h" />
@@ -228,6 +230,8 @@
     <ClInclude Include="texture.h" />
     <ClInclude Include="texturemanager.h" />
     <ClInclude Include="ui.h" />
+    <ClInclude Include="upgrademanager.h" />
+    <ClInclude Include="upgradestation.h" />
     <ClInclude Include="vector2.h" />
     <ClInclude Include="vertexarray.h" />
     <ClInclude Include="xboxcontroller.h" />
