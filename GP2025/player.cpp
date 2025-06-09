@@ -46,6 +46,8 @@ bool Player::Initialise(Renderer& renderer)
 
     m_position = { 400, 300 };
     m_bAlive = true;
+
+    //responsive jump height for different screen sizes
     m_jumpHeight = std::sqrtf(2.0f * GRAVITY * (GridState::GetInstance().GetBlockSize().y * 2.3f));
     return true;
 }
@@ -228,6 +230,12 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 		m_Velocity.y = 0.0f; 
     }
 
+    //check if player is colliding with a hazard
+    if (GridState::GetInstance().CheckHazards()) {
+        m_health = 0.0f;
+        HandleDeath(3);
+    }
+
     //clamp to screen with halfWidth, to prevent clipping outside screen
     float wallMarginX = screenWidth * 0.005f;  //0.5% horizontal margin (for the walls)
     float wallMarginY = screenHeight * 0.00f; //PLayer can't move past the top 5%
@@ -311,6 +319,9 @@ void Player::HandleDeath(int deathType) {
 	case 2: // Oxygen depleted
 		LogManager::GetInstance().Log("Friend died due to oxygen depletion.");
 		break;
+    case 3: // Player hit a hazard
+        LogManager::GetInstance().Log("Player died due to a underground hazard.");
+        break;
 	default:
 		LogManager::GetInstance().Log("Player died for an unknown reason.");
 		break;
