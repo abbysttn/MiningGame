@@ -87,25 +87,38 @@ void GridState::BreakBlock(Vector2 position, char direction, Player* player)
 				switch (blockType) 
 				{
 
-				case 'G': type = ResourceType::GEM; m_lastBlockType = 2; break;
-				case 'D': type = ResourceType::DIRT; m_lastBlockType = 0; break;
-				case 'S': type = ResourceType::STONE; m_lastBlockType = 1; break;
-				
-				default: recognizedType = false; break;
+				case 'G': 
+					type = ResourceType::GEM; 
+					m_lastBlockType = 2; 
+					m_gemCount += resourceAmount;
+					break;
+				case 'D': 
+					type = ResourceType::DIRT;
+					m_lastBlockType = 0; 
+					m_dirtCount += resourceAmount;
+					break;
+				case 'S': 
+					type = ResourceType::STONE; 
+					m_lastBlockType = 1; 
+					m_stoneCount += resourceAmount;
+					break;
+				case 'O': 
+					if (player != nullptr) 
+					{
+						player->AddOxygen(5.0f);
+					}
+					m_lastBlockType = 3;
+					recognizedType = false;
+					break;
 
+				default: 
+					recognizedType = false; 
+					break;
 				}
 
-				if (recognizedType && resourceAmount > 0)
+				if (recognizedType && resourceAmount > 0 && player != nullptr)
 				{
 					player->AddResource(type, resourceAmount);
-				case 'G': m_gemCount += block->GetResourceAmount(); m_lastBlockType = 2; break;
-				case 'D': m_dirtCount += block->GetResourceAmount(); m_lastBlockType = 0; break;
-				case 'S': m_stoneCount += block->GetResourceAmount(); m_lastBlockType = 1; break;
-				case 'O': 
-					block->GetResourceAmount();  
-					m_pPlayer->AddOxygen(5.0f);
-					m_lastBlockType = 3; 
-					break;
 				}
 
 				//blockbreak particle activate

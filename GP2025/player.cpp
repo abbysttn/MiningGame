@@ -74,10 +74,13 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
         SetCurrentStamina(m_stamina - deltaTime);
     }
 
-    if (GetCurrentStamina() <= 0.0f) 
+    if (GetCurrentStamina() <= 0.0f)
     {
         LogManager::GetInstance().Log("DEAD!");
-    if (staminaRepletion) {
+    }
+
+    if (staminaRepletion) 
+    {
         m_stamina = std::min(100.0f, m_stamina + (20.0f * deltaTime)); // 20% per second
     }
 
@@ -123,26 +126,9 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     if (IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT)) { breakDirection = 'L'; m_isMining = true; }
     if (IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) { breakDirection = 'R'; m_isMining = true; }
 
-    if (m_isMining) 
+    if (m_canMine)
     {
-        GridState::GetInstance().BreakBlock(m_position, breakDirection, this);
-    if (m_canMine) {
-        if (IsKeyHeld(inputSystem, SDL_SCANCODE_UP)) {
-            GridState::GetInstance().BreakBlock(m_position, 'U');
-            m_isMining = true;
-        }
-        if (IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN)) {
-            GridState::GetInstance().BreakBlock(m_position, 'D');
-            m_isMining = true;
-        }
-        if (IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT)) {
-            GridState::GetInstance().BreakBlock(m_position, 'L');
-            m_isMining = true;
-        }
-        if (IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) {
-            GridState::GetInstance().BreakBlock(m_position, 'R');
-            m_isMining = true;
-        }
+		GridState::GetInstance().BreakBlock(m_position, breakDirection, this);
     }
 
 	if (m_isMining && m_animationState != MINE) {
@@ -198,7 +184,6 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
         // If on ground and space is pressed, jump
         if (m_OnGround && IsKeyHeld(inputSystem, SDL_SCANCODE_SPACE)) {
 			m_Velocity.y = -(JUMP_FORCE * m_jumpHeightMultiplier);
-			m_Velocity.y = -m_jumpHeight;
 			m_OnGround = false;
 
             // Change animation to jump/fall

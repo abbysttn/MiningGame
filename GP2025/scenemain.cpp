@@ -271,7 +271,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         
             if (m_godMode) {
 				m_pPlayer->SetHealth(100.0f);
-				m_pPlayer->SetStamina(100.0f);
+				m_pPlayer->SetCurrentStamina(100.0f);
 				m_pPlayer->AddOxygen(100.0f);
             }
         }
@@ -321,7 +321,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         }
 
         if (GridState::GetInstance().CheckBlockBreak()) {
-			m_pPlayer->SetStamina(m_pPlayer->GetStamina() - m_pPlayer->GetStaminaCost());
+			m_pPlayer->SetCurrentStamina(m_pPlayer->GetCurrentStamina() - m_pPlayer->GetStaminaCost());
 
             m_soundSystem.PlaySound("blockBreak");
             ParticleSystem ps;

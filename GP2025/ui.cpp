@@ -52,7 +52,6 @@ void UI::Update(Player* player, Renderer* renderer, float deltaTime)
 	// HEALTH, STAMINA, OXYGEN BARS
 	healthPercent = static_cast<float>(player->GetHealth()) / 100.0f; 
 	staminaPercent = static_cast<float>(player->GetCurrentStamina()) / player->GetMaxStamina(); 
-	staminaPercent = static_cast<float>(player->GetStamina()) / 100.0f; 
 	oxygenPercent = static_cast<float>(player->GetOxygen()) / 100.0f;
 
 	// Flash oxygen bar if low

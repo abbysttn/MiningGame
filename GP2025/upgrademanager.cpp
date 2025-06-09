@@ -67,7 +67,7 @@ void UpgradeManager::DefineUpgrades()
         [this](Player& player, int newLevel) 
         {
             float baseMaxStamina = 100.0f;
-			float newUpgradedStamina = baseMaxStamina + ((float)newLevel * 20.0f);
+			float newUpgradedStamina = baseMaxStamina + ((float)newLevel * 50.0f);
             player.SetMaxStamina(newUpgradedStamina);
             player.SetCurrentStamina(player.GetMaxStamina());
             m_statusMessage = "Max Stamina upgraded to " + std::to_string(static_cast<int>(player.GetMaxStamina())) + "!";
@@ -75,7 +75,7 @@ void UpgradeManager::DefineUpgrades()
         [](int currentLevel, int costAmount, const std::string& costType) -> std::string 
         {
             if (currentLevel == 0) return "Increases your maximum stamina for deeper depths";
-            return "Current Max Stamina: " + std::to_string(static_cast<int>(100.0f + currentLevel * 20.0f)) + ". Next level increases max stamina by 20.";
+            return "Current Max Stamina: " + std::to_string(static_cast<int>(100.0f + currentLevel * 50.0f)) + ". Next level increases max stamina by 50.";
         }
     });
 
@@ -84,7 +84,7 @@ void UpgradeManager::DefineUpgrades()
     {
         "jump_height",        // ID
         "Jump Height",        // Display Name
-        3,                    // Max Level
+        5,                    // Max Level
         [](int targetLevel) -> UpgradeCost 
         {
             return {ResourceType::GEM, 10 * targetLevel};

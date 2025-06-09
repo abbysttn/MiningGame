@@ -32,13 +32,11 @@ public:
 	float GetHealth() const { return m_health; }
 	void SetHealth(float newHealth) { m_health = std::max(0.0f, std::min(newHealth, 100.0f)); }
 
-	// Stam
+	// Stamina for upgrades
 	float GetCurrentStamina() const { return m_stamina; }
 	void SetCurrentStamina(float newStamina) { m_stamina = std::max(0.0f, std::min(newStamina, m_maxStamina));	}
 	float GetMaxStamina() const { return m_maxStamina; }
 	void SetMaxStamina(float newMaxStamina);
-	float GetStamina() const { return m_stamina; }
-	void SetStamina(float newStamina) { m_stamina = std::max(0.0f, std::min(newStamina, 100.0f)); }
 
 	int GetDepth() const { return m_depth; }
 	void SetDepth(int depth) { m_depth = depth; }
@@ -92,15 +90,11 @@ private:
 	float m_health;
 	float m_stamina;
 	float m_maxStamina;
-	int m_depth;
 
 	std::map<ResourceType, int> m_inventory;
 
 	const float GRAVITY = 1000.0f; // Pixels per second squared
 	const float JUMP_FORCE = 550.0f; 
-
-	float m_jumpHeightMultiplier;
-	int m_miningStrengthLevel;
 
 	float m_oxygen;
 	float m_oxygenTimer;
@@ -109,13 +103,10 @@ private:
 	// UPGRADABLE VALUES
 	int m_staminaCost = 8;			 // Cost to mine a block
 	float m_jumpHeight;	 // Jump Height
+	float m_jumpHeightMultiplier; // Jump Height Multiplier for upgrades
+	int m_miningStrengthLevel; // Mining Strength Level (does nothing rn but can be used for upgrades)
 	// int m_miningSpeed = 1;
 
-	int m_dirtCount = 0;
-	int m_stoneCount = 0;
-	int m_gemCount = 0;
-
-	const float GRAVITY = 1000.0f; // Pixels per second squared
 	Vector2 m_Velocity;
 	bool m_OnGround = false;
 	bool m_noClip = false;
