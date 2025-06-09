@@ -46,6 +46,7 @@ bool Player::Initialise(Renderer& renderer)
 
     m_position = { 400, 300 };
     m_bAlive = true;
+    m_jumpHeight = std::sqrtf(2.0f * GRAVITY * (GridState::GetInstance().GetBlockSize().y * 2.3f));
     return true;
 }
 

@@ -53,6 +53,8 @@ public:
 	bool IsBlockBroken();
 	bool SpiderSpawn();
 
+	Vector2 GetBlockSize();
+
 protected:
 
 private:

@@ -74,7 +74,7 @@ private:
 
 	// UPGRADABLE VALUES
 	int m_staminaCost = 8;			 // Cost to mine a block
-	float m_jumpHeight = 550.0f;	 // Jump Height
+	float m_jumpHeight;	 // Jump Height
 	// int m_miningSpeed = 1;
 
 	int m_dirtCount = 0;

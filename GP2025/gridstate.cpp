@@ -197,3 +197,8 @@ bool GridState::SpiderSpawn()
 
 	return (GetRandomPercentage() < spawnChance);
 }
+
+Vector2 GridState::GetBlockSize()
+{
+	return m_gameGrid->GetBlockSize();
+}
