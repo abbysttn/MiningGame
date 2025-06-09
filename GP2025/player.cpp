@@ -81,7 +81,9 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 
     if (staminaRepletion) 
     {
-        m_stamina = std::min(100.0f, m_stamina + (20.0f * deltaTime)); // 20% per second
+        // So that it works when the player upgs their stamina otherwise it caps at 100.
+        float replenishStamValue = GetCurrentStamina() + (20.0f * deltaTime);
+        SetCurrentStamina(replenishStamValue);
     }
 
 	if (m_stamina <= 0.0f) {
