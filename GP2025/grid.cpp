@@ -156,12 +156,16 @@ bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 		block->SetScale(scaleFactor);
 
 		block->Position().x = (x * m_tileSize) + screenOffsetX;
-		block->Position().y = (y * m_tileSize) + screenOffsetY;	
+		block->Position().y = (y * m_tileSize) + screenOffsetY;
 
 		m_blockSize.x = static_cast<float>(block->GetSpriteWidth());
 		m_blockSize.y = static_cast<float>(block->GetSpriteHeight());
 
-		if (y == 0 && (x != 4 && x != 5 && x != 6)) {
+		if (y == 0 && (x <= 4 || x >= 15)) {
+			block->SetBreakable(false);
+		}
+
+		if (x == 0 || x == 19) {
 			block->SetBreakable(false);
 		}
 

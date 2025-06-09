@@ -19,7 +19,7 @@ public:
     UI(Renderer* renderer);
     ~UI();
 
-    void Update(Player* player, Renderer* renderer);
+    void Update(Player* player, Renderer* renderer, float deltaTime);
     void Render();
 
     void LoadDefaultTexture();
@@ -45,9 +45,14 @@ private:
     const float barHeight = 25.0f;
     Vector2 barPositionHealth;
     Vector2 barPositionStamina;
+	Vector2 barPositionOxygen;
 
     float healthPercent;
     float staminaPercent;
+    float oxygenPercent;
+
+    bool showOxygenBar = true;
+    float blinkTimer = 0.0f;
 
 	// Resource counters
     std::unique_ptr<Sprite> m_dirtIcon;

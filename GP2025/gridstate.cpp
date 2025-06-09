@@ -1,9 +1,9 @@
 #include "gridstate.h"
-#include "gridstate.h"
 
 #include "gameobjectpool.h"
 #include "quadtree.h"
 #include "Renderer.h"
+#include "player.h"
 
 #include "collisionhelper.h"
 
@@ -82,7 +82,11 @@ void GridState::BreakBlock(Vector2 position, char direction)
 				case 'G': m_gemCount += block->GetResourceAmount(); m_lastBlockType = 2; break;
 				case 'D': m_dirtCount += block->GetResourceAmount(); m_lastBlockType = 0; break;
 				case 'S': m_stoneCount += block->GetResourceAmount(); m_lastBlockType = 1; break;
-
+				case 'O': 
+					block->GetResourceAmount();  
+					m_pPlayer->AddOxygen(5.0f);
+					m_lastBlockType = 3; 
+					break;
 				}
 
 				//blockbreak particle activate

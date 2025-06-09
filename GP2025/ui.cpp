@@ -27,8 +27,9 @@ UI::UI(Renderer* renderer) : m_pRenderer(renderer) , m_font(std::make_unique<Fon
 	LoadDefaultTexture();
 
 	// Set health and stamina bar position
-	barPositionHealth = Vector2(120.0f, m_screenHeight - 70.0f); 
-	barPositionStamina = Vector2(120.0f, m_screenHeight - 35.0f);
+	barPositionHealth = Vector2(120.0f, m_screenHeight - 105.0f); 
+	barPositionStamina = Vector2(120.0f, m_screenHeight - 70.0f);
+	barPositionOxygen = Vector2(120.0f, m_screenHeight - 35.0f);
 }
 
 UI::~UI()
@@ -36,7 +37,7 @@ UI::~UI()
 	
 }
 
-void UI::Update(Player* player, Renderer* renderer)
+void UI::Update(Player* player, Renderer* renderer, float deltaTime)
 {
 	// DEPTH TRACKER
 	std::string newDepthText = "Depth: " + std::to_string(player->GetDepth()) + "m";
@@ -48,9 +49,23 @@ void UI::Update(Player* player, Renderer* renderer)
 		m_depthSprite->SetY(static_cast<int>(m_depthTextPos.y));
 	}
 
-	// HEALTH AND STAMINA BARS
+	// HEALTH, STAMINA, OXYGEN BARS
 	healthPercent = static_cast<float>(player->GetHealth()) / 100.0f; 
 	staminaPercent = static_cast<float>(player->GetStamina()) / 100.0f; 
+	oxygenPercent = static_cast<float>(player->GetOxygen()) / 100.0f;
+
+	// Flash oxygen bar if low
+	if (oxygenPercent < 0.2f) {
+		blinkTimer += 1.0f * deltaTime;
+		if (blinkTimer >= 0.5f) {
+			showOxygenBar = !showOxygenBar;
+			blinkTimer = 0.0f;
+		}
+	}
+	else {
+		showOxygenBar = true;
+		blinkTimer = 0.0f;
+	}
 
 	// RESOURCE COUNTERS
 	std::string newDirtText = std::to_string(player->GetDirt());
@@ -90,11 +105,15 @@ void UI::Render()
 
 	// Background bars
 	m_pRenderer->DrawRectScreenSpace(barPositionHealth, Vector2(barWidth, barHeight), 0.2f, 0.0f, 0.0f, 1.0f);
-	m_pRenderer->DrawRectScreenSpace(barPositionStamina, Vector2(barWidth, barHeight), 0.0f, 0.2f, 0.0f, 1.0f); // dark green
+	m_pRenderer->DrawRectScreenSpace(barPositionStamina, Vector2(barWidth, barHeight), 0.0f, 0.2f, 0.0f, 1.0f);
+	m_pRenderer->DrawRectScreenSpace(barPositionOxygen, Vector2(barWidth, barHeight), 0.0f, 0.0f, 0.2f, 1.0f); 
 
 	// Foreground bars
 	m_pRenderer->DrawRectScreenSpace(barPositionHealth, Vector2(barWidth * healthPercent, barHeight), 1.0f, 0.0f, 0.0f, 1.0f); // red
 	m_pRenderer->DrawRectScreenSpace(barPositionStamina, Vector2(barWidth * staminaPercent, barHeight), 0.0f, 1.0f, 0.0f, 1.0f); // green
+	if (showOxygenBar) {
+		m_pRenderer->DrawRectScreenSpace(barPositionOxygen, Vector2(barWidth * oxygenPercent, barHeight), 0.4f, 0.8f, 1.0f, 1.0f); // blue
+	}
 
 	// Resource Counters
 	if (m_dirtIcon) {
