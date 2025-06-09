@@ -116,7 +116,7 @@ bool Game::Initialise()
 		return false;
 	}
 
-	// SPlash screens
+	// Splash screens
 	Scene* pSplashSceneAUT = new SceneSplashScreenAUT();
 	if (!pSplashSceneAUT->Initialise(*m_pRenderer))
 	{

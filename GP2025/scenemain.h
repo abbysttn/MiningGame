@@ -50,13 +50,13 @@ public:
 
 	void CheckCollision(Player* player, SpiderState* spider);
 
-
 	void SetVisionLevel(int level);
 
+	void ToggleGodMode() { m_godMode = !m_godMode; }
 
 private:
 	float m_tileSize;
-	int m_aboveGroundOffset = 11; // Change later to correct above ground size
+	int m_aboveGroundOffset = 8; // Change later to correct above ground size
 
 	float m_pVisionLevel;
 	std::vector<float> m_visionLevels;
@@ -76,6 +76,8 @@ private:
 	int m_activeDrops;
 
 	bool m_paused = false;
+
+	bool m_godMode = false;
 
 	std::unique_ptr<UI> ui;
 
