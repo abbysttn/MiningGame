@@ -10,6 +10,8 @@
 
 #include "soundsystem.h"
 
+#include "upgrademanager.h"
+#include "upgradestation.h"
 
 #include "particle.h"
 #include "particlesystem.h"
@@ -50,7 +52,6 @@ public:
 
 	void CheckCollision(Player* player, SpiderState* spider);
 
-
 	void SetVisionLevel(int level);
 
 
@@ -83,9 +84,17 @@ private:
 
 	GameObjectPool* m_testSpider;
 
+	// Upgrade system
+	UpgradeManager m_upgradeManager;
+	std::vector<UpgradeStation> m_upgradeStations;
+	UpgradeStation* m_pActiveUpgradeStation;
+
+	bool m_showUpgradePrompt;
+	std::string m_interationKeyLabel = "[E]"; 
+
+	bool m_isUpgradeMenuUIVisible;
 
 	//Particle System
-
 	Sprite* m_pCoinSprite = nullptr;
 	Sprite* m_pDirtSprite = nullptr;
 	Sprite* m_pBreakBlockSprite = nullptr;

@@ -10,6 +10,7 @@
 #include <iostream>
 #include "ui.h"
 #include "logmanager.h"
+#include "resourcetype.h"
 
 #include "gridstate.h"
 #include "collisionhelper.h"
@@ -30,6 +31,9 @@ SceneMain::SceneMain()
     , m_pDirtSprite(nullptr)
     , m_pBreakBlockSprite(nullptr)
     , ui(nullptr), m_testSpider(nullptr)
+    , m_pActiveUpgradeStation(nullptr)
+    , m_showUpgradePrompt(false)
+    , m_isUpgradeMenuUIVisible(false)
 {}
 
 SceneMain::~SceneMain()
@@ -177,12 +181,20 @@ bool SceneMain::Initialise(Renderer& renderer)
         return false;
     }
 
+    // Give resources just for testing purposes
+    m_pPlayer->AddResource(ResourceType::DIRT, 500);
+    m_pPlayer->AddResource(ResourceType::STONE, 500);
+    m_pPlayer->AddResource(ResourceType::GEM, 500);
+
     m_tileSize = GridState::GetInstance().GetTileSize();
 
     ui = std::make_unique<UI>(&renderer);
     m_screenX = renderer.GetWidth();
     m_playerY = static_cast<float>(m_pPlayer->GetPosition().y);
 
+    m_upgradeManager.Initialise(m_pPlayer);
+    // Upgrade station position (to be interacted with menu) also press 'E'
+    m_upgradeStations.emplace_back(200.0f, 600.0f, 100.0f); // X, y, radius 
 
     //init particles
     m_pCoinSprite = renderer.CreateSprite("../assets/ball.png");
@@ -228,16 +240,35 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         Game::GetInstance().SetCurrentScene(0);
     }
 
+    // To close the Upg menu if its open, use ESC to close it
+    if (inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE) == BS_PRESSED) 
+    {
+        if (m_upgradeManager.IsMenuOpen()) 
+        {
+            m_upgradeManager.CloseMenu();
+            m_pActiveUpgradeStation = nullptr;
+            m_isUpgradeMenuUIVisible = false; // Hide ImGui window
+            Game::GetInstance().m_pInputSystem->ShowMouseCursor(false); // Hide mouse if game needs it
+        }
+        else 
+        {
+            m_paused = true;
+            Game::GetInstance().SetCurrentScene(2);
+            return;
+        }
+    }
 
     if (!m_paused) {
-        m_timer += deltaTime;
-
         if (m_pPlayer)
         {
-            m_pPlayer->Process(deltaTime, inputSystem);
+            if (!m_upgradeManager.IsMenuOpen() ||
+                !ImGui::GetIO().WantCaptureKeyboard)
+            {
+                m_pPlayer->Process(deltaTime, inputSystem);
+            }
             m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
         }
-
+        m_timer += deltaTime;
 
         TestingFeatures(inputSystem);
 
@@ -342,24 +373,50 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
         GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
 
+        // Upgrade station
+        m_showUpgradePrompt = false;
+        if (!m_upgradeManager.IsMenuOpen())
+        {
+            for (auto& station : m_upgradeStations)
+            {
+                if (station.IsPlayerInRange(m_pPlayer->GetPosition()))
+                {
+                    m_showUpgradePrompt = true;
+                    if (inputSystem.GetKeyState(SDL_SCANCODE_E) == BS_PRESSED)
+                    {
+                        m_upgradeManager.OpenMenu();
+                        m_pActiveUpgradeStation = &station;
+                        m_isUpgradeMenuUIVisible = true;
+                        Game::GetInstance().m_pInputSystem->ShowMouseCursor(true);
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+			if (m_pActiveUpgradeStation && !m_pActiveUpgradeStation->IsPlayerInRange(m_pPlayer->GetPosition()))
+			{
+				m_upgradeManager.CloseMenu();
+				m_pActiveUpgradeStation = nullptr;
+				m_isUpgradeMenuUIVisible = false; // Hide ImGui window
+				Game::GetInstance().m_pInputSystem->ShowMouseCursor(false); // Hide mouse if game needs it
+			}
+        }
 
         m_pVignetteSprite->SetX(static_cast<int>(m_pPlayer->GetPosition().x));
         m_pVignetteSprite->SetY(static_cast<int>(m_pPlayer->GetPosition().y));
 
         ui->Update(m_pPlayer, m_pRenderer);
 
-
         ProcessParticles(deltaTime);
-
 
         m_soundSystem.Update();
     }
-
-
-
 }
 
-void SceneMain::Draw(Renderer& renderer){
+void SceneMain::Draw(Renderer& renderer)
+{
 
     MoveCamera(renderer);
 
@@ -395,6 +452,72 @@ void SceneMain::Draw(Renderer& renderer){
 
     if (m_pVignetteSprite) {
         m_pVignetteSprite->Draw(renderer);
+    }
+
+    // Upgrade Menu 
+    if (m_isUpgradeMenuUIVisible && m_upgradeManager.IsMenuOpen()) 
+    {
+        ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver); 
+        ImGui::Begin("Upgrade Station", &m_isUpgradeMenuUIVisible); 
+
+        if (!m_isUpgradeMenuUIVisible) 
+        { // If closed by 'X'
+            m_upgradeManager.CloseMenu();
+            m_pActiveUpgradeStation = nullptr;
+            Game::GetInstance().m_pInputSystem->ShowMouseCursor(false);
+        }
+
+        const auto& upgrades = m_upgradeManager.GetAvailableUpgrades();
+        for (size_t i = 0; i < upgrades.size(); ++i) 
+        {
+            const auto& upg = upgrades[i];
+            std::string buttonLabel = upg.displayName;
+            UpgradeCost cost = { ResourceType::DIRT, 0 }; // Default cost for display
+
+            if (upg.IsMaxLevel()) 
+            {
+                buttonLabel += " - MAX Level (" + std::to_string(upg.currentLevel) + ")";
+            }
+            else 
+            {
+                cost = upg.getCostForLevel(upg.currentLevel + 1);
+                buttonLabel += " Lv." + std::to_string(upg.currentLevel)
+                    + " -> Lv." + std::to_string(upg.currentLevel + 1)
+                    + " (Cost: " + std::to_string(cost.amount)
+                    + " " + ResourceTypeToString(cost.resource) + ")";
+            }
+
+            if (ImGui::Button(buttonLabel.c_str(), ImVec2(-1, 0))) 
+            { 
+                if (!upg.IsMaxLevel()) 
+                {
+                    m_upgradeManager.AttemptUpgrade(i);
+                }
+            }
+            // Display description
+            if (upg.getDescription) 
+            {
+                ImGui::TextWrapped("%s", upg.getDescription(upg.currentLevel, cost.amount, ResourceTypeToString(cost.resource)).c_str());
+            }
+            if (i < upgrades.size() - 1) ImGui::Separator();
+        }
+
+        if (!m_upgradeManager.GetStatusMessage().empty()) 
+        {
+            ImGui::Separator();
+            ImGui::TextWrapped("Status: %s", m_upgradeManager.GetStatusMessage().c_str());
+        }
+
+        ImGui::Separator();
+        if (ImGui::Button("Close Menu", ImVec2(-1, 0))) 
+        {
+            m_upgradeManager.CloseMenu();
+            m_pActiveUpgradeStation = nullptr;
+            m_isUpgradeMenuUIVisible = false;
+            Game::GetInstance().m_pInputSystem->ShowMouseCursor(false);
+        }
+
+        ImGui::End();
     }
 
     ui->Render(); // Draw Last
@@ -491,7 +614,7 @@ void SceneMain::TestingFeatures(InputSystem& inputSystem) {
     }
     if (inputSystem.GetKeyState(SDL_SCANCODE_L))
     {
-        m_pPlayer->SetStamina(m_pPlayer->GetStamina() - 0.5f);
+        m_pPlayer->SetCurrentStamina(m_pPlayer->GetCurrentStamina() - 0.5f);
     }
     if (inputSystem.GetKeyState(SDL_SCANCODE_J))
     {

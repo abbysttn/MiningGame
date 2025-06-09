@@ -50,7 +50,7 @@ void UI::Update(Player* player, Renderer* renderer)
 
 	// HEALTH AND STAMINA BARS
 	healthPercent = static_cast<float>(player->GetHealth()) / 100.0f; 
-	staminaPercent = static_cast<float>(player->GetStamina()) / 100.0f; 
+	staminaPercent = static_cast<float>(player->GetCurrentStamina()) / player->GetMaxStamina(); 
 
 	// RESOURCE COUNTERS
 	std::string newDirtText = std::to_string(player->GetDirt());

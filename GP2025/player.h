@@ -6,7 +6,9 @@
 //#include "renderer.h"
 //#include "scenemain.h"
 #include <cmath>
+#include <map>
 #include <algorithm>
+#include "resourcetype.h"
 
 enum PlayerAnimationState {
 	IDLE,
@@ -31,22 +33,32 @@ public:
 	float GetHealth() const { return m_health; }
 	void SetHealth(float newHealth){ m_health = std::max(0.0f, std::min(newHealth, 100.0f)); }
 
-	float GetStamina() const { return m_stamina; }
-	void SetStamina(float newStamina) { m_stamina = std::max(0.0f, std::min(newStamina, 100.0f));	}
-	
+	// Stam
+	float GetCurrentStamina() const { return m_stamina; }
+	void SetCurrentStamina(float newStamina) { m_stamina = std::max(0.0f, std::min(newStamina, 100.0f));	}
+	float GetMaxStamina() const { return m_maxStamina; }
+	void SetMaxStamina(float newMaxStamina);
+
 	int GetDepth() const { return m_depth; }
 	void SetDepth(int depth) { m_depth = depth; }
 
 	float GetPlayerHeight();
 	float GetPlayerWidth();
-	int GetDirt() const { return m_dirtCount; }
-	void SetDirt(int dirt) { m_dirtCount = std::max(0, dirt); }
 
-	int GetStone() const { return m_stoneCount; }
-	void SetStone(int stone) { m_stoneCount = std::max(0, stone); }
+	// Resources
+	void AddResource(ResourceType type, int amount);
+	bool HasResource(ResourceType type, int amount) const;
+	bool RemoveResource(ResourceType type, int amount);
+	int GetResourceCount(ResourceType type) const;
 
-	int GetGem() const { return m_gemCount; }
-	void SetGem(int gem) { m_gemCount = std::max(0, gem); }
+	int GetDirt() const { return GetResourceCount(ResourceType::DIRT); }
+	void SetDirt(int dirt) { m_inventory[ResourceType::DIRT] = std::max(0, dirt); }
+
+	int GetStone() const { return GetResourceCount(ResourceType::STONE); }
+	void SetStone(int stone) { m_inventory[ResourceType::STONE] = std::max(0, stone); }
+
+	int GetGem() const { return GetResourceCount(ResourceType::GEM); }
+	void SetGem(int gem) { m_inventory[ResourceType::GEM] = std::max(0, gem); }
 
 	void SetNoClip(bool noClip) { m_noClip = noClip; }
 
@@ -55,6 +67,15 @@ public:
 	bool IsPlayerMining() { return m_isMining; }
 	PlayerAnimationState GetCurrentState() { return m_animationState; }
 
+	// Jump Height
+	float GetJumpHeightMultiplier() const { return m_jumpHeightMultiplier; }
+	void SetJumpHeightMultiplier(float multiplier) { m_jumpHeightMultiplier = multiplier; }
+
+	// Mining strength
+	int GetMiningStrengthLevel() const { return m_miningStrengthLevel; }
+	void SetMiningStrengthLevel(int level) { m_miningStrengthLevel = level; }
+
+
 private:
 	float m_speed;
 	Renderer* m_pRenderer;
@@ -62,14 +83,17 @@ private:
 
 	float m_health;
 	float m_stamina;
+	float m_maxStamina;
 	int m_depth;
 
-	int m_dirtCount = 0;
-	int m_stoneCount = 0;
-	int m_gemCount = 0;
+	std::map<ResourceType, int> m_inventory;
 
 	const float GRAVITY = 1000.0f; // Pixels per second squared
 	const float JUMP_FORCE = 550.0f; 
+
+	float m_jumpHeightMultiplier;
+	int m_miningStrengthLevel;
+
 	Vector2 m_Velocity;
 	bool m_OnGround = false;
 	bool m_noClip = false;
