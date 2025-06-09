@@ -122,11 +122,10 @@ void GridState::ResetGrid()
 {
 	delete m_gameGrid;
 	m_gameGrid = nullptr;
-}
 
-char GridState::GetBlockType(Block* block)
-{
-	return 0;
+	m_dirtCount = 0;
+	m_gemCount = 0;
+	m_stoneCount = 0;
 }
 
 void GridState::ProcessGrid(float deltaTime, InputSystem& inputSystem)
@@ -160,6 +159,9 @@ bool GridState::CheckCollision(Box& box)
 					(float)block->GetSpriteHeight());
 
 				if (CollisionHelper::IsColliding(blockBox, box)) {
+
+					m_touchingHazard = block->IsHazard();
+
 					return true;
 				}
 			}
@@ -167,6 +169,11 @@ bool GridState::CheckCollision(Box& box)
 	}
 
 	return false;
+}
+
+bool GridState::CheckHazards()
+{
+	return m_touchingHazard;
 }
 
 float GridState::GetTileSize()

@@ -92,7 +92,7 @@ bool Game::Initialise()
 	bbHeight = 800;
 
 	m_pRenderer = new Renderer();
-	if (!m_pRenderer->Initialise(true, (int)bbWidth, (int)bbHeight))
+	if (!m_pRenderer->Initialise(false, (int)bbWidth, (int)bbHeight))
 	{
 		LogManager::GetInstance().Log("Renderer failed to initialise!");
 		return false;

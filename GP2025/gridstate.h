@@ -29,12 +29,11 @@ public:
 
 	void ResetGrid();
 
-	char GetBlockType(Block* block);
-
 	void ProcessGrid(float deltaTime, InputSystem& inputSystem);
 	void DrawGrid(Renderer& renderer);
 
 	bool CheckCollision(Box& box);
+	bool CheckHazards();
 
 	float GetTileSize();
 
@@ -71,6 +70,8 @@ protected:
 	Vector2 m_brokenBlockPos;
 	int m_brokenBlockTile;
 	Vector2 m_lastBrokenPos;
+
+	bool m_touchingHazard;
 
 	bool update1 = true;
 
