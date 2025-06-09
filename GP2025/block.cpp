@@ -24,6 +24,13 @@ bool Block::Initialise(Renderer& renderer, int depth, int x)
 	GetBlockType(m_depth, m_filepath, x);
 
 	m_sprite = renderer.CreateAnimatedSprite(m_filepath);
+
+	if (m_blockType == 'O') {
+		m_sprite->SetRedTint(0.1f);
+		m_sprite->SetGreenTint(0.3f);
+		m_sprite->SetBlueTint(1.0f);
+	}
+
 	m_sprite->SetupFrames(8, 8);
 	m_sprite->SetLooping(false);
 	m_sprite->SetFrameDuration(m_animatingTime);
@@ -168,7 +175,12 @@ bool Block::ResourcesGiven()
 
 void Block::GetBlockType(int& depth, const char*& filepath, int x)
 {
-	if (depth == 0 && (x != 4 && x != 5 && x != 6)) {
+	if (depth <= 0 && (x <= 4 || x >= 15)) {
+		filepath = "../assets/brock.png";
+		return;
+	}
+
+	if (x == 0 || x == 19) {
 		filepath = "../assets/brock.png";
 		return;
 	}
@@ -191,7 +203,15 @@ void Block::GetBlockType(int& depth, const char*& filepath, int x)
 		percentage = 0.1f;
 	}
 
+	// 5% Oxygen Chance. Runs before gem chance.
+	if (depth >= 5 && GetRandomPercentage() < 0.05f) {
+		filepath = "../assets/stone.png";
+		m_blockType = 'O';
+		return;
+	}
+
 	float chance = GetRandomPercentage();
+
 
 	if (chance <= percentage) {
 		IsGem = true;

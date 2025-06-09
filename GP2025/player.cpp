@@ -21,6 +21,8 @@ Player::Player()
 	, m_maxStamina(100.0f)
     , m_jumpHeightMultiplier(1.0f)
 	, m_miningStrengthLevel(1)
+    , m_oxygen(100.0f)
+    , m_oxygenTimer(0.0f)
 {
     m_inventory[ResourceType::DIRT] = 0;
     m_inventory[ResourceType::STONE] = 0;
@@ -29,7 +31,6 @@ Player::Player()
 
 Player::~Player()
 {
-
     delete m_pIdleSprite;
     delete m_pJumpSprite;
     delete m_pMineSprite;
@@ -51,6 +52,7 @@ bool Player::Initialise(Renderer& renderer)
 
     m_position = { 400, 300 };
     m_bAlive = true;
+    m_jumpHeight = std::sqrtf(2.0f * GRAVITY * (GridState::GetInstance().GetBlockSize().y * 2.3f));
     return true;
 }
 
@@ -59,7 +61,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     Vector2 direction(0.0f, 0.0f);
 
     bool staminaRepletion = (m_position.x >= 1180.0f && m_position.x <= 1280.0f) &&
-        (m_position.y <= 528.0f);
+        (m_depth <= 1);
 
     if (staminaRepletion) 
     {
@@ -73,19 +75,43 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     if (GetCurrentStamina() <= 0.0f) 
     {
         LogManager::GetInstance().Log("DEAD!");
+    if (staminaRepletion) {
+        m_stamina = std::min(100.0f, m_stamina + (20.0f * deltaTime)); // 20% per second
     }
 
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_W))    direction.y -= 1.0f;
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_S))  direction.y += 1.0f;
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_A))  direction.x -= 1.0f;
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_D)) direction.x += 1.0f;
+	if (m_stamina <= 0.0f) {
+        m_canMine = false;
+	}
+    else {
+		m_canMine = true;
+    }
+
+	if (m_health <= 0.0f) {
+		HandleDeath(1);
+        //return;
+	}
+
+    // Oxygen depletion logic
+    m_oxygenTimer += deltaTime;
+
+	// Reduce oxygen by 1% every 2 seconds
+    if (m_oxygenTimer >= 2.0f) {
+        m_oxygen -= 1.0f; 
+        if (m_oxygen < 0.0f) m_oxygen = 0.0f;
+        m_oxygenTimer = 0.0f;
+    }
+
+	if (m_oxygen <= 0.0f) {
+        HandleDeath(2);
+        //return;
+	}
+
     if (m_noClip) {
-        if (IsKeyHeld(inputSystem, SDL_SCANCODE_W))  direction.y -= 1.0f;
+        if (IsKeyHeld(inputSystem, SDL_SCANCODE_W))    direction.y -= 1.0f;
         if (IsKeyHeld(inputSystem, SDL_SCANCODE_S))  direction.y += 1.0f;
     }
-
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_A))      direction.x -= 1.0f;
-    if (IsKeyHeld(inputSystem, SDL_SCANCODE_D))      direction.x += 1.0f;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_A))  direction.x -= 1.0f;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_D)) direction.x += 1.0f;
 
 
     m_isMining = false;
@@ -98,6 +124,23 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     if (m_isMining) 
     {
         GridState::GetInstance().BreakBlock(m_position, breakDirection, this);
+    if (m_canMine) {
+        if (IsKeyHeld(inputSystem, SDL_SCANCODE_UP)) {
+            GridState::GetInstance().BreakBlock(m_position, 'U');
+            m_isMining = true;
+        }
+        if (IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN)) {
+            GridState::GetInstance().BreakBlock(m_position, 'D');
+            m_isMining = true;
+        }
+        if (IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT)) {
+            GridState::GetInstance().BreakBlock(m_position, 'L');
+            m_isMining = true;
+        }
+        if (IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) {
+            GridState::GetInstance().BreakBlock(m_position, 'R');
+            m_isMining = true;
+        }
     }
 
 	if (m_isMining && m_animationState != MINE) {
@@ -153,6 +196,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
         // If on ground and space is pressed, jump
         if (m_OnGround && IsKeyHeld(inputSystem, SDL_SCANCODE_SPACE)) {
 			m_Velocity.y = -(JUMP_FORCE * m_jumpHeightMultiplier);
+			m_Velocity.y = -m_jumpHeight;
 			m_OnGround = false;
 
             // Change animation to jump/fall
@@ -332,3 +376,16 @@ int Player::GetResourceCount(ResourceType type) const
     return 0;
 }
 
+void Player::HandleDeath(int deathType) {
+	switch (deathType) {
+	case 1: // Health depleted
+		LogManager::GetInstance().Log("Player died due to health depletion.");
+		break;
+	case 2: // Oxygen depleted
+		LogManager::GetInstance().Log("Friend died due to oxygen depletion.");
+		break;
+	default:
+		LogManager::GetInstance().Log("Player died for an unknown reason.");
+		break;
+	}
+}

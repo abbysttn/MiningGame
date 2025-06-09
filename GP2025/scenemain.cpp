@@ -180,6 +180,7 @@ bool SceneMain::Initialise(Renderer& renderer)
         m_pPlayer = nullptr;
         return false;
     }
+	GridState::GetInstance().SetPlayer(m_pPlayer);
 
     // Give resources just for testing purposes
     m_pPlayer->AddResource(ResourceType::DIRT, 500);
@@ -267,6 +268,12 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
                 m_pPlayer->Process(deltaTime, inputSystem);
             }
             m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
+        
+            if (m_godMode) {
+				m_pPlayer->SetHealth(100.0f);
+				m_pPlayer->SetStamina(100.0f);
+				m_pPlayer->AddOxygen(100.0f);
+            }
         }
         m_timer += deltaTime;
 
@@ -314,6 +321,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         }
 
         if (GridState::GetInstance().CheckBlockBreak()) {
+			m_pPlayer->SetStamina(m_pPlayer->GetStamina() - m_pPlayer->GetStaminaCost());
+
             m_soundSystem.PlaySound("blockBreak");
             ParticleSystem ps;
             ps.Initialise(m_pBreakBlockSprite, m_pPlayer, 35, ParticleType::BlockBreak);
@@ -328,10 +337,6 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         if (!m_pPlayer->IsPlayerMining()) {
             m_soundSystem.StopSound("pickaxeHit");
         }
-
-
-
-
 
         SpawnWaterDrops();
 
@@ -407,7 +412,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         m_pVignetteSprite->SetX(static_cast<int>(m_pPlayer->GetPosition().x));
         m_pVignetteSprite->SetY(static_cast<int>(m_pPlayer->GetPosition().y));
 
-        ui->Update(m_pPlayer, m_pRenderer);
+        ui->Update(m_pPlayer, m_pRenderer, deltaTime);
 
         ProcessParticles(deltaTime);
 
@@ -529,7 +534,7 @@ void SceneMain::DebugDraw()
     if (m_pPlayer)
     {
         ImGui::NewLine();
-        ImGui::Text("Press Spacebar to hide/show");
+        ImGui::Text("Press Backspace to hide/show");
         ImGui::Text("Debugging Tools:");
         ImGui::Text("%.1f FPS | Frame time: %.3f ms", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
 
@@ -570,8 +575,6 @@ void SceneMain::ProcessParticles(float time) {
 
         for (Particle& p : it->GetParticles()) {
             if (p.GetType() == ParticleType::WaterDrop) {
-                //play sound if velocity is ~zero and hasn't played yet
-                std::cout << p.GetVelocity().y << std::endl;
                 if (!p.CheckPlayedSound() && p.GetVelocity().y < 0.1f) {
                     m_soundSystem.PlaySound("waterdrop");
                     p.SetSoundPlayed();
@@ -604,11 +607,8 @@ void SceneMain::SpawnWaterDrops() {
 }
 
 void SceneMain::TestingFeatures(InputSystem& inputSystem) {
-
-    //test health and stamina
-
     // DEBUG STUFF
-    if (inputSystem.GetKeyState(SDL_SCANCODE_K))
+    if (inputSystem.GetKeyState(SDL_SCANCODE_F1))
     {
         m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 0.5f);
     }
@@ -627,10 +627,10 @@ void SceneMain::TestingFeatures(InputSystem& inputSystem) {
     if (inputSystem.GetKeyState(SDL_SCANCODE_G))
     {
         m_pPlayer->SetGem(m_pPlayer->GetGem() + 1);
+		ToggleGodMode();
     }
 
-    //test particles
-
+    // Test particles
     if (inputSystem.GetKeyState(SDL_SCANCODE_I) == BS_PRESSED)
     {
         ParticleSystem ps;

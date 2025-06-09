@@ -26,18 +26,19 @@ public:
 	void Process(float deltaTime, InputSystem& inputSystem);
 	void Draw(Renderer& renderer);
 	bool IsKeyHeld(InputSystem& input, SDL_Scancode key);
-	void HandleMovement(float deltaTime, InputSystem& inputSystem);
 
 	Vector2 GetPosition() const { return m_position; };
 
 	float GetHealth() const { return m_health; }
-	void SetHealth(float newHealth){ m_health = std::max(0.0f, std::min(newHealth, 100.0f)); }
+	void SetHealth(float newHealth) { m_health = std::max(0.0f, std::min(newHealth, 100.0f)); }
 
 	// Stam
 	float GetCurrentStamina() const { return m_stamina; }
 	void SetCurrentStamina(float newStamina) { m_stamina = std::max(0.0f, std::min(newStamina, m_maxStamina));	}
 	float GetMaxStamina() const { return m_maxStamina; }
 	void SetMaxStamina(float newMaxStamina);
+	float GetStamina() const { return m_stamina; }
+	void SetStamina(float newStamina) { m_stamina = std::max(0.0f, std::min(newStamina, 100.0f)); }
 
 	int GetDepth() const { return m_depth; }
 	void SetDepth(int depth) { m_depth = depth; }
@@ -60,12 +61,19 @@ public:
 	int GetGem() const { return GetResourceCount(ResourceType::GEM); }
 	void SetGem(int gem) { m_inventory[ResourceType::GEM] = std::max(0, gem); }
 
+	float GetOxygen() const { return m_oxygen; }
+	void AddOxygen(float amount) { m_oxygen = std::max(0.0f, std::min(m_oxygen + amount, 100.0f)); }
+
 	void SetNoClip(bool noClip) { m_noClip = noClip; }
 
 	void LoadAnimatedSprites();
 
 	bool IsPlayerMining() { return m_isMining; }
 	PlayerAnimationState GetCurrentState() { return m_animationState; }
+	
+	void HandleDeath(int deathType);
+
+	int GetStaminaCost() const { return m_staminaCost; }
 
 	// Jump Height
 	float GetJumpHeightMultiplier() const { return m_jumpHeightMultiplier; }
@@ -94,6 +102,20 @@ private:
 	float m_jumpHeightMultiplier;
 	int m_miningStrengthLevel;
 
+	float m_oxygen;
+	float m_oxygenTimer;
+	int m_depth;
+
+	// UPGRADABLE VALUES
+	int m_staminaCost = 8;			 // Cost to mine a block
+	float m_jumpHeight;	 // Jump Height
+	// int m_miningSpeed = 1;
+
+	int m_dirtCount = 0;
+	int m_stoneCount = 0;
+	int m_gemCount = 0;
+
+	const float GRAVITY = 1000.0f; // Pixels per second squared
 	Vector2 m_Velocity;
 	bool m_OnGround = false;
 	bool m_noClip = false;
@@ -106,6 +128,7 @@ private:
 
 	bool m_facingLeft = false;
 	bool m_isMining = false;
+	bool m_canMine = true;
 };
 
 #endif // PLAYER_H

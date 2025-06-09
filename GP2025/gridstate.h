@@ -4,6 +4,7 @@
 #include "grid.h"
 #include "block.h"
 #include "vector"
+#include "player.h"
 
 class GameObjectPool;
 class Renderer;
@@ -43,12 +44,17 @@ public:
 
 	int GetGem() const { return m_gemCount; }
 
+	void SetPlayer(Player* player) { m_pPlayer = player; }
+
+
 	bool CheckBlockDig();
 	bool CheckBlockBreak();
 	int GetLastBlockType();
 	Vector2 GetBrokenBlockPos();
 	bool IsBlockBroken();
 	bool SpiderSpawn();
+
+	Vector2 GetBlockSize();
 
 protected:
 
@@ -71,6 +77,8 @@ protected:
 	int m_dirtCount = 0;
 	int m_stoneCount = 0;
 	int m_gemCount = 0;
+
+	Player* m_pPlayer = nullptr;
 
 private:
 

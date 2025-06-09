@@ -4,6 +4,7 @@
 #include "gameobjectpool.h"
 #include "quadtree.h"
 #include "Renderer.h"
+#include "player.h"
 
 #include "collisionhelper.h"
 
@@ -89,6 +90,7 @@ void GridState::BreakBlock(Vector2 position, char direction, Player* player)
 				case 'G': type = ResourceType::GEM; m_lastBlockType = 2; break;
 				case 'D': type = ResourceType::DIRT; m_lastBlockType = 0; break;
 				case 'S': type = ResourceType::STONE; m_lastBlockType = 1; break;
+				
 				default: recognizedType = false; break;
 
 				}
@@ -96,6 +98,14 @@ void GridState::BreakBlock(Vector2 position, char direction, Player* player)
 				if (recognizedType && resourceAmount > 0)
 				{
 					player->AddResource(type, resourceAmount);
+				case 'G': m_gemCount += block->GetResourceAmount(); m_lastBlockType = 2; break;
+				case 'D': m_dirtCount += block->GetResourceAmount(); m_lastBlockType = 0; break;
+				case 'S': m_stoneCount += block->GetResourceAmount(); m_lastBlockType = 1; break;
+				case 'O': 
+					block->GetResourceAmount();  
+					m_pPlayer->AddOxygen(5.0f);
+					m_lastBlockType = 3; 
+					break;
 				}
 
 				//blockbreak particle activate
@@ -205,4 +215,9 @@ bool GridState::SpiderSpawn()
 	float spawnChance = 0.05f;
 
 	return (GetRandomPercentage() < spawnChance);
+}
+
+Vector2 GridState::GetBlockSize()
+{
+	return m_gameGrid->GetBlockSize();
 }
