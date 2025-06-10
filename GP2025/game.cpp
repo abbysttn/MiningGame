@@ -304,11 +304,16 @@ void Game::DebugDraw
 		ImGui::Begin("Debug Window", &open, ImGuiWindowFlags_MenuBar);
 
 		ImGui::Text("COMP710 GP Framework (%s)", "2025, S1");
+		ImGui::Text("Press Backspace to hide/show");
 
 		if (ImGui::Button("Quit"))
 		{
 			Quit();
 		}
+
+		ImGui::NewLine();
+		ImGui::Text("%.1f FPS | Frame time: %.3f ms", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
+		ImGui::NewLine();
 
 		LogManager::GetInstance().DebugDraw();
 

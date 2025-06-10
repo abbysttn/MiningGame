@@ -8,6 +8,7 @@
 #include "Texture.h"
 #include "LogManager.h"
 #include "Game.h"
+#include "xboxcontroller.h"
 
 // IMGUI
 #include "imgui/imgui.h"
@@ -92,7 +93,8 @@ void SceneSplashScreenAUT::Process(float deltaTime, InputSystem& inputSystem)
 	// Skip button for splash screens ' Enter Key '
 	if (m_eCurrentState != AUTSplashState::FINISHED)
 	{
-		if (inputSystem.GetKeyState(SDL_SCANCODE_RETURN) == BS_PRESSED || inputSystem.GetKeyState(SDL_SCANCODE_KP_ENTER) == BS_PRESSED)
+		if (inputSystem.GetKeyState(SDL_SCANCODE_RETURN) == BS_PRESSED || inputSystem.GetKeyState(SDL_SCANCODE_KP_ENTER) == BS_PRESSED ||
+			(inputSystem.GetNumberOfControllersAttached() > 0 && inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_START) == BS_PRESSED))
 		{
 			// Skip the splash screen if Enter is pressed
 			m_fAlpha = 0.0f;
