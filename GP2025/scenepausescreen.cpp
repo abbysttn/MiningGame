@@ -88,8 +88,8 @@ bool ScenePauseScreen::Initialise(Renderer& renderer)
 
 	SDL_Renderer* sdlRenderer = renderer.GetSDLRenderer();
 
-	// Placeholder Image for now (need to change)!
-	m_pBackgroundSprite = renderer.CreateSprite("../assets/titleBackground.png");
+	// Pause background
+	m_pBackgroundSprite = renderer.CreateSprite("../assets/pauseBackground.png");
 	m_pBackgroundSprite->SetX(static_cast<int>(m_screenWidth / 2));
 	m_pBackgroundSprite->SetY(static_cast<int>(m_screenHeight / 2));
 	float bgScaleX = m_screenWidth / m_pBackgroundSprite->GetWidth();
