@@ -75,6 +75,11 @@ void CutscenePlayer::SetScale(float scale)
 	m_scale = scale;
 }
 
+void CutscenePlayer::SetRotation(float rotation)
+{
+	m_pAnimSprite->SetAngle(rotation);
+}
+
 void CutscenePlayer::SetFlip(bool flip)
 {
 	m_flip = flip;
@@ -114,4 +119,11 @@ void CutscenePlayer::SetState(PlayerState state)
 void CutscenePlayer::SetCutscene(CutScene scene)
 {
 	m_currentScene = scene;
+}
+
+void CutscenePlayer::SetColour(float red, float green, float blue)
+{
+	m_pAnimSprite->SetRedTint(red);
+	m_pAnimSprite->SetBlueTint(blue);
+	m_pAnimSprite->SetGreenTint(green);
 }

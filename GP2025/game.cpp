@@ -20,6 +20,7 @@
 #include "SceneSplashScreenFMOD.h"
 #include "startcutscene.h"
 #include "sceneloadingscreen.h"
+#include "endcutscene.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -190,6 +191,15 @@ bool Game::Initialise()
 	}
 	m_scenes.push_back(pMainScene);
 
+	//end cutscene
+	Scene* pEndCutscene = new EndCutscene();
+	if (!pEndCutscene->Initialise(*m_pRenderer)) {
+		LogManager::GetInstance().Log("End Cutscene failed to load!");
+		delete pEndCutscene;
+		return false;
+	}
+	m_scenes.push_back(pEndCutscene);
+
 	m_iCurrentScene = 0;
 	SetCurrentScene(m_iCurrentScene);
 
@@ -268,6 +278,7 @@ void Game::Process(float deltaTime)
 	* (Instructions scene)
 	* Loading Screen = 4
 	* Main Scene = 5
+	* End cutscene = 6
 	*/
 
 	if (m_iCurrentScene == 0)

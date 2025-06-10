@@ -145,6 +145,7 @@
     <ClCompile Include="animatedsprite.cpp" />
     <ClCompile Include="block.cpp" />
     <ClCompile Include="cutsceneplayer.cpp" />
+    <ClCompile Include="endcutscene.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="fallingrocks.cpp" />
     <ClCompile Include="font.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="block.h" />
     <ClInclude Include="collisionhelper.h" />
     <ClInclude Include="cutsceneplayer.h" />
+    <ClInclude Include="endcutscene.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="fallingrocks.h" />
     <ClInclude Include="font.h" />

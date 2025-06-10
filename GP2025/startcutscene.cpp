@@ -50,6 +50,7 @@ bool StartCutscene::Initialise(Renderer& renderer)
 	m_player->Initialise(renderer);
 	m_player->SetScale(m_grid->GetTileSize() / 35.0f);
 	m_player->Position() = m_grid->GetPlayerStartPos();
+	m_player->SetColour(0.8f, 1.0f, 0.8f);
 
 	m_player->SetState(MINE);
 	m_player->SetFlip(true);
