@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <iostream>
 
+const int LOADING_INDEX = 3;
+
 SceneTitlescreen::SceneTitlescreen(FMOD::System* fmodSystem)
 	: m_pStartBtnTexture(nullptr)
 	, m_pExitBtnTexture(nullptr)
@@ -197,7 +199,7 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 			{
 				m_tSoundSystem.PlaySound("click");
 
-				Game::GetInstance().SetCurrentScene(3);
+				Game::GetInstance().SetCurrentScene(LOADING_INDEX);
 			}
 		}
 		else
@@ -213,16 +215,16 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 		inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_START) == BS_PRESSED))
 	{
 		m_tSoundSystem.PlaySound("click");
-		Game::GetInstance().SetCurrentScene(3);
+		Game::GetInstance().SetCurrentScene(LOADING_INDEX);
 	}
 
 
 	// Exit button
 	if (m_pExitBtnSprite)
 	{
-		m_bisMouseOverStart = IsMouseOverSprite(inputSystem, m_pExitBtnSprite);
+		m_bisMouseOverExit = IsMouseOverSprite(inputSystem, m_pExitBtnSprite);
 
-		if (m_bisMouseOverStart)
+		if (m_bisMouseOverExit)
 		{
 			m_pExitBtnSprite->SetRedTint(m_hoverRed);
 			m_pExitBtnSprite->SetGreenTint(m_hoverGreen);

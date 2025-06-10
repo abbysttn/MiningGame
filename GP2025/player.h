@@ -59,6 +59,7 @@ public:
 	int GetGem() const { return GetResourceCount(ResourceType::GEM); }
 	void SetGem(int gem) { m_inventory[ResourceType::GEM] = std::max(0, gem); }
 
+	// Oxygen (can be turned into a upgradeable stat)
 	float GetOxygen() const { return m_oxygen; }
 	void AddOxygen(float amount) { m_oxygen = std::max(0.0f, std::min(m_oxygen + amount, 100.0f)); }
 
@@ -99,9 +100,11 @@ private:
 
 	std::map<ResourceType, int> m_inventory;
 
+	// Jumping and Gravity
 	const float GRAVITY = 1000.0f; // Pixels per second squared
 	const float JUMP_FORCE = 550.0f; 
-
+	
+	// Oxygen 
 	float m_oxygen;
 	float m_oxygenTimer;
 	int m_depth;
