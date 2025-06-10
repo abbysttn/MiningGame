@@ -20,6 +20,7 @@
 #include "SceneSplashScreenFMOD.h"
 #include "startcutscene.h"
 #include "sceneloadingscreen.h"
+#include "endcutscene.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -190,6 +191,15 @@ bool Game::Initialise()
 	}
 	m_scenes.push_back(pMainScene);
 
+	//end cutscene
+	Scene* pEndCutscene = new EndCutscene();
+	if (!pEndCutscene->Initialise(*m_pRenderer)) {
+		LogManager::GetInstance().Log("End Cutscene failed to load!");
+		delete pEndCutscene;
+		return false;
+	}
+	m_scenes.push_back(pEndCutscene);
+
 	m_iCurrentScene = 0;
 	SetCurrentScene(m_iCurrentScene);
 
@@ -268,6 +278,7 @@ void Game::Process(float deltaTime)
 	* (Instructions scene)
 	* Loading Screen = 4
 	* Main Scene = 5
+	* End cutscene = 6
 	*/
 
 	if (m_iCurrentScene == 0)
@@ -311,6 +322,30 @@ void Game::Process(float deltaTime)
 			if (loadingScreen->IsFinished())
 			{
 				SetCurrentScene(5); // Move to main scene
+			}
+		}
+	}
+
+	else if (m_iCurrentScene == 5)
+	{
+		SceneMain* mainScene = dynamic_cast<SceneMain*>(m_scenes[m_iCurrentScene]);
+		if (mainScene)
+		{
+			if (mainScene->GameWon())
+			{
+				SetCurrentScene(6); // Move to end cutscene
+			}
+		}
+	}
+
+	else if (m_iCurrentScene == 6)
+	{
+		EndCutscene* endCutscene = dynamic_cast<EndCutscene*>(m_scenes[m_iCurrentScene]);
+		if (endCutscene)
+		{
+			if (endCutscene->IsFinished())
+			{
+				SetCurrentScene(3); // Move to title
 			}
 		}
 	}

@@ -30,12 +30,13 @@ public:
 
 	Vector2& Position();
 	void SetScale(float scale);
+	void SetRotation(float rotation);
 	void SetFlip(bool flip);
 
 	void SetState(PlayerState state);
 	void SetCutscene(CutScene scene);
 
-
+	void SetColour(float red, float green, float blue);
 
 protected:
 

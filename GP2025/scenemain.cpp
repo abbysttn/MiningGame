@@ -766,7 +766,6 @@ void SceneMain::SetVisionLevel(int level) {
     m_pVignetteSprite->SetScale(newScale);
 }
 
-
 void SceneMain::LightEvent(float time) {
     m_lightEventTimer += time;
 
@@ -790,4 +789,14 @@ void SceneMain::LightEvent(float time) {
         m_lightOn = true;
         m_flicktimer = 0.0f;
     }
+}
+
+bool SceneMain::GameWon()
+{
+    return m_pPlayer->IsAtBottom();
+}
+
+bool SceneMain::IsFinished()
+{
+    return m_gameOver;
 }

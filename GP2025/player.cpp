@@ -292,10 +292,10 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     float minX = wallMarginX + spriteHalfWidth;
     float maxX = screenWidth - wallMarginX - spriteHalfWidth;
     float minY = wallMarginY + spriteHalfHeight;
-    float maxY = static_cast<float>(screenHeight - spriteHalfHeight);
+    maxHeight = static_cast<float>(screenHeight - spriteHalfHeight);
 
     m_position.x = std::max(minX, std::min(maxX, m_position.x));
-    m_position.y = std::max(minY, std::min(maxY, m_position.y));
+    m_position.y = std::max(minY, std::min(maxHeight, m_position.y));
 
 	if (direction.x < 0.0f) m_facingLeft = true;
 	else if (direction.x > 0.0f) m_facingLeft = false;
@@ -354,6 +354,11 @@ void Player::LoadAnimatedSprites() {
     // Default
     m_pAnimSprite = m_pIdleSprite;
 	m_animationState = IDLE;
+}
+
+bool Player::IsAtBottom()
+{
+    return m_position.y >= maxHeight;
 }
 
 void Player::SetMaxStamina(float newMaxStamina) 

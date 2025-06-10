@@ -1,4 +1,4 @@
-#include "startcutscene.h"
+#include "endcutscene.h"
 
 #include "renderer.h"
 #include "inputsystem.h"
@@ -13,9 +13,9 @@
 #include "logmanager.h"
 #include "sprite.h"
 
-StartCutscene::StartCutscene() : m_grid(nullptr), m_player(nullptr), m_rocks(nullptr), m_fade(nullptr) {}
+EndCutscene::EndCutscene() : m_grid(nullptr), m_player(nullptr), m_rocks(nullptr), m_fade(nullptr), m_trappedMiner(nullptr) {}
 
-StartCutscene::~StartCutscene()
+EndCutscene::~EndCutscene()
 {
 	delete m_grid;
 	m_grid = nullptr;
@@ -29,10 +29,13 @@ StartCutscene::~StartCutscene()
 	delete m_fade;
 	m_fade = nullptr;
 
+	delete m_trappedMiner;
+	m_trappedMiner = nullptr;
+
 	m_tSoundSystem.Release();
 }
 
-bool StartCutscene::Initialise(Renderer& renderer)
+bool EndCutscene::Initialise(Renderer& renderer)
 {
 	if (!m_tSoundSystem.Initialise())
 	{
@@ -51,9 +54,22 @@ bool StartCutscene::Initialise(Renderer& renderer)
 	m_player->Initialise(renderer);
 	m_player->SetScale(m_grid->GetTileSize() / 35.0f);
 	m_player->Position() = m_grid->GetPlayerStartPos();
+	m_player->Position().x += m_grid->GetBlockSize().x * 15.0f;
 
-	m_player->SetState(MINE);
+	finishPos.x = m_grid->GetPlayerStartPos().x + m_grid->GetBlockSize().x * 3.0f;
+	finishPos.y = m_player->Position().y;
+
+	m_player->SetState(IDLE);
 	m_player->SetFlip(true);
+
+	m_trappedMiner = new CutscenePlayer();
+	m_trappedMiner->Initialise(renderer);
+	m_trappedMiner->SetScale(m_grid->GetTileSize() / 35.0f);
+	m_trappedMiner->Position() = m_grid->GetPlayerStartPos();
+
+	m_trappedMiner->SetState(IDLE);
+	m_trappedMiner->SetFlip(false);
+	m_trappedMiner->SetRotation(45.0f);
 
 	m_rocks = new FallingRocks();
 	m_rocks->SetStartPos(m_grid->GetRockStartPos());
@@ -76,19 +92,21 @@ bool StartCutscene::Initialise(Renderer& renderer)
 	return true;
 }
 
-void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
+void EndCutscene::Process(float deltaTime, InputSystem& inputSystem)
 {
-	m_player->SetColour(0.8f, 1.0f, 0.8f);
+	m_trappedMiner->SetColour(0.8f, 1.0f, 0.8f);
 
 	m_grid->Process(deltaTime, inputSystem);
 
 	m_rocks->Process(deltaTime, inputSystem);
 
+	m_trappedMiner->Process(deltaTime);
+
 	m_player->Process(deltaTime);
 
 	if (m_startTimer < m_startTime) {
 		m_startTimer += deltaTime;
-
+		
 		if (!m_hitSound) {
 			m_tSoundSystem.PlaySound("hit");
 			m_hitSound = true;
@@ -101,47 +119,57 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 	}
 
 	if (m_startTimer >= m_startTime) {
-		m_startTimer = m_startTime;
-	}
 
-	Vector2 gridCoords = { 4, 7 };
+		if (m_player->Position().x >= finishPos.x) {
+			m_player->Position().x -= 150.0f * deltaTime;
+			m_rockTimer = 0.0f;
+		}
+		else if (!m_rocksFallen) {
+			m_trappedMiner->SetRotation(0.0f);
+			if (m_rockTimer >= 0.9f) m_trappedMiner->Position().x += 50.0f * deltaTime;
+		}
 
-	Block* block = m_grid->GetBlockFromGrid(gridCoords);
+		if (m_rockTimer < m_rockTime) {
+			m_rockTimer += deltaTime;
+			m_reactionTimer = 0.0f;
+		}
 
-	if (block != nullptr) {
-		block->BreakBlock(false);
-		if (block->BlockBroken()) {
+		if (m_rockTimer >= m_rockTime) {
+			m_rocks->SetFalling(true);
+			m_rocksFallen = true;
+		}
 
-			if (m_reactionTimer == 0.0f) {
-				m_rocks->SetFalling(true);
-				m_tSoundSystem.PlaySound("fall");
+		if (m_reactionTimer < m_reactionTime) {
+			m_reactionTimer += deltaTime;
+
+			if (m_reactionTimer > 1.0f && m_reactionTimer < 1.8f) {
+				m_trappedMiner->SetState(JUMP);
+			}
+			else {
+				m_trappedMiner->SetState(IDLE);
+			}
+
+			if (m_reactionTimer > 1.2f && m_reactionTimer < 2.0f) {
+				m_player->SetState(JUMP);
+			}
+			else {
 				m_player->SetState(IDLE);
-				m_player->Position() = m_grid->GetPlayerStartPos();
+			}
+		}
+
+		if (m_reactionTimer >= m_reactionTime) {
+			m_reactionTime = m_reactionTime;
+			m_player->SetFlip(false);
+
+			m_timer += deltaTime;
+			alpha = m_timer - 3.0f;
+
+			if (m_timer > 2.0f) {
+				m_player->SetFlip(true);
 			}
 
-			if (m_reactionTimer < m_reactionTime) {
-				m_reactionTimer += deltaTime;
-
-				if (m_reactionTimer > 1.0f && m_reactionTimer < 1.8f) {
-					m_player->SetState(JUMP);
-					m_player->Position() = m_grid->GetPlayerStartPos();
-				}
-				else {
-					m_player->SetState(IDLE);
-					m_player->Position() = m_grid->GetPlayerStartPos();
-				}
-			}
-
-			if (m_reactionTimer >= m_reactionTime) {
-				m_reactionTime = m_reactionTime;
-				m_player->SetFlip(false);
-
-				m_timer += deltaTime;
-				alpha = m_timer - 1.0f;
-
-				if (m_timer >= m_time) {
-					m_sceneDone = true;
-				}
+			if (m_timer >= m_time) {
+				m_sceneDone = true;
 			}
 		}
 	}
@@ -157,29 +185,30 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 	m_tSoundSystem.Update();
 }
 
-void StartCutscene::Draw(Renderer& renderer)
+void EndCutscene::Draw(Renderer& renderer)
 {
 	m_grid->Draw(renderer);
 	m_rocks->Draw(renderer);
 	m_player->Draw(renderer);
+	m_trappedMiner->Draw(renderer);
 	m_fade->Draw(renderer);
 }
 
-void StartCutscene::DebugDraw()
+void EndCutscene::DebugDraw()
 {
 }
 
-void StartCutscene::OnEnter()
+void EndCutscene::OnEnter()
 {
 	m_tSoundSystem.PlaySound("bgm");
 }
 
-void StartCutscene::OnExit()
+void EndCutscene::OnExit()
 {
 	m_tSoundSystem.StopSound("bgm");
 }
 
-bool StartCutscene::IsFinished()
+bool EndCutscene::IsFinished()
 {
 	return m_sceneDone;
 }
