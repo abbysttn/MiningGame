@@ -16,7 +16,7 @@
 const char* FONT_FILEPATH = "../assets/fonts/joystix.otf";
 const int FONT_SIZE = 24;
 const SDL_Color TEXT_COLOR = { 255, 255, 255, 255 }; // White color
-const char* TEXT_STRING = "LOADING...";
+const char* TEXT_STRING = "LOADING";
 const float FADE_DURATION = 1.0f;
 const float DISPLAY_DURATION = 1.0f; // Stay on the screen for at least this long
 const float DOT_ANIMATION_INTERVAL = 0.5f; // Interval for dot animation

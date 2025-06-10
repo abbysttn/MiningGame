@@ -116,7 +116,6 @@ void SceneMain::OnEnter() {
 void SceneMain::OnExit()
 {
     m_soundSystem.StopSound("cavebgm");
-
 }
 void SceneMain::CheckCollision(Player* player, SpiderState* spider)
 {
@@ -250,7 +249,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
     m_collisionTree->clear();
 
-    //quit to menu
+    // Pause menu & upgrade menu closing logic
     ButtonState escapeState = inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE);
     ButtonState xboxBackState = BS_NEUTRAL;
 
@@ -278,7 +277,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         else
         {
             m_paused = true;
-            Game::GetInstance().SetCurrentScene(2);
+            Game::GetInstance().SetCurrentScene(7); // 7 is pause screen
             return;
         }
     }

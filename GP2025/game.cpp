@@ -21,6 +21,7 @@
 #include "startcutscene.h"
 #include "sceneloadingscreen.h"
 #include "endcutscene.h"
+#include "scenepausescreen.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -134,7 +135,6 @@ bool Game::Initialise()
 	{
 		LogManager::GetInstance().Log("FMOD Splash screen failed to load!");
 		delete pSplashSceneFMOD;
-		delete pSplashSceneAUT;
 		m_scenes.clear();
 		return false;
 	}
@@ -154,8 +154,6 @@ bool Game::Initialise()
 	if (!pTitleScene->Initialise(*m_pRenderer))
 	{
 		LogManager::GetInstance().Log("Titlescreen fialed to load!!");
-		delete pSplashSceneFMOD;
-		delete pSplashSceneAUT;
 		delete pTitleScene;
 		m_scenes.clear();
 		return false;
@@ -167,9 +165,6 @@ bool Game::Initialise()
 	if (!pLoadingScene->Initialise(*m_pRenderer))
 	{
 		LogManager::GetInstance().Log("Titlescreen fialed to load!!");
-		delete pSplashSceneFMOD;
-		delete pSplashSceneAUT;
-		delete pTitleScene;
 		delete pLoadingScene;
 		m_scenes.clear();
 		return false;
@@ -181,10 +176,6 @@ bool Game::Initialise()
 	{
 		// Debugging stuff
 		LogManager::GetInstance().Log("Title scene failed to load!");
-		delete pSplashSceneFMOD;
-		delete pSplashSceneAUT;
-		delete pTitleScene;
-		delete pLoadingScene;
 		delete pMainScene;
 		m_scenes.clear();
 		return false;
@@ -199,6 +190,16 @@ bool Game::Initialise()
 		return false;
 	}
 	m_scenes.push_back(pEndCutscene);
+
+	// Pause scene
+	Scene* pPauseScene = new ScenePauseScreen();
+	if (!pPauseScene->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("Pause screen failed to load!!");
+		delete pPauseScene;
+		return false;
+	}
+	m_scenes.push_back(pPauseScene);
 
 	m_iCurrentScene = 0;
 	SetCurrentScene(m_iCurrentScene);
@@ -271,14 +272,18 @@ void Game::Process(float deltaTime)
 
 	/*
 	* Scenes Order
+	* -- Splashes --
 	* AUT Splash = 0
 	* FMOD Splash = 1
+	* -- Splashes end --
 	* Cutscene = 2
 	* Title screen = 3
 	* (Instructions scene)
 	* Loading Screen = 4
 	* Main Scene = 5
 	* End cutscene = 6
+	* ----------------
+	* Pause screen = 7
 	*/
 
 	if (m_iCurrentScene == 0)
@@ -434,7 +439,7 @@ void Game::SetCurrentScene(int sceneIndex)
 
 		if (m_pInputSystem)
 		{
-			if (m_iCurrentScene == 3)
+			if (m_iCurrentScene == 3 || m_iCurrentScene == 7)
 			{
 				m_pInputSystem->ShowMouseCursor(true);
 				m_pInputSystem->SetRelativeMode(false);
