@@ -9,6 +9,7 @@
 #include "game.h"
 #include "logmanager.h"
 #include "vector2.h"
+#include "xboxcontroller.h"
 
 
 
@@ -207,7 +208,9 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 		}
 	}
 
-	if (inputSystem.GetKeyState(SDL_SCANCODE_RETURN) == BS_PRESSED)
+	if (inputSystem.GetKeyState(SDL_SCANCODE_RETURN) == BS_PRESSED ||
+		(inputSystem.GetNumberOfControllersAttached() > 0 &&
+		inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_START) == BS_PRESSED))
 	{
 		m_tSoundSystem.PlaySound("click");
 		Game::GetInstance().SetCurrentScene(3);
@@ -240,7 +243,9 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 		}
 	}
 
-	if (inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE) == BS_PRESSED)
+	if (inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE) == BS_PRESSED ||
+		(inputSystem.GetNumberOfControllersAttached() > 0 &&
+		inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_BACK) == BS_PRESSED))
 	{
 		m_tSoundSystem.StopSound("bgm");
 
