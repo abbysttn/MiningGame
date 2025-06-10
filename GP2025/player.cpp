@@ -174,7 +174,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 
             // A Button - Jump
             if (!m_noClip && m_OnGround && controller->GetButtonState(SDL_CONTROLLER_BUTTON_A) == BS_HELD) {
-				m_Velocity.y = -(JUMP_FORCE * m_jumpHeightMultiplier);
+				m_Velocity.y = -(m_jumpHeight * m_jumpHeightMultiplier);
 				m_OnGround = false;
 
 				// Change animation to jump/fall

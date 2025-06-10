@@ -88,7 +88,7 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 	Block* block = m_grid->GetBlockFromGrid(gridCoords);
 
 	if (block != nullptr) {
-		block->BreakBlock();
+		block->BreakBlock(false);
 		if (block->BlockBroken()) {
 
 			if (m_reactionTimer == 0.0f) {

@@ -263,10 +263,11 @@ void Game::Process(float deltaTime)
 	* Scenes Order
 	* AUT Splash = 0
 	* FMOD Splash = 1
-	* Title screen = 2
+	* Cutscene = 2
+	* Title screen = 3
 	* (Instructions scene)
-	* Loading Screen = 3
-	* Main Scene = 4
+	* Loading Screen = 4
+	* Main Scene = 5
 	*/
 
 	if (m_iCurrentScene == 0)
@@ -297,7 +298,7 @@ void Game::Process(float deltaTime)
 	}
 
 	// loading screen
-	else if (m_iCurrentScene == 3)
+	else if (m_iCurrentScene == 4)
 	{
 		SceneLoadingScreen* loadingScreen = dynamic_cast<SceneLoadingScreen*>(m_scenes[m_iCurrentScene]);
 		if (loadingScreen)
@@ -309,7 +310,7 @@ void Game::Process(float deltaTime)
 
 			if (loadingScreen->IsFinished())
 			{
-				SetCurrentScene(4); // Move to main scene
+				SetCurrentScene(5); // Move to main scene
 			}
 		}
 	}
