@@ -195,7 +195,7 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     m_upgradeManager.Initialise(m_pPlayer);
     // Upgrade station position (to be interacted with menu) also press 'E'
-    m_upgradeStations.emplace_back(200.0f, 600.0f, 100.0f); // X, y, radius 
+    m_upgradeStations.emplace_back(static_cast<float>(m_pRenderer->GetWidth())*0.15f, static_cast<float>(m_pRenderer->GetHeight()) * 0.9f, 100.0f); // X, y, radius 
 
     //init particles
     m_pCoinSprite = renderer.CreateSprite("../assets/ball.png");
@@ -231,27 +231,33 @@ bool SceneMain::Initialise(Renderer& renderer)
 void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 {
     m_collisionTree->clear();
-    
+
     //quit to menu
     ButtonState escapeState = inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE);
-    if (escapeState == BS_PRESSED)
+    ButtonState xboxBackState = BS_NEUTRAL;
+
+    if (inputSystem.GetNumberOfControllersAttached() > 0) {
+        xboxBackState = inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_BACK);
+    }
+
+    if (escapeState == BS_PRESSED || xboxBackState == BS_PRESSED)
     {
         m_paused = true;
         std::cout << "Escape pressed" << std::endl;
         Game::GetInstance().SetCurrentScene(0);
     }
 
-    // To close the Upg menu if its open, use ESC to close it
-    if (inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE) == BS_PRESSED) 
+    // To close the Upgrade menu if its open, use ESC to close it
+    if (escapeState == BS_PRESSED || xboxBackState == BS_PRESSED)
     {
-        if (m_upgradeManager.IsMenuOpen()) 
+        if (m_upgradeManager.IsMenuOpen())
         {
             m_upgradeManager.CloseMenu();
             m_pActiveUpgradeStation = nullptr;
             m_isUpgradeMenuUIVisible = false; // Hide ImGui window
             Game::GetInstance().m_pInputSystem->ShowMouseCursor(false); // Hide mouse if game needs it
         }
-        else 
+        else
         {
             m_paused = true;
             Game::GetInstance().SetCurrentScene(2);
@@ -259,165 +265,178 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         }
     }
 
-    if (!m_paused) {
-        if (m_pPlayer)
+    if (m_paused) {
+        return;
+    }
+
+    if (m_pPlayer)
+    {
+        if (!m_upgradeManager.IsMenuOpen() ||
+            !ImGui::GetIO().WantCaptureKeyboard)
         {
-            if (!m_upgradeManager.IsMenuOpen() ||
-                !ImGui::GetIO().WantCaptureKeyboard)
-            {
-                m_pPlayer->Process(deltaTime, inputSystem);
-            }
-            m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
-        
-            if (m_godMode) {
-				m_pPlayer->SetHealth(100.0f);
-				m_pPlayer->SetCurrentStamina(100.0f);
-				m_pPlayer->AddOxygen(100.0f);
-            }
+            m_pPlayer->Process(deltaTime, inputSystem);
         }
-        m_timer += deltaTime;
+        m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
 
-        TestingFeatures(inputSystem);
-
-        float pX = m_pPlayer->GetPosition().x;
-        float pY = m_pPlayer->GetPosition().y;
-        Vector2 pPos = Vector2(pX, pY);
-
-
-        int type = GridState::GetInstance().GetLastBlockType();
-
-        Sprite* pickupSprite = m_pDirtPickupSprite;
-
-
-        switch (type) {
-        case 0: 
-            pickupSprite = m_pDirtPickupSprite;
-
-            break;
-
-        case 1: 
-            pickupSprite = m_pStonePickupSprite;
-
-            break;
-        case 2:
-            pickupSprite = m_pGemPickupSprite;
-
-            break;
-        default:
-
-            break;
+        if (m_godMode) {
+            m_pPlayer->SetHealth(100.0f);
+            m_pPlayer->SetCurrentStamina(100.0f);
+            m_pPlayer->AddOxygen(100.0f);
         }
 
+		if (m_pPlayer->IsInfiniteResources()) {
+			m_pPlayer->SetDirt(9999);
+			m_pPlayer->SetStone(9999);
+			m_pPlayer->SetGem(9999);
+		}
+    }
+    m_timer += deltaTime;
 
-        m_dirtParticleCooldown -= deltaTime;
-        if (GridState::GetInstance().CheckBlockDig() && m_dirtParticleCooldown <= 0.0f) {
+    DebugFunctions(inputSystem);
 
-            m_soundSystem.PlaySound("pickaxeHit");
-            ParticleSystem ps;
-            ps.Initialise(m_pDirtSprite, m_pPlayer, 3, ParticleType::DigDirt);
-            ps.ActivateAt(pPos);
-            m_particleSystems.push_back(std::move(ps));
-            m_dirtParticleCooldown = 0.6f;
-        }
+    float pX = m_pPlayer->GetPosition().x;
+    float pY = m_pPlayer->GetPosition().y;
+    Vector2 pPos = Vector2(pX, pY);
 
-        if (GridState::GetInstance().CheckBlockBreak()) {
-			m_pPlayer->SetCurrentStamina(m_pPlayer->GetCurrentStamina() - m_pPlayer->GetStaminaCost());
 
-            m_soundSystem.PlaySound("blockBreak");
-            ParticleSystem ps;
-            ps.Initialise(m_pBreakBlockSprite, m_pPlayer, 35, ParticleType::BlockBreak);
-            ps.ActivateAt(pPos);
-            m_particleSystems.push_back(std::move(ps));
+    int type = GridState::GetInstance().GetLastBlockType();
 
-            ParticleSystem ps2;
-            ps2.Initialise(pickupSprite, m_pPlayer, 5);
-            ps2.ActivateAt(m_pPlayer->GetPosition());
-            m_particleSystems.push_back(std::move(ps2));
-        }
-        if (!m_pPlayer->IsPlayerMining()) {
-            m_soundSystem.StopSound("pickaxeHit");
-        }
+    Sprite* pickupSprite = m_pDirtPickupSprite;
 
-        SpawnWaterDrops();
 
-        if (GridState::GetInstance().IsBlockBroken() && GridState::GetInstance().SpiderSpawn()) {
-            if (m_testSpider->usedCount() != m_testSpider->totalCount()) {
-                if (GameObject* obj = m_testSpider->getObject()) {
-                    if (obj && dynamic_cast<SpiderState*>(obj)) {
-                        SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+    switch (type) {
+    case 0:
+        pickupSprite = m_pDirtPickupSprite;
 
-                        spider->SetActive(true);
-                        spider->SetPosition(GridState::GetInstance().GetBrokenBlockPos());
-                    }
-                }
-            }
-        }
+        break;
 
-        for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
-            if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
+    case 1:
+        pickupSprite = m_pStonePickupSprite;
+
+        break;
+    case 2:
+        pickupSprite = m_pGemPickupSprite;
+
+        break;
+    default:
+
+        break;
+    }
+
+
+    //if player is digging an actual block
+
+    m_dirtParticleCooldown -= deltaTime;
+    if (GridState::GetInstance().CheckBlockDig() && m_dirtParticleCooldown <= 0.0f) {
+
+        m_soundSystem.PlaySound("pickaxeHit");
+        ParticleSystem ps;
+        ps.Initialise(m_pDirtSprite, m_pPlayer, 3, ParticleType::DigDirt);
+        ps.ActivateAt(pPos);
+        m_particleSystems.push_back(std::move(ps));
+        m_dirtParticleCooldown = 0.6f;
+    }
+
+    //if player breaks a block
+
+    if (GridState::GetInstance().CheckBlockBreak()) {
+        m_pPlayer->SetCurrentStamina(m_pPlayer->GetCurrentStamina() - m_pPlayer->GetStaminaCost());
+
+        m_soundSystem.PlaySound("blockBreak");
+        ParticleSystem ps;
+        ps.Initialise(m_pBreakBlockSprite, m_pPlayer, 35, ParticleType::BlockBreak);
+        ps.ActivateAt(pPos);
+        m_particleSystems.push_back(std::move(ps));
+
+        ParticleSystem ps2;
+        ps2.Initialise(pickupSprite, m_pPlayer, 5);
+        ps2.ActivateAt(m_pPlayer->GetPosition());
+        m_particleSystems.push_back(std::move(ps2));
+    }
+    if (!m_pPlayer->IsPlayerMining()) {
+        m_soundSystem.StopSound("pickaxeHit");
+    }
+
+    SpawnWaterDrops();
+
+    if (GridState::GetInstance().IsBlockBroken() && GridState::GetInstance().SpiderSpawn()) {
+        if (m_testSpider->usedCount() != m_testSpider->totalCount()) {
+            if (GameObject* obj = m_testSpider->getObject()) {
                 if (obj && dynamic_cast<SpiderState*>(obj)) {
                     SpiderState* spider = dynamic_cast<SpiderState*>(obj);
-                    if (spider->IsActive()) {
 
-                        Box spiderBox(
-                            spider->GetPosition().x,
-                            spider->GetPosition().y,
-                            (float)spider->GetSpriteWidth(),
-                            (float)spider->GetSpriteHeight()
-                        );
-
-                        m_collisionTree->insert(spider, spiderBox);
-
-                        CheckCollision(m_pPlayer, spider);
-
-                        spider->Update(deltaTime, m_pPlayer->GetPosition());
-                    }
+                    spider->SetActive(true);
+                    spider->SetPosition(GridState::GetInstance().GetBrokenBlockPos());
                 }
             }
         }
-
-        GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
-
-        // Upgrade station
-        m_showUpgradePrompt = false;
-        if (!m_upgradeManager.IsMenuOpen())
-        {
-            for (auto& station : m_upgradeStations)
-            {
-                if (station.IsPlayerInRange(m_pPlayer->GetPosition()))
-                {
-                    m_showUpgradePrompt = true;
-                    if (inputSystem.GetKeyState(SDL_SCANCODE_E) == BS_PRESSED)
-                    {
-                        m_upgradeManager.OpenMenu();
-                        m_pActiveUpgradeStation = &station;
-                        m_isUpgradeMenuUIVisible = true;
-                        Game::GetInstance().m_pInputSystem->ShowMouseCursor(true);
-                        break;
-                    }
-                }
-            }
-        }
-        else
-        {
-			if (m_pActiveUpgradeStation && !m_pActiveUpgradeStation->IsPlayerInRange(m_pPlayer->GetPosition()))
-			{
-				m_upgradeManager.CloseMenu();
-				m_pActiveUpgradeStation = nullptr;
-				m_isUpgradeMenuUIVisible = false; // Hide ImGui window
-				Game::GetInstance().m_pInputSystem->ShowMouseCursor(false); // Hide mouse if game needs it
-			}
-        }
-
-        m_pVignetteSprite->SetX(static_cast<int>(m_pPlayer->GetPosition().x));
-        m_pVignetteSprite->SetY(static_cast<int>(m_pPlayer->GetPosition().y));
-
-        ui->Update(m_pPlayer, m_pRenderer, deltaTime);
-
-        ProcessParticles(deltaTime);
-
-        m_soundSystem.Update();
     }
+
+    for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
+        if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
+            if (obj && dynamic_cast<SpiderState*>(obj)) {
+                SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+                if (spider->IsActive()) {
+
+                    Box spiderBox(
+                        spider->GetPosition().x,
+                        spider->GetPosition().y,
+                        (float)spider->GetSpriteWidth(),
+                        (float)spider->GetSpriteHeight()
+                    );
+
+                    m_collisionTree->insert(spider, spiderBox);
+
+                    CheckCollision(m_pPlayer, spider);
+
+                    spider->Update(deltaTime, m_pPlayer->GetPosition());
+                }
+            }
+        }
+    }
+
+    GridState::GetInstance().ProcessGrid(deltaTime, inputSystem);
+
+    // Upgrade station
+    m_showUpgradePrompt = false;
+    if (!m_upgradeManager.IsMenuOpen())
+    {
+        for (auto& station : m_upgradeStations)
+        {
+            if (station.IsPlayerInRange(m_pPlayer->GetPosition(), static_cast<float>(m_pMineBackground->GetWidth()), static_cast<float>(m_pMineBackground->GetHeight()), static_cast<float>(m_pRenderer->GetHeight())))
+            {
+                m_showUpgradePrompt = true;
+                if (inputSystem.GetKeyState(SDL_SCANCODE_E) == BS_PRESSED
+                    || (inputSystem.GetNumberOfControllersAttached() > 0 && inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_X) == BS_PRESSED))
+                {
+                    m_upgradeManager.OpenMenu();
+                    m_pActiveUpgradeStation = &station;
+                    m_isUpgradeMenuUIVisible = true;
+                    Game::GetInstance().m_pInputSystem->ShowMouseCursor(true);
+                    break;
+                }
+            }
+        }
+    }
+    else
+    {
+        if (m_pActiveUpgradeStation && !m_pActiveUpgradeStation->IsPlayerInRange(m_pPlayer->GetPosition(), static_cast<float>(m_pMineBackground->GetWidth()), static_cast<float>(m_pMineBackground->GetHeight()), static_cast<float>(m_pRenderer->GetHeight())))
+        {
+            m_upgradeManager.CloseMenu();
+            m_pActiveUpgradeStation = nullptr;
+            m_isUpgradeMenuUIVisible = false; // Hide ImGui window
+            Game::GetInstance().m_pInputSystem->ShowMouseCursor(false); // Hide mouse if game needs it
+        }
+    }
+
+    m_pVignetteSprite->SetX(static_cast<int>(m_pPlayer->GetPosition().x));
+    m_pVignetteSprite->SetY(static_cast<int>(m_pPlayer->GetPosition().y));
+
+    ui->Update(m_pPlayer, m_pRenderer, deltaTime);
+
+    ProcessParticles(deltaTime);
+
+    m_soundSystem.Update();
 }
 
 void SceneMain::Draw(Renderer& renderer)
@@ -462,8 +481,16 @@ void SceneMain::Draw(Renderer& renderer)
     // Upgrade Menu 
     if (m_isUpgradeMenuUIVisible && m_upgradeManager.IsMenuOpen()) 
     {
-        ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver); 
-        ImGui::Begin("Upgrade Station", &m_isUpgradeMenuUIVisible); 
+
+        ImGui::SetNextWindowPos(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.07f, static_cast<float>(m_pRenderer->GetHeight()) * 0.24f), ImGuiCond_Always);  // fixed position
+        ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.13f, static_cast<float>(m_pRenderer->GetWidth()) * 0.15f), ImGuiCond_Always); // fixed size
+
+        ImGui::Begin("Upgrade Station", &m_isUpgradeMenuUIVisible,
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoCollapse |
+            ImGuiWindowFlags_NoScrollbar
+        );
 
         if (!m_isUpgradeMenuUIVisible) 
         { // If closed by 'X'
@@ -534,10 +561,37 @@ void SceneMain::DebugDraw()
     if (m_pPlayer)
     {
         ImGui::NewLine();
-        ImGui::Text("Press Backspace to hide/show");
-        ImGui::Text("Debugging Tools:");
-        ImGui::Text("%.1f FPS | Frame time: %.3f ms", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
 
+        ImGui::Text("Debugging Tools:");
+        
+        bool godMode = m_godMode;
+        if (ImGui::Checkbox("God Mode (F1)", &godMode))
+        {
+            ToggleGodMode();
+        }
+
+        bool infiniteResources = m_pPlayer->IsInfiniteResources();
+        if (ImGui::Checkbox("Infinite Resources (F2)", &infiniteResources))
+        {
+            m_pPlayer->SetInfiniteResources(infiniteResources);
+        }
+
+        if (ImGui::Button("Unlock All Upgrades (F3)"))
+        {
+            // TODO: Implement upgrade unlocking logic
+        }
+
+        bool instantMine = m_pPlayer->IsInstantMine();
+        if (ImGui::Checkbox("Instant Mine (F4)", &instantMine))
+        {
+            m_pPlayer->SetInstantMine(instantMine);
+        }
+
+        bool noclip = m_pPlayer->IsNoClip();
+        if (ImGui::Checkbox("NoClip (F5)", &noclip))
+        {
+            m_pPlayer->SetNoClip(noclip);
+        }
     }
 }
 
@@ -606,29 +660,38 @@ void SceneMain::SpawnWaterDrops() {
     }
 }
 
-void SceneMain::TestingFeatures(InputSystem& inputSystem) {
-    // DEBUG STUFF
-    if (inputSystem.GetKeyState(SDL_SCANCODE_F1))
+void SceneMain::DebugFunctions(InputSystem& inputSystem) {
+	// Toggle God Mode
+    if (inputSystem.GetKeyState(SDL_SCANCODE_F1) == BS_PRESSED)
     {
-        m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 0.5f);
+        ToggleGodMode();
     }
-    if (inputSystem.GetKeyState(SDL_SCANCODE_L))
+
+    // Toggle Infinite Resources
+    if (inputSystem.GetKeyState(SDL_SCANCODE_F2) == BS_PRESSED)
     {
-        m_pPlayer->SetCurrentStamina(m_pPlayer->GetCurrentStamina() - 0.5f);
+		m_pPlayer->SetInfiniteResources(!m_pPlayer->IsInfiniteResources());
     }
-    if (inputSystem.GetKeyState(SDL_SCANCODE_J))
+
+    // Unlock All Upgrades
+    if (inputSystem.GetKeyState(SDL_SCANCODE_F3) == BS_PRESSED)
     {
-        m_pPlayer->SetDirt(m_pPlayer->GetDirt() + 1);
+		// TODO:
     }
-    if (inputSystem.GetKeyState(SDL_SCANCODE_H))
+
+    // Instant Mining
+    if (inputSystem.GetKeyState(SDL_SCANCODE_F4) == BS_PRESSED)
     {
-        m_pPlayer->SetStone(m_pPlayer->GetStone() + 1);
+		m_pPlayer->SetInstantMine(!m_pPlayer->IsInstantMine());
     }
-    if (inputSystem.GetKeyState(SDL_SCANCODE_G))
+
+    // Toggle NoClip
+    if (inputSystem.GetKeyState(SDL_SCANCODE_F5) == BS_PRESSED)
     {
-        m_pPlayer->SetGem(m_pPlayer->GetGem() + 1);
-		ToggleGodMode();
+		m_pPlayer->SetNoClip(!m_pPlayer->IsNoClip());
     }
+
+
 
     // Test particles
     if (inputSystem.GetKeyState(SDL_SCANCODE_I) == BS_PRESSED)

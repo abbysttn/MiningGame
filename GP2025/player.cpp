@@ -127,12 +127,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     if (IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT)) { breakDirection = 'L'; m_isMining = true; }
     if (IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) { breakDirection = 'R'; m_isMining = true; }
 
-    if (m_canMine)
-    {
-		GridState::GetInstance().BreakBlock(m_position, breakDirection, this);
-    }
-
-	if (m_isMining && m_animationState != MINE) {
+	if (m_isMining && !m_noClip && m_animationState != MINE) {
 		m_pAnimSprite = m_pMineSprite;
 		m_animationState = MINE;
 		m_pMineSprite->Animate();
@@ -148,19 +143,55 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
         XboxController* controller = inputSystem.GetController(0);
         if (controller != nullptr && controller->IsConnected())
         {
-            Vector2 stick = controller->GetLeftStick();
 
-            //normalise
+			// Left Stick - Movement
+            Vector2 leftStick = controller->GetLeftStick();
+
             const float MAX_AXIS = 32768.0f;
-            Vector2 controllerDir(stick.x / MAX_AXIS, stick.y / MAX_AXIS);
-
-            //deadzone handling
             const float DEADZONE = 0.2f;
-            if (std::abs(controllerDir.x) > DEADZONE || std::abs(controllerDir.y) > DEADZONE)
-            {
-                direction = controllerDir;
+
+            float lx = leftStick.x / MAX_AXIS;
+            if (std::abs(lx) > DEADZONE) {
+                direction.x = lx;
+            }
+
+            // Right Stick - Mining
+			Vector2 rightStick = controller->GetRightStick();
+            
+            float rx = rightStick.x / MAX_AXIS;
+			float ry = rightStick.y / MAX_AXIS;
+
+			if (std::abs(rx) > DEADZONE || std::abs(ry) > DEADZONE) {
+				m_isMining = true;
+
+				if (std::abs(rx) > std::abs(ry)) {
+					breakDirection = (rx > 0.0f) ? 'R' : 'L';
+				}
+				else {
+					breakDirection = (ry > 0.0f) ? 'D' : 'U';
+				}
+			}
+
+            // A Button - Jump
+            if (!m_noClip && m_OnGround && controller->GetButtonState(SDL_CONTROLLER_BUTTON_A) == BS_HELD) {
+				m_Velocity.y = -(JUMP_FORCE * m_jumpHeightMultiplier);
+				m_OnGround = false;
+
+				// Change animation to jump/fall
+				if (m_animationState != JUMP) {
+					m_pAnimSprite = m_pJumpSprite;
+					m_animationState = JUMP;
+					m_pJumpSprite->SetCurrentFrame(0);
+					m_pJumpSprite->Animate();
+				}
             }
         }
+    }
+
+    // Perform mining input
+    if (m_canMine && !m_noClip && breakDirection != 0)
+    {
+        GridState::GetInstance().BreakBlock(m_position, breakDirection, this);
     }
 
     //normalising to prevent faster diagonal movement
@@ -169,6 +200,11 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
         float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
         direction.x /= length;
         direction.y /= length;
+    }
+
+    if (m_noClip){
+        m_velocity.y = 0.0f;
+        m_OnGround = false;
     }
 
     const int screenWidth = m_pRenderer->GetWidth();
@@ -222,16 +258,15 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 
     float paddingX = (m_pAnimSprite->GetWidth() / 3.3f);
     float paddingY = (m_pAnimSprite->GetHeight() / 4.7f);
-
     Box testBoxX(testPos.x + paddingX, m_position.y + paddingY, (float)m_pAnimSprite->GetWidth() * 0.45f, (float)m_pAnimSprite->GetHeight() * 0.7f);
 
-    if (!GridState::GetInstance().CheckCollision(testBoxX)) {
+    if (m_noClip || !GridState::GetInstance().CheckCollision(testBoxX)) {
         m_position.x = testPos.x;
     }
 
     Box testBoxY(m_position.x + paddingX, testPos.y + paddingY, (float)m_pAnimSprite->GetWidth() * 0.45f, (float)m_pAnimSprite->GetHeight() * 0.7f);
 
-    if (!GridState::GetInstance().CheckCollision(testBoxY)) {
+    if (m_noClip || !GridState::GetInstance().CheckCollision(testBoxY)) {
         m_position.y = testPos.y;
         m_OnGround = false;
     }
@@ -241,11 +276,11 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
             m_OnGround = true;
         }
 
-		m_Velocity.y = 0.0f; 
+        m_Velocity.y = 0.0f;
     }
 
     //check if player is colliding with a hazard
-    if (GridState::GetInstance().CheckHazards()) {
+    if (!m_noClip && GridState::GetInstance().CheckHazards()) {
         m_health = 0.0f;
         HandleDeath(3);
     }

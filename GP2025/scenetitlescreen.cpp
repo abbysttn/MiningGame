@@ -9,6 +9,7 @@
 #include "game.h"
 #include "logmanager.h"
 #include "vector2.h"
+#include "xboxcontroller.h"
 
 
 
@@ -16,6 +17,8 @@
 #include "imgui/imgui.h"
 #include <algorithm>
 #include <iostream>
+
+const int LOADING_INDEX = 3;
 
 SceneTitlescreen::SceneTitlescreen(FMOD::System* fmodSystem)
 	: m_pStartBtnTexture(nullptr)
@@ -196,7 +199,7 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 			{
 				m_tSoundSystem.PlaySound("click");
 
-				Game::GetInstance().SetCurrentScene(3);
+				Game::GetInstance().SetCurrentScene(LOADING_INDEX);
 			}
 		}
 		else
@@ -207,19 +210,21 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 		}
 	}
 
-	if (inputSystem.GetKeyState(SDL_SCANCODE_RETURN) == BS_PRESSED)
+	if (inputSystem.GetKeyState(SDL_SCANCODE_RETURN) == BS_PRESSED ||
+		(inputSystem.GetNumberOfControllersAttached() > 0 &&
+		inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_START) == BS_PRESSED))
 	{
 		m_tSoundSystem.PlaySound("click");
-		Game::GetInstance().SetCurrentScene(3);
+		Game::GetInstance().SetCurrentScene(LOADING_INDEX);
 	}
 
 
 	// Exit button
 	if (m_pExitBtnSprite)
 	{
-		m_bisMouseOverStart = IsMouseOverSprite(inputSystem, m_pExitBtnSprite);
+		m_bisMouseOverExit = IsMouseOverSprite(inputSystem, m_pExitBtnSprite);
 
-		if (m_bisMouseOverStart)
+		if (m_bisMouseOverExit)
 		{
 			m_pExitBtnSprite->SetRedTint(m_hoverRed);
 			m_pExitBtnSprite->SetGreenTint(m_hoverGreen);
@@ -240,7 +245,9 @@ void SceneTitlescreen::Process(float deltaTime, InputSystem& inputSystem)
 		}
 	}
 
-	if (inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE) == BS_PRESSED)
+	if (inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE) == BS_PRESSED ||
+		(inputSystem.GetNumberOfControllersAttached() > 0 &&
+		inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_BACK) == BS_PRESSED))
 	{
 		m_tSoundSystem.StopSound("bgm");
 

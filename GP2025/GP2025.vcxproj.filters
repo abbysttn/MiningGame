@@ -43,9 +43,7 @@
     <ClCompile Include="spider.cpp" />
     <ClCompile Include="spiderstate.cpp" />
     <ClCompile Include="upgrademanager.cpp" />
-    <ClCompile Include="startcutscene.cpp" />
-    <ClCompile Include="cutsceneplayer.cpp" />
-    <ClCompile Include="fallingrocks.cpp" />
+    <ClCompile Include="sceneloadingscreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animatedsprite.h" />
@@ -97,9 +95,7 @@
     <ClInclude Include="spiderstate.h" />
     <ClInclude Include="upgrademanager.h" />
     <ClInclude Include="upgradestation.h" />
-    <ClInclude Include="startcutscene.h" />
-    <ClInclude Include="cutsceneplayer.h" />
-    <ClInclude Include="fallingrocks.h" />
+    <ClInclude Include="sceneloadingscreen.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="game\shaders\sprite.frag" />

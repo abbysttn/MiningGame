@@ -59,10 +59,12 @@ public:
 	int GetGem() const { return GetResourceCount(ResourceType::GEM); }
 	void SetGem(int gem) { m_inventory[ResourceType::GEM] = std::max(0, gem); }
 
+	// Oxygen (can be turned into a upgradeable stat)
 	float GetOxygen() const { return m_oxygen; }
 	void AddOxygen(float amount) { m_oxygen = std::max(0.0f, std::min(m_oxygen + amount, 100.0f)); }
 
 	void SetNoClip(bool noClip) { m_noClip = noClip; }
+	bool IsNoClip() const { return m_noClip; }
 
 	void LoadAnimatedSprites();
 
@@ -81,6 +83,11 @@ public:
 	int GetMiningStrengthLevel() const { return m_miningStrengthLevel; }
 	void SetMiningStrengthLevel(int level) { m_miningStrengthLevel = level; }
 
+	void SetInfiniteResources(bool infinite) { m_infiniteResources = infinite; }
+	bool IsInfiniteResources() const { return m_infiniteResources; }
+
+	void SetInstantMine(bool instant) { m_instantMine = instant; }
+	bool IsInstantMine() const { return m_instantMine; }
 
 private:
 	float m_speed;
@@ -93,6 +100,7 @@ private:
 
 	std::map<ResourceType, int> m_inventory;
 
+	// Jumping and Gravity
 	const float GRAVITY = 1000.0f; // Pixels per second squared
 
 	float m_oxygen;
@@ -110,6 +118,8 @@ private:
 	bool m_OnGround = false;
 	bool m_noClip = false;
 
+	bool m_infiniteResources = false; 
+
 	PlayerAnimationState m_animationState = IDLE;
 
 	AnimatedSprite* m_pIdleSprite = nullptr;
@@ -119,6 +129,7 @@ private:
 	bool m_facingLeft = false;
 	bool m_isMining = false;
 	bool m_canMine = true;
+	bool m_instantMine = false;
 };
 
 #endif // PLAYER_H

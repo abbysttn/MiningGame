@@ -68,7 +68,7 @@ void GridState::BreakBlock(Vector2 position, char direction, Player* player)
 
 	if (block != nullptr) {
 		if (block->CanBreak()) {
-			block->BreakBlock();
+			block->BreakBlock(player->IsInstantMine());
 
 			m_digBlock = true;
 

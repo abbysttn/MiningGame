@@ -43,7 +43,7 @@ public:
 	void SpawnWaterDrops();
 	void ProcessParticles(float time);
 
-	void TestingFeatures(InputSystem& inputSystem);
+	void DebugFunctions(InputSystem& inputSystem);
 
 	int GetBackgroundHeight();
 

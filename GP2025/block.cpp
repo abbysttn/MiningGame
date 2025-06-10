@@ -135,9 +135,18 @@ bool Block::CanBreak()
 	return m_canBreak;
 }
 
-void Block::BreakBlock()
+void Block::BreakBlock(bool instantMine)
 {
-	if (!m_isBroken && !m_isBreaking) {
+	if (m_isBroken || m_isBreaking) {
+		return;
+	}
+
+	if (instantMine) {
+		m_isBroken = true;
+		m_active = false;
+		return;
+	}
+	else {
 		m_isBreaking = true;
 	}
 }

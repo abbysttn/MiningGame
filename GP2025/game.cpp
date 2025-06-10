@@ -19,6 +19,7 @@
 #include "SceneSplashScreenAUT.h"
 #include "SceneSplashScreenFMOD.h"
 #include "startcutscene.h"
+#include "sceneloadingscreen.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -105,9 +106,9 @@ bool Game::Initialise()
 	m_iLastTime = SDL_GetPerformanceCounter();
 	m_pRenderer->SetClearColour(0, 0, 0);
 
-	// Initialise FMOD
-	FMOD::System_Create(&m_pFMODSystem);
-	m_pFMODSystem->init(512, FMOD_INIT_NORMAL, 0);
+	//// Initialise FMOD
+	//FMOD::System_Create(&m_pFMODSystem);
+	//m_pFMODSystem->init(512, FMOD_INIT_NORMAL, 0);
 
 	// Initialise Input System
 	m_pInputSystem= new InputSystem();
@@ -160,6 +161,20 @@ bool Game::Initialise()
 	}
 	m_scenes.push_back(pTitleScene);
 
+	// Loading screen
+	Scene* pLoadingScene = new SceneLoadingScreen();
+	if (!pLoadingScene->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("Titlescreen fialed to load!!");
+		delete pSplashSceneFMOD;
+		delete pSplashSceneAUT;
+		delete pTitleScene;
+		delete pLoadingScene;
+		m_scenes.clear();
+		return false;
+	}
+	m_scenes.push_back(pLoadingScene);
+
 	Scene* pMainScene = new SceneMain();
 	if (!pMainScene->Initialise(*m_pRenderer))
 	{
@@ -168,6 +183,7 @@ bool Game::Initialise()
 		delete pSplashSceneFMOD;
 		delete pSplashSceneAUT;
 		delete pTitleScene;
+		delete pLoadingScene;
 		delete pMainScene;
 		m_scenes.clear();
 		return false;
@@ -249,8 +265,8 @@ void Game::Process(float deltaTime)
 	* FMOD Splash = 1
 	* Title screen = 2
 	* (Instructions scene)
-	* (Loading maybe) 
-	* Main Scene = 3
+	* Loading Screen = 3
+	* Main Scene = 4
 	*/
 
 	if (m_iCurrentScene == 0)
@@ -280,7 +296,23 @@ void Game::Process(float deltaTime)
 		}
 	}
 
-	// loading screen?
+	// loading screen
+	else if (m_iCurrentScene == 3)
+	{
+		SceneLoadingScreen* loadingScreen = dynamic_cast<SceneLoadingScreen*>(m_scenes[m_iCurrentScene]);
+		if (loadingScreen)
+		{
+			if (loadingScreen->GetCurrentLoadingState() == LoadingState::DISPLAYING && !loadingScreen->IsActualLoadingComplete())
+			{
+				loadingScreen->SetActualLoadingComplete(true);
+			}
+
+			if (loadingScreen->IsFinished())
+			{
+				SetCurrentScene(4); // Move to main scene
+			}
+		}
+	}
 
 }
 
@@ -323,11 +355,16 @@ void Game::DebugDraw
 		ImGui::Begin("Debug Window", &open, ImGuiWindowFlags_MenuBar);
 
 		ImGui::Text("COMP710 GP Framework (%s)", "2025, S1");
+		ImGui::Text("Press Backspace to hide/show");
 
 		if (ImGui::Button("Quit"))
 		{
 			Quit();
 		}
+
+		ImGui::NewLine();
+		ImGui::Text("%.1f FPS | Frame time: %.3f ms", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
+		ImGui::NewLine();
 
 		LogManager::GetInstance().DebugDraw();
 

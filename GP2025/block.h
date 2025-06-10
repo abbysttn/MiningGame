@@ -30,7 +30,7 @@ public:
 	void SetBreakable(bool canBreak);
 	bool CanBreak();
 
-	void BreakBlock();
+	void BreakBlock(bool instantMine);
 	bool BlockBroken();
 	char GetBlockType();
 	int GetResourceAmount();
