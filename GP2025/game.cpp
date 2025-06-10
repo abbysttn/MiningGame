@@ -18,6 +18,7 @@
 #include "scenetitlescreen.h"
 #include "SceneSplashScreenAUT.h"
 #include "SceneSplashScreenFMOD.h"
+#include "sceneloadingscreen.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -150,6 +151,20 @@ bool Game::Initialise()
 	}
 	m_scenes.push_back(pTitleScene);
 
+	// Loading screen
+	Scene* pLoadingScene = new SceneLoadingScreen();
+	if (!pLoadingScene->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("Titlescreen fialed to load!!");
+		delete pSplashSceneFMOD;
+		delete pSplashSceneAUT;
+		delete pTitleScene;
+		delete pLoadingScene;
+		m_scenes.clear();
+		return false;
+	}
+	m_scenes.push_back(pLoadingScene);
+
 	Scene* pMainScene = new SceneMain();
 	if (!pMainScene->Initialise(*m_pRenderer))
 	{
@@ -158,6 +173,7 @@ bool Game::Initialise()
 		delete pSplashSceneFMOD;
 		delete pSplashSceneAUT;
 		delete pTitleScene;
+		delete pLoadingScene;
 		delete pMainScene;
 		m_scenes.clear();
 		return false;
@@ -239,8 +255,8 @@ void Game::Process(float deltaTime)
 	* FMOD Splash = 1
 	* Title screen = 2
 	* (Instructions scene)
-	* (Loading maybe) 
-	* Main Scene = 3
+	* Loading Screen = 3
+	* Main Scene = 4
 	*/
 
 	if (m_iCurrentScene == 0)
@@ -261,7 +277,23 @@ void Game::Process(float deltaTime)
 		}
 	}
 
-	// loading screen?
+	// loading screen
+	else if (m_iCurrentScene == 3)
+	{
+		SceneLoadingScreen* loadingScreen = dynamic_cast<SceneLoadingScreen*>(m_scenes[m_iCurrentScene]);
+		if (loadingScreen)
+		{
+			if (loadingScreen->GetCurrentLoadingState() == LoadingState::DISPLAYING && !loadingScreen->IsActualLoadingComplete())
+			{
+				loadingScreen->SetActualLoadingComplete(true);
+			}
+
+			if (loadingScreen->IsFinished())
+			{
+				SetCurrentScene(4); // Move to main scene
+			}
+		}
+	}
 
 }
 

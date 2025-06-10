@@ -39,7 +39,7 @@ void UpgradeManager::DefineUpgrades()
         [](int targetLevel) -> UpgradeCost 
         {
             // How much the next level would cost
-            return {ResourceType::STONE, 50 * targetLevel};
+            return {ResourceType::STONE, 5 * targetLevel};
         },
         [this](Player& player, int newLevel) 
         {
@@ -62,7 +62,7 @@ void UpgradeManager::DefineUpgrades()
         5,                    // Max Level
         [](int targetLevel) -> UpgradeCost 
         {
-            return {ResourceType::DIRT, 50 + (25 * targetLevel)};
+            return {ResourceType::DIRT, 10 + (5 * targetLevel)};
         },
         [this](Player& player, int newLevel) 
         {
@@ -113,6 +113,10 @@ void UpgradeManager::DefineUpgrades()
             return oss.str();
         }
     });
+
+	// Oxygen Upgrade
+
+    // Health Upgrade
 }
 
 void UpgradeManager::SyncUpgradeLevelsWithPlayer() 
