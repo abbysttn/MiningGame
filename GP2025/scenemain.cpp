@@ -309,6 +309,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         }
 
 
+        //if player is digging an actual block
+
         m_dirtParticleCooldown -= deltaTime;
         if (GridState::GetInstance().CheckBlockDig() && m_dirtParticleCooldown <= 0.0f) {
 
@@ -319,6 +321,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
             m_particleSystems.push_back(std::move(ps));
             m_dirtParticleCooldown = 0.6f;
         }
+
+        //if player breaks a block
 
         if (GridState::GetInstance().CheckBlockBreak()) {
 			m_pPlayer->SetCurrentStamina(m_pPlayer->GetCurrentStamina() - m_pPlayer->GetStaminaCost());
