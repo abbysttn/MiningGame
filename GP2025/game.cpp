@@ -104,9 +104,9 @@ bool Game::Initialise()
 	m_iLastTime = SDL_GetPerformanceCounter();
 	m_pRenderer->SetClearColour(0, 0, 0);
 
-	// Initialise FMOD
-	FMOD::System_Create(&m_pFMODSystem);
-	m_pFMODSystem->init(512, FMOD_INIT_NORMAL, 0);
+	//// Initialise FMOD
+	//FMOD::System_Create(&m_pFMODSystem);
+	//m_pFMODSystem->init(512, FMOD_INIT_NORMAL, 0);
 
 	// Initialise Input System
 	m_pInputSystem= new InputSystem();
