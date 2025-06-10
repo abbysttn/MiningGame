@@ -42,6 +42,8 @@ public:
 	void SetGridType(bool regular);
 
 	Vector2 GetPlayerStartPos();
+	Vector2 GetRockStartPos();
+	Vector2 GetRockEndPos();
 
 
 protected:
@@ -74,6 +76,8 @@ private:
 	Vector2 m_blockSize;
 
 	Vector2 m_playerStartPos;
+	Vector2 m_fallingStart;
+	Vector2 m_fallingEnd;
 
 };
 

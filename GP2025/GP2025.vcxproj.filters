@@ -45,6 +45,7 @@
     <ClCompile Include="upgrademanager.cpp" />
     <ClCompile Include="startcutscene.cpp" />
     <ClCompile Include="cutsceneplayer.cpp" />
+    <ClCompile Include="fallingrocks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animatedsprite.h" />
@@ -98,6 +99,7 @@
     <ClInclude Include="upgradestation.h" />
     <ClInclude Include="startcutscene.h" />
     <ClInclude Include="cutsceneplayer.h" />
+    <ClInclude Include="fallingrocks.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="game\shaders\sprite.frag" />

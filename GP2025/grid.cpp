@@ -158,6 +158,16 @@ Vector2 Grid::GetPlayerStartPos()
 	return m_playerStartPos;
 }
 
+Vector2 Grid::GetRockStartPos()
+{
+	return m_fallingStart;
+}
+
+Vector2 Grid::GetRockEndPos()
+{
+	return m_fallingEnd;
+}
+
 bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 {
 	int spriteIndex = y * m_cols + x;
@@ -229,6 +239,9 @@ bool Grid::InitCutsceneObjects(Renderer& renderer, size_t x, size_t y)
 			if (x >= 5) block->SetActive(false);
 			if (x == 5) m_playerStartPos = block->Position();
 		}
+
+		if (y == 4 && x == 11) m_fallingStart = block->Position();
+		if (y == 7 && x == 11) m_fallingEnd = block->Position();
 
 		return true;
 	}

@@ -9,6 +9,7 @@ class Renderer;
 class InputSystem;
 class Grid;
 class CutscenePlayer;
+class FallingRocks;
 
 class StartCutscene : public Scene {
 public:
@@ -33,6 +34,7 @@ public:
 protected:
 	Grid* m_grid;
 	CutscenePlayer* m_player;
+	FallingRocks* m_rocks;
 
 	bool m_sceneDone;
 

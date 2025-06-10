@@ -146,6 +146,7 @@
     <ClCompile Include="block.cpp" />
     <ClCompile Include="cutsceneplayer.cpp" />
     <ClCompile Include="entity.cpp" />
+    <ClCompile Include="fallingrocks.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gameobjectpool.cpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="collisionhelper.h" />
     <ClInclude Include="cutsceneplayer.h" />
     <ClInclude Include="entity.h" />
+    <ClInclude Include="fallingrocks.h" />
     <ClInclude Include="font.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gameobject.h" />

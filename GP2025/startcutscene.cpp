@@ -8,9 +8,11 @@
 #include "game.h"
 #include "cutsceneplayer.h"
 
+#include "fallingrocks.h"
+
 #include "logmanager.h"
 
-StartCutscene::StartCutscene() : m_grid(nullptr), m_player(nullptr) {}
+StartCutscene::StartCutscene() : m_grid(nullptr), m_player(nullptr), m_rocks(nullptr) {}
 
 StartCutscene::~StartCutscene()
 {
@@ -19,6 +21,9 @@ StartCutscene::~StartCutscene()
 
 	delete m_player;
 	m_player = nullptr;
+
+	delete m_rocks;
+	m_rocks = nullptr;
 }
 
 bool StartCutscene::Initialise(Renderer& renderer)
@@ -33,12 +38,20 @@ bool StartCutscene::Initialise(Renderer& renderer)
 	m_player->SetScale(m_grid->GetTileSize() / 35.0f);
 	m_player->Position() = m_grid->GetPlayerStartPos();
 
+	m_rocks = new FallingRocks();
+	m_rocks->SetStartPos(m_grid->GetRockStartPos());
+	m_rocks->SetEndPos(m_grid->GetRockEndPos());
+	m_rocks->SetScale(m_grid->GetTileSize());
+	m_rocks->Initialise(renderer);
+
 	return true;
 }
 
 void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 {
 	m_grid->Process(deltaTime, inputSystem);
+
+	m_rocks->Process(deltaTime, inputSystem);
 
 	m_player->SetState(MINE);
 	m_player->SetFlip(true);
@@ -54,12 +67,14 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 			m_player->SetState(IDLE);
 			m_player->Position() = m_grid->GetPlayerStartPos();
 
+			if (m_reactionTimer == 0.0f) m_rocks->SetFalling(true);
+
 			if (m_reactionTimer < m_reactionTime) {
 				m_reactionTimer += deltaTime;
 			}
 
 			if (m_reactionTimer >= m_reactionTime) {
-				m_reactionTime == m_reactionTime;
+				m_reactionTime = m_reactionTime;
 				m_player->SetFlip(false);
 			}
 		}
@@ -74,6 +89,7 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 void StartCutscene::Draw(Renderer& renderer)
 {
 	m_grid->Draw(renderer);
+	m_rocks->Draw(renderer);
 	m_player->Draw(renderer);
 }
 

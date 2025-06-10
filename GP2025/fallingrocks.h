@@ -2,13 +2,13 @@
 #define _FALLINGROCKS_H__
 
 #include "scene.h"
+#include "gameobjectpool.h"
+#include "vector2.h"
 
 using namespace std;
 
 class Renderer;
 class InputSystem;
-class Grid;
-class CutscenePlayer;
 
 class FallingRocks : public Scene {
 public:
@@ -20,9 +20,19 @@ public:
 	virtual void Draw(Renderer& renderer);
 	virtual void DebugDraw();
 
+	void SetScale(float scale);
+	void SetStartPos(Vector2 pos);
+	void SetEndPos(Vector2 pos);
+
+	void SetFalling(bool falling);
+
 	bool GetStatus();
 
+	Vector2 CalcFinalPosition(int index, int total);
+
 protected:
+	Vector2 Normalise(Vector2 a);
+	float Distance(Vector2 a, Vector2 b);
 
 private:
 	FallingRocks(const FallingRocks& fallingRocks);
@@ -31,13 +41,16 @@ private:
 public:
 
 protected:
-	Grid* m_grid;
-	CutscenePlayer* m_player;
+	GameObjectPool* m_blocks;
 
-	bool m_sceneDone;
+	Vector2 m_startPos;
+	Vector2 m_endPos;
 
-	float m_reactionTimer = 0.0f;
-	float m_reactionTime = 5.0f;
+	float m_scale = 40.0f;
+
+	float m_fallSpeed = 0.0f;
+	float m_gravity = 500.0f;
+	bool m_falling;
 
 private:
 };

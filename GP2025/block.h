@@ -42,6 +42,11 @@ public:
 
 	void UpdateBreakingSpeed();
 
+	void SetXDirection(float x);
+	float GetXDirection();
+	void SetEndPos(Vector2 end);
+	Vector2 GetEndPos();
+
 protected:
 	void GetBlockType(int& depth, const char*& filepath, int x);
 
@@ -73,6 +78,8 @@ protected:
 	float m_currentTime = 0.0f;
 
 	bool m_cutsceneBlock = false;
+	float xDirection;
+	Vector2 endPos;
 
 private:
 
