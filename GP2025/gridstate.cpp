@@ -14,10 +14,11 @@
 #include <cmath>
 #include "inlinehelper.h"
 
-void GridState::CreateGrid(Renderer& renderer, float backgroundScale)
+void GridState::CreateGrid(Renderer& renderer, float backgroundScale, bool isRegular)
 {
 	m_gameGrid = new Grid();
 	m_gameGrid->SetBackgroundHeight(backgroundScale);
+	m_gameGrid->SetGridType(true);
 	m_gameGrid->Initialise(renderer);
 }
 
@@ -174,6 +175,7 @@ bool GridState::CheckCollision(Box& box)
 				if (CollisionHelper::IsColliding(blockBox, box)) {
 
 					m_touchingHazard = block->IsHazard();
+					m_touchingFood = false; //fix
 
 					return true;
 				}
@@ -187,6 +189,11 @@ bool GridState::CheckCollision(Box& box)
 bool GridState::CheckHazards()
 {
 	return m_touchingHazard;
+}
+
+bool GridState::CheckFood()
+{
+	return m_touchingFood;
 }
 
 float GridState::GetTileSize()

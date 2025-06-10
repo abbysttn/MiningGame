@@ -22,7 +22,7 @@ public:
 		return instance;
 	}
 
-	void CreateGrid(Renderer& renderer, float backgroundScale);
+	void CreateGrid(Renderer& renderer, float backgroundScale, bool isRegular);
 	GameObjectPool* GetPool();
 
 	void BreakBlock(Vector2 position, char direction, Player* player);
@@ -34,6 +34,7 @@ public:
 
 	bool CheckCollision(Box& box);
 	bool CheckHazards();
+	bool CheckFood();
 
 	float GetTileSize();
 
@@ -72,6 +73,7 @@ protected:
 	Vector2 m_lastBrokenPos;
 
 	bool m_touchingHazard;
+	bool m_touchingFood;
 
 	bool update1 = true;
 

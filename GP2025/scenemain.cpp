@@ -186,7 +186,7 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_pMineBackground->SetY(static_cast<int>(scaledHeight / 2.0f));
     m_pMineBackground->SetScale(scale);
 
-    GridState::GetInstance().CreateGrid(renderer, scaledHeight);
+    GridState::GetInstance().CreateGrid(renderer, scaledHeight, true);
 
     m_pPlayer = new Player();
     if (!m_pPlayer->Initialise(renderer))

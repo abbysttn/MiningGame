@@ -18,6 +18,8 @@
 #include "scenetitlescreen.h"
 #include "SceneSplashScreenAUT.h"
 #include "SceneSplashScreenFMOD.h"
+#include "startcutscene.h"
+#include "sceneloadingscreen.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -88,8 +90,8 @@ void Game::Quit()
 
 bool Game::Initialise()
 {
-	bbWidth = 1000;
-	bbHeight = 800;
+	bbWidth = 960;
+	bbHeight = 540;
 
 	m_pRenderer = new Renderer();
 	if (!m_pRenderer->Initialise(false, (int)bbWidth, (int)bbHeight))
@@ -137,6 +139,15 @@ bool Game::Initialise()
 	}
 	m_scenes.push_back(pSplashSceneFMOD);
 
+	//start cutscene
+	Scene* pStartCutscene = new StartCutscene();
+	if (!pStartCutscene->Initialise(*m_pRenderer)) {
+		LogManager::GetInstance().Log("Start Cutscene failed to load!");
+		delete pStartCutscene;
+		return false;
+	}
+	m_scenes.push_back(pStartCutscene);
+
 	// Titlescreen stuffz
 	Scene* pTitleScene = new SceneTitlescreen(m_pFMODSystem);
 	if (!pTitleScene->Initialise(*m_pRenderer))
@@ -150,6 +161,20 @@ bool Game::Initialise()
 	}
 	m_scenes.push_back(pTitleScene);
 
+	// Loading screen
+	Scene* pLoadingScene = new SceneLoadingScreen();
+	if (!pLoadingScene->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("Titlescreen fialed to load!!");
+		delete pSplashSceneFMOD;
+		delete pSplashSceneAUT;
+		delete pTitleScene;
+		delete pLoadingScene;
+		m_scenes.clear();
+		return false;
+	}
+	m_scenes.push_back(pLoadingScene);
+
 	Scene* pMainScene = new SceneMain();
 	if (!pMainScene->Initialise(*m_pRenderer))
 	{
@@ -158,6 +183,7 @@ bool Game::Initialise()
 		delete pSplashSceneFMOD;
 		delete pSplashSceneAUT;
 		delete pTitleScene;
+		delete pLoadingScene;
 		delete pMainScene;
 		m_scenes.clear();
 		return false;
@@ -237,10 +263,11 @@ void Game::Process(float deltaTime)
 	* Scenes Order
 	* AUT Splash = 0
 	* FMOD Splash = 1
-	* Title screen = 2
+	* Cutscene = 2
+	* Title screen = 3
 	* (Instructions scene)
-	* (Loading maybe) 
-	* Main Scene = 3
+	* Loading Screen = 4
+	* Main Scene = 5
 	*/
 
 	if (m_iCurrentScene == 0)
@@ -257,11 +284,36 @@ void Game::Process(float deltaTime)
 		SceneSplashScreenFMOD* fmodSplash = dynamic_cast<SceneSplashScreenFMOD*>(m_scenes[m_iCurrentScene]);
 		if (fmodSplash && fmodSplash->IsFinished())
 		{
-			SetCurrentScene(2); // Move to title screen
+			SetCurrentScene(2); // Move to cutscene
 		}
 	}
 
-	// loading screen?
+	else if (m_iCurrentScene == 2)
+	{
+		StartCutscene* cutscene = dynamic_cast<StartCutscene*>(m_scenes[m_iCurrentScene]);
+		if (cutscene && cutscene->IsFinished())
+		{
+			SetCurrentScene(3); // Move to Title
+		}
+	}
+
+	// loading screen
+	else if (m_iCurrentScene == 4)
+	{
+		SceneLoadingScreen* loadingScreen = dynamic_cast<SceneLoadingScreen*>(m_scenes[m_iCurrentScene]);
+		if (loadingScreen)
+		{
+			if (loadingScreen->GetCurrentLoadingState() == LoadingState::DISPLAYING && !loadingScreen->IsActualLoadingComplete())
+			{
+				loadingScreen->SetActualLoadingComplete(true);
+			}
+
+			if (loadingScreen->IsFinished())
+			{
+				SetCurrentScene(5); // Move to main scene
+			}
+		}
+	}
 
 }
 
@@ -347,7 +399,7 @@ void Game::SetCurrentScene(int sceneIndex)
 
 		if (m_pInputSystem)
 		{
-			if (m_iCurrentScene == 2)
+			if (m_iCurrentScene == 3)
 			{
 				m_pInputSystem->ShowMouseCursor(true);
 				m_pInputSystem->SetRelativeMode(false);
