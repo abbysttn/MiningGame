@@ -81,6 +81,11 @@ SceneMain::~SceneMain()
         m_pVignetteSprite = nullptr;
     }
 
+    if (m_pDarkVignetteSprite) {
+        delete m_pDarkVignetteSprite;
+        m_pDarkVignetteSprite = nullptr;
+    }
+
     if (m_pDirtPickupSprite) {
         delete m_pDirtPickupSprite;
         m_pDirtPickupSprite = nullptr;
@@ -139,7 +144,9 @@ bool SceneMain::Initialise(Renderer& renderer)
 {
     LogManager::GetInstance().Log("SceneMain is Initialising!");
 
+    m_lightEventTimer = 60.0f;
     m_pVisionLevel = 1;
+    m_lightOn = true;
     m_visionLevels = { 1.0f, 1.2f, 1.3f, 1.5f, 2.0f };
 
     m_dirtParticleCooldown = 1.2f;
@@ -160,6 +167,9 @@ bool SceneMain::Initialise(Renderer& renderer)
    
     m_pVignetteSprite = renderer.CreateSprite("../assets/vignette.png");
     m_pVignetteSprite->SetScale(m_pVisionLevel);
+
+    m_pDarkVignetteSprite = renderer.CreateSprite("../assets/darkVignette.png");
+    m_pDarkVignetteSprite->SetScale(m_pVisionLevel);
 
 
     float scaleX = static_cast<float>(renderer.GetWidth()) / m_pMineBackground->GetWidth();
@@ -230,6 +240,9 @@ bool SceneMain::Initialise(Renderer& renderer)
 
 void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 {
+
+    m_timer += deltaTime;
+
     m_collisionTree->clear();
 
     //quit to menu
@@ -290,8 +303,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 			m_pPlayer->SetGem(9999);
 		}
     }
-    m_timer += deltaTime;
-
+    LightEvent(deltaTime);
     DebugFunctions(inputSystem);
 
     float pX = m_pPlayer->GetPosition().x;
@@ -431,6 +443,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
     m_pVignetteSprite->SetX(static_cast<int>(m_pPlayer->GetPosition().x));
     m_pVignetteSprite->SetY(static_cast<int>(m_pPlayer->GetPosition().y));
+    m_pDarkVignetteSprite->SetX(static_cast<int>(m_pPlayer->GetPosition().x));
+    m_pDarkVignetteSprite->SetY(static_cast<int>(m_pPlayer->GetPosition().y));
 
     ui->Update(m_pPlayer, m_pRenderer, deltaTime);
 
@@ -474,9 +488,16 @@ void SceneMain::Draw(Renderer& renderer)
         ps.Draw(renderer);
     }
 
-    if (m_pVignetteSprite) {
-        m_pVignetteSprite->Draw(renderer);
+    if (m_pVignetteSprite && m_pDarkVignetteSprite) {
+        if (m_lightOn == true) {
+            m_pVignetteSprite->Draw(renderer);
+        }
+        else {
+            m_pDarkVignetteSprite->Draw(renderer);
+        }
+
     }
+
 
     // Upgrade Menu 
     if (m_isUpgradeMenuUIVisible && m_upgradeManager.IsMenuOpen()) 
@@ -732,4 +753,9 @@ void SceneMain::SetVisionLevel(int level) {
     m_pVisionLevel = (float)level;
     float newScale = m_visionLevels[level-1];
     m_pVignetteSprite->SetScale(newScale);
+}
+
+
+void SceneMain::LightEvent(float time) {
+
 }
