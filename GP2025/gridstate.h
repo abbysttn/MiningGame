@@ -8,6 +8,7 @@
 
 class GameObjectPool;
 class Renderer;
+class Player;
 
 using namespace std;
 
@@ -24,16 +25,15 @@ public:
 	void CreateGrid(Renderer& renderer, float backgroundScale);
 	GameObjectPool* GetPool();
 
-	void BreakBlock(Vector2 position, char direction);
+	void BreakBlock(Vector2 position, char direction, Player* player);
 
 	void ResetGrid();
-
-	char GetBlockType(Block* block);
 
 	void ProcessGrid(float deltaTime, InputSystem& inputSystem);
 	void DrawGrid(Renderer& renderer);
 
 	bool CheckCollision(Box& box);
+	bool CheckHazards();
 
 	float GetTileSize();
 
@@ -70,6 +70,8 @@ protected:
 	Vector2 m_brokenBlockPos;
 	int m_brokenBlockTile;
 	Vector2 m_lastBrokenPos;
+
+	bool m_touchingHazard;
 
 	bool update1 = true;
 

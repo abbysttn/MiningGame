@@ -36,6 +36,10 @@ public:
 	int GetResourceAmount();
 	bool ResourcesGiven();
 
+	bool IsHazard();
+
+	void UpdateBreakingSpeed();
+
 protected:
 	void GetBlockType(int& depth, const char*& filepath, int x);
 
@@ -56,6 +60,8 @@ protected:
 	char m_blockType;
 	bool m_resourceGiven = false;
 	bool m_canBreak = true;
+
+	bool m_isHazard = false;
 
 	bool m_isBroken;
 	bool m_isBreaking = false;

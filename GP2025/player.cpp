@@ -18,9 +18,15 @@ Player::Player()
     : m_speed(400.0f)
     , m_health(100.0f)
 	, m_stamina(100.0f)
+	, m_maxStamina(100.0f)
+    , m_jumpHeightMultiplier(1.0f)
+	, m_miningStrengthLevel(1)
     , m_oxygen(100.0f)
     , m_oxygenTimer(0.0f)
 {
+    m_inventory[ResourceType::DIRT] = 0;
+    m_inventory[ResourceType::STONE] = 0;
+    m_inventory[ResourceType::GEM] = 0;
 }
 
 Player::~Player()
@@ -46,6 +52,8 @@ bool Player::Initialise(Renderer& renderer)
 
     m_position = { 400, 300 };
     m_bAlive = true;
+
+    //responsive jump height for different screen sizes
     m_jumpHeight = std::sqrtf(2.0f * GRAVITY * (GridState::GetInstance().GetBlockSize().y * 2.3f));
     return true;
 }
@@ -57,8 +65,25 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     bool staminaRepletion = (m_position.x >= 1180.0f && m_position.x <= 1280.0f) &&
         (m_depth <= 1);
 
-    if (staminaRepletion) {
-        m_stamina = std::min(100.0f, m_stamina + (20.0f * deltaTime)); // 20% per second
+    if (staminaRepletion) 
+    {
+        SetCurrentStamina(m_stamina + deltaTime * 3.0f);
+    }
+    else 
+    {
+        SetCurrentStamina(m_stamina - deltaTime);
+    }
+
+    if (GetCurrentStamina() <= 0.0f)
+    {
+        LogManager::GetInstance().Log("DEAD!");
+    }
+
+    if (staminaRepletion) 
+    {
+        // So that it works when the player upgs their stamina otherwise it caps at 100.
+        float replenishStamValue = GetCurrentStamina() + (20.0f * deltaTime);
+        SetCurrentStamina(replenishStamValue);
     }
 
 	if (m_stamina <= 0.0f) {
@@ -97,23 +122,15 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 
 
     m_isMining = false;
-    if (m_canMine) {
-        if (IsKeyHeld(inputSystem, SDL_SCANCODE_UP)) {
-            GridState::GetInstance().BreakBlock(m_position, 'U');
-            m_isMining = true;
-        }
-        if (IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN)) {
-            GridState::GetInstance().BreakBlock(m_position, 'D');
-            m_isMining = true;
-        }
-        if (IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT)) {
-            GridState::GetInstance().BreakBlock(m_position, 'L');
-            m_isMining = true;
-        }
-        if (IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) {
-            GridState::GetInstance().BreakBlock(m_position, 'R');
-            m_isMining = true;
-        }
+    char breakDirection = 0;
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_UP)) { breakDirection = 'U'; m_isMining = true; }
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_DOWN)) { breakDirection = 'D'; m_isMining = true; }
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_LEFT)) { breakDirection = 'L'; m_isMining = true; }
+    if (IsKeyHeld(inputSystem, SDL_SCANCODE_RIGHT)) { breakDirection = 'R'; m_isMining = true; }
+
+    if (m_canMine)
+    {
+		GridState::GetInstance().BreakBlock(m_position, breakDirection, this);
     }
 
 	if (m_isMining && m_animationState != MINE) {
@@ -168,7 +185,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 	if (!m_noClip) {
         // If on ground and space is pressed, jump
         if (m_OnGround && IsKeyHeld(inputSystem, SDL_SCANCODE_SPACE)) {
-			m_Velocity.y = -m_jumpHeight;
+			m_Velocity.y = -(JUMP_FORCE * m_jumpHeightMultiplier);
 			m_OnGround = false;
 
             // Change animation to jump/fall
@@ -228,6 +245,12 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 		m_Velocity.y = 0.0f; 
     }
 
+    //check if player is colliding with a hazard
+    if (GridState::GetInstance().CheckHazards()) {
+        m_health = 0.0f;
+        HandleDeath(3);
+    }
+
     //clamp to screen with halfWidth, to prevent clipping outside screen
     float wallMarginX = screenWidth * 0.005f;  //0.5% horizontal margin (for the walls)
     float wallMarginY = screenHeight * 0.00f; //PLayer can't move past the top 5%
@@ -239,10 +262,6 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 
     m_position.x = std::max(minX, std::min(maxX, m_position.x));
     m_position.y = std::max(minY, std::min(maxY, m_position.y));
-
-    m_dirtCount = GridState::GetInstance().GetDirt();
-    m_stoneCount = GridState::GetInstance().GetStone();
-    m_gemCount = GridState::GetInstance().GetGem();
 
 	if (direction.x < 0.0f) m_facingLeft = true;
 	else if (direction.x > 0.0f) m_facingLeft = false;
@@ -303,6 +322,55 @@ void Player::LoadAnimatedSprites() {
 	m_animationState = IDLE;
 }
 
+void Player::SetMaxStamina(float newMaxStamina) 
+{
+    m_maxStamina = newMaxStamina;
+
+    if (m_stamina > m_maxStamina) 
+    {
+        m_stamina = m_maxStamina;
+    }
+}
+
+void Player::AddResource(ResourceType type, int amount) 
+{
+    m_inventory[type] += amount;
+    if (m_inventory[type] < 0) 
+    {
+        m_inventory[type] = 0;
+    }
+}
+
+bool Player::HasResource(ResourceType type, int amount) const 
+{
+    auto it = m_inventory.find(type);
+    if (it != m_inventory.end()) 
+    {
+        return it->second >= amount;
+    }
+    return false; 
+}
+
+bool Player::RemoveResource(ResourceType type, int amount) 
+{
+    if (HasResource(type, amount)) 
+    {
+        m_inventory[type] -= amount;
+        return true;
+    }
+    return false;
+}
+
+int Player::GetResourceCount(ResourceType type) const 
+{
+    auto it = m_inventory.find(type);
+    if (it != m_inventory.end()) 
+    {
+        return it->second;
+    }
+    return 0;
+}
+
 void Player::HandleDeath(int deathType) {
 	switch (deathType) {
 	case 1: // Health depleted
@@ -311,6 +379,9 @@ void Player::HandleDeath(int deathType) {
 	case 2: // Oxygen depleted
 		LogManager::GetInstance().Log("Friend died due to oxygen depletion.");
 		break;
+    case 3: // Player hit a hazard
+        LogManager::GetInstance().Log("Player died due to a underground hazard.");
+        break;
 	default:
 		LogManager::GetInstance().Log("Player died for an unknown reason.");
 		break;

@@ -173,6 +173,11 @@ bool Block::ResourcesGiven()
 	return m_resourceGiven;
 }
 
+bool Block::IsHazard()
+{
+	return m_isHazard;
+}
+
 void Block::GetBlockType(int& depth, const char*& filepath, int x)
 {
 	if (depth <= 0 && (x <= 4 || x >= 15)) {
@@ -235,9 +240,29 @@ void Block::GetBlockType(int& depth, const char*& filepath, int x)
 			return;
 		}
 		else {
-			filepath = "../assets/stone.png";
-			m_blockType = 'S';
-			return;
+			float hazardChance = 0.05f * exp(-0.01f * m_depth);
+			roll = GetRandomPercentage();
+
+			if (roll < hazardChance) {
+				m_isHazard = true;
+				m_canBreak = false;
+
+				int hazard = GetRandom(1, 2);
+
+				if (hazard == 1) {
+					filepath = "../assets/lava.png";
+					return;
+				}
+				else {
+					filepath = "../assets/bomb.png";
+					return;
+				}
+			}
+			else {
+				filepath = "../assets/stone.png";
+				m_blockType = 'S';
+				return;
+			}
 		}
 	}
 }
