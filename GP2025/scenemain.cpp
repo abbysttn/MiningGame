@@ -195,7 +195,7 @@ bool SceneMain::Initialise(Renderer& renderer)
 
     m_upgradeManager.Initialise(m_pPlayer);
     // Upgrade station position (to be interacted with menu) also press 'E'
-    m_upgradeStations.emplace_back(200.0f, 600.0f, 100.0f); // X, y, radius 
+    m_upgradeStations.emplace_back(static_cast<float>(m_pRenderer->GetWidth())*0.15f, static_cast<float>(m_pRenderer->GetHeight()) * 0.9f, 100.0f); // X, y, radius 
 
     //init particles
     m_pCoinSprite = renderer.CreateSprite("../assets/ball.png");
@@ -403,7 +403,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     {
         for (auto& station : m_upgradeStations)
         {
-            if (station.IsPlayerInRange(m_pPlayer->GetPosition()))
+            if (station.IsPlayerInRange(m_pPlayer->GetPosition(), static_cast<float>(m_pMineBackground->GetWidth()), static_cast<float>(m_pMineBackground->GetHeight()), static_cast<float>(m_pRenderer->GetHeight())))
             {
                 m_showUpgradePrompt = true;
                 if (inputSystem.GetKeyState(SDL_SCANCODE_E) == BS_PRESSED
@@ -420,7 +420,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     }
     else
     {
-        if (m_pActiveUpgradeStation && !m_pActiveUpgradeStation->IsPlayerInRange(m_pPlayer->GetPosition()))
+        if (m_pActiveUpgradeStation && !m_pActiveUpgradeStation->IsPlayerInRange(m_pPlayer->GetPosition(), static_cast<float>(m_pMineBackground->GetWidth()), static_cast<float>(m_pMineBackground->GetHeight()), static_cast<float>(m_pRenderer->GetHeight())))
         {
             m_upgradeManager.CloseMenu();
             m_pActiveUpgradeStation = nullptr;
@@ -481,8 +481,16 @@ void SceneMain::Draw(Renderer& renderer)
     // Upgrade Menu 
     if (m_isUpgradeMenuUIVisible && m_upgradeManager.IsMenuOpen()) 
     {
-        ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver); 
-        ImGui::Begin("Upgrade Station", &m_isUpgradeMenuUIVisible); 
+
+        ImGui::SetNextWindowPos(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.07f, static_cast<float>(m_pRenderer->GetHeight()) * 0.24f), ImGuiCond_Always);  // fixed position
+        ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.13f, static_cast<float>(m_pRenderer->GetWidth()) * 0.15f), ImGuiCond_Always); // fixed size
+
+        ImGui::Begin("Upgrade Station", &m_isUpgradeMenuUIVisible,
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoCollapse |
+            ImGuiWindowFlags_NoScrollbar
+        );
 
         if (!m_isUpgradeMenuUIVisible) 
         { // If closed by 'X'

@@ -16,15 +16,16 @@ public:
         m_position.Set(x, y);
     }
 
-    bool IsPlayerInRange(const Vector2& playerPosition) const 
+    bool IsPlayerInRange(const Vector2& playerPosition, float bgWidth, float bgHeight, float rendererHeight) const
     {
         if (!m_isActive) return false;
 
-        float dx = playerPosition.x - m_position.x;
-        float dy = playerPosition.y - m_position.y;
-        
-        float distSq = (dx * dx) + (dy * dy);
-        return distSq <= (m_interactionRadius * m_interactionRadius);
+        float leftBoundary = bgWidth * 0.2f;
+        float topBoundary = rendererHeight * 0.74f;
+
+
+        return playerPosition.x <= leftBoundary && playerPosition.y <= topBoundary;
+
     }
 };
 
