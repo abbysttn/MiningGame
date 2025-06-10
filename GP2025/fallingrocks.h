@@ -1,5 +1,5 @@
-#ifndef _STARTCUTSCENE_H__
-#define _STARTCUTSCENE_H__
+#ifndef _FALLINGROCKS_H__
+#define _FALLINGROCKS_H__
 
 #include "scene.h"
 
@@ -10,10 +10,10 @@ class InputSystem;
 class Grid;
 class CutscenePlayer;
 
-class StartCutscene : public Scene {
+class FallingRocks : public Scene {
 public:
-	StartCutscene();
-	virtual ~StartCutscene();
+	FallingRocks();
+	virtual ~FallingRocks();
 
 	virtual bool Initialise(Renderer& renderer);
 	virtual void Process(float deltaTime, InputSystem& inputSystem);
@@ -25,8 +25,8 @@ public:
 protected:
 
 private:
-	StartCutscene(const StartCutscene& startCutScene);
-	StartCutscene& operator=(const StartCutscene& startCutScene);
+	FallingRocks(const FallingRocks& fallingRocks);
+	FallingRocks& operator=(const FallingRocks& fallingRocks);
 
 public:
 
@@ -42,4 +42,4 @@ protected:
 private:
 };
 
-#endif // !_STARTCUTSCENE_H__
+#endif // !_FALLINGROCKS_H__

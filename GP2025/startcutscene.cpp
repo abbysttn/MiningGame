@@ -4,8 +4,11 @@
 #include "inputsystem.h"
 
 #include "grid.h"
+#include "block.h"
 #include "game.h"
-#include "player.h"
+#include "cutsceneplayer.h"
+
+#include "logmanager.h"
 
 StartCutscene::StartCutscene() : m_grid(nullptr), m_player(nullptr) {}
 
@@ -25,9 +28,10 @@ bool StartCutscene::Initialise(Renderer& renderer)
 	m_grid->SetGridType(false);
 	m_grid->Initialise(renderer);
 
-	m_player = new Player();
-	//m_player->Initialise(renderer);
-	//m_player->GetPosition() = m_grid->GetPlayerStartPos();
+	m_player = new CutscenePlayer();
+	m_player->Initialise(renderer);
+	m_player->SetScale(m_grid->GetTileSize() / 35.0f);
+	m_player->Position() = m_grid->GetPlayerStartPos();
 
 	return true;
 }
@@ -35,7 +39,31 @@ bool StartCutscene::Initialise(Renderer& renderer)
 void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 {
 	m_grid->Process(deltaTime, inputSystem);
-	//m_player->Process(deltaTime, inputSystem);
+
+	m_player->SetState(MINE);
+	m_player->SetFlip(true);
+	m_player->Process(deltaTime);
+
+	Vector2 gridCoords = { 4, 7 };
+
+	Block* block = m_grid->GetBlockFromGrid(gridCoords);
+
+	if (block != nullptr) {
+		block->BreakBlock();
+		if (block->BlockBroken()) {
+			m_player->SetState(IDLE);
+			m_player->Position() = m_grid->GetPlayerStartPos();
+
+			if (m_reactionTimer < m_reactionTime) {
+				m_reactionTimer += deltaTime;
+			}
+
+			if (m_reactionTimer >= m_reactionTime) {
+				m_reactionTime == m_reactionTime;
+				m_player->SetFlip(false);
+			}
+		}
+	}
 
 	if (inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE) == BS_PRESSED)
 	{
@@ -46,7 +74,7 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 void StartCutscene::Draw(Renderer& renderer)
 {
 	m_grid->Draw(renderer);
-	//m_player->Draw(renderer);
+	m_player->Draw(renderer);
 }
 
 void StartCutscene::DebugDraw()
