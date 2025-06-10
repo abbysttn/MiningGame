@@ -38,6 +38,9 @@ bool StartCutscene::Initialise(Renderer& renderer)
 	m_player->SetScale(m_grid->GetTileSize() / 35.0f);
 	m_player->Position() = m_grid->GetPlayerStartPos();
 
+	m_player->SetState(MINE);
+	m_player->SetFlip(true);
+
 	m_rocks = new FallingRocks();
 	m_rocks->SetStartPos(m_grid->GetRockStartPos());
 	m_rocks->SetEndPos(m_grid->GetRockEndPos());
@@ -53,8 +56,6 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 
 	m_rocks->Process(deltaTime, inputSystem);
 
-	m_player->SetState(MINE);
-	m_player->SetFlip(true);
 	m_player->Process(deltaTime);
 
 	Vector2 gridCoords = { 4, 7 };
@@ -64,13 +65,24 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 	if (block != nullptr) {
 		block->BreakBlock();
 		if (block->BlockBroken()) {
-			m_player->SetState(IDLE);
-			m_player->Position() = m_grid->GetPlayerStartPos();
 
-			if (m_reactionTimer == 0.0f) m_rocks->SetFalling(true);
+			if (m_reactionTimer == 0.0f) {
+				m_rocks->SetFalling(true);
+				m_player->SetState(IDLE);
+				m_player->Position() = m_grid->GetPlayerStartPos();
+			}
 
 			if (m_reactionTimer < m_reactionTime) {
 				m_reactionTimer += deltaTime;
+
+				if (m_reactionTimer > 1.0f && m_reactionTimer < 1.8f) {
+					m_player->SetState(JUMP);
+					m_player->Position() = m_grid->GetPlayerStartPos();
+				}
+				else {
+					m_player->SetState(IDLE);
+					m_player->Position() = m_grid->GetPlayerStartPos();
+				}
 			}
 
 			if (m_reactionTimer >= m_reactionTime) {

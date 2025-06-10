@@ -11,12 +11,15 @@ CutscenePlayer::~CutscenePlayer()
 	m_pMineSprite = nullptr;
 	delete m_pIdleSprite;
 	m_pIdleSprite = nullptr;
+	delete m_pJumpSprite;
+	m_pJumpSprite = nullptr;
 }
 
 bool CutscenePlayer::Initialise(Renderer& renderer)
 {
 	m_pIdleSprite = renderer.CreateAnimatedSprite("../assets/Idle.png");
 	m_pMineSprite = renderer.CreateAnimatedSprite("../assets/Swing.png");
+	m_pJumpSprite = renderer.CreateAnimatedSprite("../assets/Jump.png");
 
 	m_pIdleSprite->SetupFrames(32, 32);
 	m_pIdleSprite->SetLooping(true);
@@ -29,6 +32,12 @@ bool CutscenePlayer::Initialise(Renderer& renderer)
 	m_pMineSprite->SetFrameDuration(0.1f);
 	m_pMineSprite->Animate();
 	m_pMineSprite->SetScale(m_scale);
+
+	m_pJumpSprite->SetupFrames(32, 32);
+	m_pJumpSprite->SetLooping(true);
+	m_pJumpSprite->SetFrameDuration(0.1f);
+	m_pJumpSprite->Animate();
+	m_pJumpSprite->SetScale(m_scale);
 
 	// Default
 	m_pAnimSprite = m_pIdleSprite;
@@ -90,6 +99,14 @@ void CutscenePlayer::SetState(PlayerState state)
 		m_pAnimSprite->SetX(static_cast<int>(m_position.x));
 		m_pAnimSprite->SetY(static_cast<int>(m_position.y));
 		m_pIdleSprite->Animate();
+		break;
+		
+	case JUMP:
+		m_pAnimSprite = m_pJumpSprite;
+		m_pAnimSprite->SetScale(m_scale);
+		m_pAnimSprite->SetX(static_cast<int>(m_position.x));
+		m_pAnimSprite->SetY(static_cast<int>(m_position.y));
+		m_pJumpSprite->Animate();
 		break;
 	}
 }

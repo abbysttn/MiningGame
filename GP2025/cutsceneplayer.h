@@ -9,7 +9,8 @@ class AnimatedSprite;
 
 enum PlayerState {
 	IDLE,
-	MINE
+	MINE,
+	JUMP
 };
 
 enum CutScene {
@@ -52,6 +53,7 @@ protected:
 
 	AnimatedSprite* m_pIdleSprite = nullptr;
 	AnimatedSprite* m_pMineSprite = nullptr;
+	AnimatedSprite* m_pJumpSprite = nullptr;
 
 	float m_scale = 40.0f;
 

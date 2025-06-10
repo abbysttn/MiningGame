@@ -188,26 +188,6 @@ void Block::SetCutsceneBlock(bool isCutscene)
 	m_cutsceneBlock = isCutscene;
 }
 
-void Block::SetXDirection(float x)
-{
-	xDirection = x;
-}
-
-float Block::GetXDirection()
-{
-	return xDirection;
-}
-
-void Block::SetEndPos(Vector2 end)
-{
-	endPos = end;
-}
-
-Vector2 Block::GetEndPos()
-{
-	return endPos;
-}
-
 void Block::GetBlockType(int& depth, const char*& filepath, int x)
 {
 	if (!m_cutsceneBlock) {

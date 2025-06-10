@@ -4,6 +4,7 @@
 #include "inputsystem.h"
 
 #include "inlinehelper.h"
+#include <cmath>
 
 #include "block.h"
 
@@ -17,7 +18,9 @@ FallingRocks::~FallingRocks()
 
 bool FallingRocks::Initialise(Renderer& renderer)
 {
-	m_blocks = new GameObjectPool(Block(), 20);
+	m_blocks = new GameObjectPool(Block(), 30);
+
+	m_fallDelays.resize(m_blocks->totalCount(), 0.0f);
 
 	for (size_t i = 0; i < m_blocks->totalCount(); i++) {
 		if (GameObject* obj = m_blocks->getObjectAtIndex(i)) {
@@ -30,17 +33,13 @@ bool FallingRocks::Initialise(Renderer& renderer)
 
 			block->SetCutsceneBlock(true);
 
-			block->Initialise(renderer, GetRandom(10, 20), 1);
+			block->Initialise(renderer, GetRandom(10, 30), 1);
 
 			float scaleFactor = m_scale / block->GetSpriteWidth();
 
 			block->SetScale(scaleFactor);
 
 			block->Position() = m_startPos;
-
-			float direction = (((i + 1) * 1.5f) / 10.0f) - 1.5f;
-
-			block->SetXDirection(direction);
 		}
 	}
 
@@ -62,8 +61,15 @@ void FallingRocks::Process(float deltaTime, InputSystem& inputSystem)
 		}
 	}
 	else {
+		const float delayBetweenBlocks = 0.05f;
 
 		m_fallSpeed += m_gravity * deltaTime;
+		bool allLanded = true;
+
+		const float baseHeight = m_endPos.y;
+		const int layers = 5;
+		const float layerHeight = 35.0f;
+		const int blocksPerLayer = m_blocks->totalCount() / layers;
 
 		for (size_t i = 0; i < m_blocks->totalCount(); i++) {
 			if (GameObject* obj = m_blocks->getObjectAtIndex(i)) {
@@ -71,18 +77,31 @@ void FallingRocks::Process(float deltaTime, InputSystem& inputSystem)
 					Block* block = dynamic_cast<Block*>(obj);
 					if (block->IsActive()) {
 
+						m_fallDelays[i] += deltaTime;
+
+						if (m_fallDelays[i] < delayBetweenBlocks * i)
+							continue;
+
 						Vector2 pos = block->Position();
 
-						if (i <= 8) pos.y += (m_fallSpeed * deltaTime) - (block->GetXDirection() / 2.0f);
-						if (i >= 12) pos.y += (m_fallSpeed * deltaTime) + (block->GetXDirection() / 2.0f);
-						if (i == 9 || i == 10 || i == 11) pos.y += m_fallSpeed * deltaTime;
+						int layer = i / blocksPerLayer;
+						if (layer >= layers) layer = layers - 1;
 
-						pos.x += block->GetXDirection();
+						float centerIndex = blocksPerLayer / 2.0f;
+						float distanceFromCenter = (i % blocksPerLayer) - centerIndex;
 
-						if (pos.y >= (m_endPos.y - (block->GetXDirection() / 2.0f))) {
-							pos.y = m_endPos.y;
-							m_falling = false;
-							m_fallSpeed = 0.0f;
+						float xSpread = 100.0f * (1.0f - (float)layer / layers);
+						float targetX = m_startPos.x + (distanceFromCenter * xSpread / centerIndex);
+
+						float targetY = baseHeight - (layer * layerHeight);
+
+						if (pos.y < targetY) {
+							allLanded = false;
+							pos.y += m_fallSpeed * deltaTime;
+							pos.x += (targetX - pos.x) * deltaTime;
+						}
+						else {
+							pos = { targetX, targetY };
 						}
 
 						block->Position() = pos;
@@ -90,6 +109,11 @@ void FallingRocks::Process(float deltaTime, InputSystem& inputSystem)
 					}
 				}
 			}
+		}
+
+		if (allLanded) {
+			m_falling = false;
+			m_fallSpeed = 0.0f;
 		}
 	}
 }

@@ -4,6 +4,7 @@
 #include "scene.h"
 #include "gameobjectpool.h"
 #include "vector2.h"
+#include "vector"
 
 using namespace std;
 
@@ -51,6 +52,8 @@ protected:
 	float m_fallSpeed = 0.0f;
 	float m_gravity = 500.0f;
 	bool m_falling;
+
+	vector<float> m_fallDelays;
 
 private:
 };
