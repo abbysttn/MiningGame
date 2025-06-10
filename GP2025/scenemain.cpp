@@ -234,7 +234,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
     //quit to menu
     ButtonState escapeState = inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE);
-    ButtonState xboxBackState;
+    ButtonState xboxBackState = BS_NEUTRAL;
 
     if (inputSystem.GetNumberOfControllersAttached() > 0) {
         xboxBackState = inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_BACK);
