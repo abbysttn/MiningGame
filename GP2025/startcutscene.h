@@ -48,6 +48,12 @@ protected:
 
 	bool m_sceneDone = false;
 
+	float m_startTimer = 0.0f;
+	float m_startTime = 2.0f;
+
+	bool m_hitSound = false;
+	bool m_hitSound2 = false;
+
 	float m_reactionTimer = 0.0f;
 	float m_reactionTime = 5.0f;
 

@@ -326,6 +326,31 @@ void Game::Process(float deltaTime)
 		}
 	}
 
+	else if (m_iCurrentScene == 5)
+	{
+		SceneMain* mainScene = dynamic_cast<SceneMain*>(m_scenes[m_iCurrentScene]);
+		if (mainScene)
+		{
+			if (mainScene->GameWon())
+			{
+				SetCurrentScene(6); // Move to end cutscene
+				delete mainScene;
+			}
+		}
+	}
+
+	else if (m_iCurrentScene == 6)
+	{
+		EndCutscene* endCutscene = dynamic_cast<EndCutscene*>(m_scenes[m_iCurrentScene]);
+		if (endCutscene)
+		{
+			if (endCutscene->IsFinished())
+			{
+				SetCurrentScene(3); // Move to title
+			}
+		}
+	}
+
 }
 
 void Game::Draw(Renderer& renderer)

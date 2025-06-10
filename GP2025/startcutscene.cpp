@@ -40,6 +40,7 @@ bool StartCutscene::Initialise(Renderer& renderer)
 	}
 	m_tSoundSystem.LoadSound("bgm", "../assets/sound/caveWind.mp3", true);
 	m_tSoundSystem.LoadSound("fall", "../assets/sound/rockFall.mp3", false);
+	m_tSoundSystem.LoadSound("hit", "../assets/sound/pickaxeHit.wav", false);
 
 	m_grid = new Grid();
 	m_grid->SetBackgroundHeight(renderer.GetHeight() - (m_grid->GetTileSize() * 20.0f));
@@ -83,6 +84,24 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 	m_rocks->Process(deltaTime, inputSystem);
 
 	m_player->Process(deltaTime);
+
+	if (m_startTimer < m_startTime) {
+		m_startTimer += deltaTime;
+
+		if (!m_hitSound) {
+			m_tSoundSystem.PlaySound("hit");
+			m_hitSound = true;
+		}
+
+		if (m_startTimer >= 0.8f && !m_hitSound2) {
+			m_tSoundSystem.PlaySound("hit");
+			m_hitSound2 = true;
+		}
+	}
+
+	if (m_startTimer >= m_startTime) {
+		m_startTimer = m_startTime;
+	}
 
 	Vector2 gridCoords = { 4, 7 };
 

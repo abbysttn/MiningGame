@@ -68,6 +68,8 @@ public:
 
 	void LoadAnimatedSprites();
 
+	bool IsAtBottom();
+
 	bool IsPlayerMining() { return m_isMining; }
 	PlayerAnimationState GetCurrentState() { return m_animationState; }
 	
@@ -102,6 +104,8 @@ private:
 
 	// Jumping and Gravity
 	const float GRAVITY = 1000.0f; // Pixels per second squared
+
+	float maxHeight;
 
 	float m_oxygen;
 	float m_oxygenTimer;

@@ -733,3 +733,13 @@ void SceneMain::SetVisionLevel(int level) {
     float newScale = m_visionLevels[level-1];
     m_pVignetteSprite->SetScale(newScale);
 }
+
+bool SceneMain::IsFinished()
+{
+    return m_gameOver;
+}
+
+bool SceneMain::GameWon()
+{
+    return m_pPlayer->IsAtBottom();
+}

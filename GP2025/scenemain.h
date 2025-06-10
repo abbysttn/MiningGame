@@ -56,6 +56,9 @@ public:
 
 	void ToggleGodMode() { m_godMode = !m_godMode; }
 
+	bool IsFinished();
+	bool GameWon();
+
 private:
 	float m_tileSize;
 	int m_aboveGroundOffset = 8; // Change later to correct above ground size
@@ -78,6 +81,7 @@ private:
 	int m_activeDrops;
 
 	bool m_paused = false;
+	bool m_gameOver = false;
 
 	bool m_godMode = false;
 
