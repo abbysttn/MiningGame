@@ -39,10 +39,14 @@ public:
 	Vector2 GetScreenOffsets();
 
 	void SetBackgroundHeight(float height);
+	void SetGridType(bool regular);
+
+	Vector2 GetPlayerStartPos();
 
 
 protected:
 	bool InitObjects(Renderer& renderer, size_t x, size_t y);
+	bool InitCutsceneObjects(Renderer& renderer, size_t x, size_t y);
 private:
 	Grid(const Grid& grid);
 	Grid& operator=(const Grid& grid);
@@ -58,6 +62,7 @@ private:
 
 	float m_tileSize;
 	float m_backgroundHeight;
+	bool m_isRegular;
 
 	int m_cols = 20;
 	int m_rows = 30;
@@ -67,6 +72,8 @@ private:
 	float screenOffsetY;
 
 	Vector2 m_blockSize;
+
+	Vector2 m_playerStartPos;
 
 };
 

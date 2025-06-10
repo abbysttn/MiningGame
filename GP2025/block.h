@@ -37,6 +37,8 @@ public:
 	bool ResourcesGiven();
 
 	bool IsHazard();
+	bool IsFood();
+	void SetCutsceneBlock(bool isCutscene);
 
 	void UpdateBreakingSpeed();
 
@@ -62,12 +64,15 @@ protected:
 	bool m_canBreak = true;
 
 	bool m_isHazard = false;
+	bool m_isFood = false;
 
 	bool m_isBroken;
 	bool m_isBreaking = false;
 	int m_currentBlockStatus = 0;
 	float m_animatingTime = 0.1f;
 	float m_currentTime = 0.0f;
+
+	bool m_cutsceneBlock = false;
 
 private:
 

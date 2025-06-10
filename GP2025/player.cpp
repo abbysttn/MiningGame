@@ -62,8 +62,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 {
     Vector2 direction(0.0f, 0.0f);
 
-    bool staminaRepletion = (m_position.x >= 1180.0f && m_position.x <= 1280.0f) &&
-        (m_depth <= 1);
+    bool staminaRepletion = GridState::GetInstance().CheckFood();
 
     if (staminaRepletion) 
     {
@@ -185,7 +184,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 	if (!m_noClip) {
         // If on ground and space is pressed, jump
         if (m_OnGround && IsKeyHeld(inputSystem, SDL_SCANCODE_SPACE)) {
-			m_Velocity.y = -(JUMP_FORCE * m_jumpHeightMultiplier);
+			m_Velocity.y = -(m_jumpHeight * m_jumpHeightMultiplier);
 			m_OnGround = false;
 
             // Change animation to jump/fall

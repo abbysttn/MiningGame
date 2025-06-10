@@ -178,16 +178,34 @@ bool Block::IsHazard()
 	return m_isHazard;
 }
 
+bool Block::IsFood()
+{
+	return m_isFood;
+}
+
+void Block::SetCutsceneBlock(bool isCutscene)
+{
+	m_cutsceneBlock = isCutscene;
+}
+
 void Block::GetBlockType(int& depth, const char*& filepath, int x)
 {
-	if (depth <= 0 && (x <= 4 || x >= 15)) {
-		filepath = "../assets/brock.png";
-		return;
-	}
+	if (!m_cutsceneBlock) {
 
-	if (x == 0 || x == 19) {
-		filepath = "../assets/brock.png";
-		return;
+		if (depth <= 0 && (x <= 4 || x >= 15)) {
+			filepath = "../assets/brock.png";
+
+			if (x == 15 || x == 16) {
+				m_isFood = true;
+			}
+
+			return;
+		}
+
+		if (x == 0 || x == 19) {
+			filepath = "../assets/brock.png";
+			return;
+		}
 	}
 
 	float percentage = 0.0f;
@@ -209,7 +227,7 @@ void Block::GetBlockType(int& depth, const char*& filepath, int x)
 	}
 
 	// 5% Oxygen Chance. Runs before gem chance.
-	if (depth >= 5 && GetRandomPercentage() < 0.05f) {
+	if (depth >= 5 && GetRandomPercentage() < 0.05f && !m_cutsceneBlock) {
 		filepath = "../assets/stone.png";
 		m_blockType = 'O';
 		return;
@@ -240,6 +258,13 @@ void Block::GetBlockType(int& depth, const char*& filepath, int x)
 			return;
 		}
 		else {
+			if (m_cutsceneBlock) {
+				filepath = "../assets/stone.png";
+				m_blockType = 'S';
+				return;
+			}
+
+
 			float hazardChance = 0.05f * exp(-0.01f * m_depth);
 			roll = GetRandomPercentage();
 

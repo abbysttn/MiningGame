@@ -94,7 +94,6 @@ private:
 	std::map<ResourceType, int> m_inventory;
 
 	const float GRAVITY = 1000.0f; // Pixels per second squared
-	const float JUMP_FORCE = 550.0f; 
 
 	float m_oxygen;
 	float m_oxygenTimer;

@@ -18,6 +18,7 @@
 #include "scenetitlescreen.h"
 #include "SceneSplashScreenAUT.h"
 #include "SceneSplashScreenFMOD.h"
+#include "startcutscene.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -88,8 +89,8 @@ void Game::Quit()
 
 bool Game::Initialise()
 {
-	bbWidth = 1000;
-	bbHeight = 800;
+	bbWidth = 960;
+	bbHeight = 540;
 
 	m_pRenderer = new Renderer();
 	if (!m_pRenderer->Initialise(false, (int)bbWidth, (int)bbHeight))
@@ -117,6 +118,15 @@ bool Game::Initialise()
 	}
 
 	// Splash screens
+	Scene* pStartCutscene = new StartCutscene();
+	if (!pStartCutscene->Initialise(*m_pRenderer)) {
+		LogManager::GetInstance().Log("Start Cutscene failed to load!");
+		delete pStartCutscene;
+		return false;
+	}
+	m_scenes.push_back(pStartCutscene);
+
+
 	Scene* pSplashSceneAUT = new SceneSplashScreenAUT();
 	if (!pSplashSceneAUT->Initialise(*m_pRenderer))
 	{
