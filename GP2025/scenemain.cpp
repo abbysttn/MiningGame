@@ -81,6 +81,11 @@ SceneMain::~SceneMain()
         m_pVignetteSprite = nullptr;
     }
 
+    if (m_pDarkVignetteSprite) {
+        delete m_pDarkVignetteSprite;
+        m_pDarkVignetteSprite = nullptr;
+    }
+
     if (m_pDirtPickupSprite) {
         delete m_pDirtPickupSprite;
         m_pDirtPickupSprite = nullptr;
@@ -103,6 +108,9 @@ SceneMain::~SceneMain()
 void SceneMain::OnEnter() {
     m_paused = false;
     m_soundSystem.PlaySound("cavebgm");
+    m_lightEventTimer = 0.0f;
+    m_lightEventSkipped = false;
+
 };
 
 void SceneMain::OnExit()
@@ -139,7 +147,10 @@ bool SceneMain::Initialise(Renderer& renderer)
 {
     LogManager::GetInstance().Log("SceneMain is Initialising!");
 
+    m_lightEventInterval = 69.0f;
+    m_lightEventTimer = 0.0f;
     m_pVisionLevel = 1;
+    m_lightOn = true;
     m_visionLevels = { 1.0f, 1.2f, 1.3f, 1.5f, 2.0f };
 
     m_dirtParticleCooldown = 1.2f;
@@ -151,6 +162,7 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_soundSystem.LoadSound("pickaxeHit", "../assets/sound/pickaxeHit.wav");
     m_soundSystem.LoadSound("blockBreak", "../assets/sound/blockBreak.wav");
     m_soundSystem.LoadSound("cavebgm", "../assets/sound/cavebgm.mp3");
+    m_soundSystem.LoadSound("lightflicker", "../assets/sound/lightFlicker.wav");
 
     m_pRenderer = &renderer;
     m_screenWidth = static_cast<float>(renderer.GetWidth());
@@ -160,6 +172,9 @@ bool SceneMain::Initialise(Renderer& renderer)
    
     m_pVignetteSprite = renderer.CreateSprite("../assets/vignette.png");
     m_pVignetteSprite->SetScale(m_pVisionLevel);
+
+    m_pDarkVignetteSprite = renderer.CreateSprite("../assets/darkVignette.png");
+    m_pDarkVignetteSprite->SetScale(m_pVisionLevel);
 
 
     float scaleX = static_cast<float>(renderer.GetWidth()) / m_pMineBackground->GetWidth();
@@ -230,6 +245,9 @@ bool SceneMain::Initialise(Renderer& renderer)
 
 void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 {
+
+    m_timer += deltaTime;
+
     m_collisionTree->clear();
 
     //quit to menu
@@ -290,8 +308,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 			m_pPlayer->SetGem(9999);
 		}
     }
-    m_timer += deltaTime;
-
+    LightEvent(deltaTime);
     DebugFunctions(inputSystem);
 
     float pX = m_pPlayer->GetPosition().x;
@@ -431,6 +448,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
     m_pVignetteSprite->SetX(static_cast<int>(m_pPlayer->GetPosition().x));
     m_pVignetteSprite->SetY(static_cast<int>(m_pPlayer->GetPosition().y));
+    m_pDarkVignetteSprite->SetX(static_cast<int>(m_pPlayer->GetPosition().x));
+    m_pDarkVignetteSprite->SetY(static_cast<int>(m_pPlayer->GetPosition().y));
 
     ui->Update(m_pPlayer, m_pRenderer, deltaTime);
 
@@ -474,9 +493,16 @@ void SceneMain::Draw(Renderer& renderer)
         ps.Draw(renderer);
     }
 
-    if (m_pVignetteSprite) {
-        m_pVignetteSprite->Draw(renderer);
+    if (m_pVignetteSprite && m_pDarkVignetteSprite) {
+        if (m_lightOn == true) {
+            m_pVignetteSprite->Draw(renderer);
+        }
+        else {
+            m_pDarkVignetteSprite->Draw(renderer);
+        }
+
     }
+
 
     // Upgrade Menu 
     if (m_isUpgradeMenuUIVisible && m_upgradeManager.IsMenuOpen()) 
@@ -716,6 +742,12 @@ void SceneMain::DebugFunctions(InputSystem& inputSystem) {
         ps.ActivateAt(m_pPlayer->GetPosition());
         m_particleSystems.push_back(std::move(ps));
     }
+    if (inputSystem.GetKeyState(SDL_SCANCODE_B) == BS_PRESSED)
+    {
+        m_lightEventTimer += 100.0f;
+        m_lightEventSkipped = true;
+
+    }
     if ((inputSystem.GetKeyState(SDL_SCANCODE_Y) == BS_PRESSED)&& m_pVisionLevel < m_visionLevels.size())
     {
         m_pVisionLevel++;
@@ -734,12 +766,37 @@ void SceneMain::SetVisionLevel(int level) {
     m_pVignetteSprite->SetScale(newScale);
 }
 
-bool SceneMain::IsFinished()
-{
-    return m_gameOver;
+void SceneMain::LightEvent(float time) {
+    m_lightEventTimer += time;
+
+    if (!m_lightOn) {
+        m_flicktimer += time;
+
+    }
+
+
+    if (m_lightEventTimer >= m_lightEventInterval) {
+
+
+        m_soundSystem.PlaySound("lightflicker");
+        m_lightOn = false;
+        m_lightEventTimer = 0.0f;
+        m_lightEventInterval = 90.0f + static_cast<float>(rand()) / RAND_MAX * 45.0f;
+        m_lightEventSkipped = false;
+    }
+
+    if (m_flicktimer >= 3.0f) {
+        m_lightOn = true;
+        m_flicktimer = 0.0f;
+    }
 }
 
 bool SceneMain::GameWon()
 {
     return m_pPlayer->IsAtBottom();
+}
+
+bool SceneMain::IsFinished()
+{
+    return m_gameOver;
 }

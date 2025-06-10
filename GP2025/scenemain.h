@@ -54,6 +54,8 @@ public:
 
 	void SetVisionLevel(int level);
 
+	void LightEvent(float time);
+
 	void ToggleGodMode() { m_godMode = !m_godMode; }
 
 	bool IsFinished();
@@ -78,6 +80,11 @@ private:
 	float m_playerY;
 	float m_waterDropInterval = 1.0f;
 	float m_timer;
+	float m_lightEventTimer;
+	float m_lightEventInterval;
+	float m_lightEventSkipped;
+	float m_flicktimer;
+
 	int m_activeDrops;
 
 	bool m_paused = false;
@@ -101,12 +108,15 @@ private:
 
 	bool m_isUpgradeMenuUIVisible;
 
+	bool m_lightOn;
+
 	//Particle System
 	Sprite* m_pCoinSprite = nullptr;
 	Sprite* m_pDirtSprite = nullptr;
 	Sprite* m_pBreakBlockSprite = nullptr;
 	Sprite* m_pWaterDropSprite = nullptr;
 	Sprite* m_pVignetteSprite = nullptr;
+	Sprite* m_pDarkVignetteSprite = nullptr;
 
 
 	Sprite* m_pDirtPickupSprite = nullptr;
