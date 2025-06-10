@@ -334,7 +334,6 @@ void Game::Process(float deltaTime)
 			if (mainScene->GameWon())
 			{
 				SetCurrentScene(6); // Move to end cutscene
-				delete mainScene;
 			}
 		}
 	}

@@ -66,7 +66,6 @@ bool EndCutscene::Initialise(Renderer& renderer)
 	m_trappedMiner->Initialise(renderer);
 	m_trappedMiner->SetScale(m_grid->GetTileSize() / 35.0f);
 	m_trappedMiner->Position() = m_grid->GetPlayerStartPos();
-	m_trappedMiner->SetColour(0.8f, 1.0f, 0.8f);
 
 	m_trappedMiner->SetState(IDLE);
 	m_trappedMiner->SetFlip(false);
@@ -95,6 +94,8 @@ bool EndCutscene::Initialise(Renderer& renderer)
 
 void EndCutscene::Process(float deltaTime, InputSystem& inputSystem)
 {
+	m_trappedMiner->SetColour(0.8f, 1.0f, 0.8f);
+
 	m_grid->Process(deltaTime, inputSystem);
 
 	m_rocks->Process(deltaTime, inputSystem);
