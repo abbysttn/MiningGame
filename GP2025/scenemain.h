@@ -78,6 +78,10 @@ private:
 	float m_waterDropInterval = 1.0f;
 	float m_timer;
 	float m_lightEventTimer;
+	float m_lightEventInterval;
+	float m_lightEventSkipped;
+	float m_flicktimer;
+
 	int m_activeDrops;
 
 	bool m_paused = false;
