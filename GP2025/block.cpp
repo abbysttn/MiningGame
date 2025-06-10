@@ -204,7 +204,7 @@ void Block::GetBlockType(int& depth, const char*& filepath, int x)
 		if (depth <= 0 && (x <= 4 || x >= 15)) {
 			filepath = "../assets/brock.png";
 
-			if (x == 15 || x == 16) {
+			if (x == 16 || x == 17) {
 				m_isFood = true;
 			}
 
