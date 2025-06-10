@@ -11,8 +11,9 @@
 #include "fallingrocks.h"
 
 #include "logmanager.h"
+#include "sprite.h"
 
-StartCutscene::StartCutscene() : m_grid(nullptr), m_player(nullptr), m_rocks(nullptr) {}
+StartCutscene::StartCutscene() : m_grid(nullptr), m_player(nullptr), m_rocks(nullptr), m_fade(nullptr) {}
 
 StartCutscene::~StartCutscene()
 {
@@ -24,10 +25,22 @@ StartCutscene::~StartCutscene()
 
 	delete m_rocks;
 	m_rocks = nullptr;
+
+	delete m_fade;
+	m_fade = nullptr;
+
+	m_tSoundSystem.Release();
 }
 
 bool StartCutscene::Initialise(Renderer& renderer)
 {
+	if (!m_tSoundSystem.Initialise())
+	{
+		return false;
+	}
+	m_tSoundSystem.LoadSound("bgm", "../assets/sound/caveWind.mp3", true);
+	m_tSoundSystem.LoadSound("fall", "../assets/sound/rockFall.mp3", false);
+
 	m_grid = new Grid();
 	m_grid->SetBackgroundHeight(renderer.GetHeight() - (m_grid->GetTileSize() * 20.0f));
 	m_grid->SetGridType(false);
@@ -46,6 +59,18 @@ bool StartCutscene::Initialise(Renderer& renderer)
 	m_rocks->SetEndPos(m_grid->GetRockEndPos());
 	m_rocks->SetScale(m_grid->GetTileSize());
 	m_rocks->Initialise(renderer);
+
+	m_fade = renderer.CreateSprite("../assets/fade.png");
+	m_fade->SetX(renderer.GetWidth() / 2);
+	m_fade->SetY(renderer.GetHeight() / 2);
+
+	float scaleX = renderer.GetWidth() / (m_fade->GetWidth() * 0.25f);
+	float scaleY = renderer.GetHeight() / (m_fade->GetHeight() * 0.25f);
+
+	float scale = scaleX >= scaleY ? scaleX : scaleY;
+
+	m_fade->SetScale(scale);
+	m_fade->SetAlpha(alpha);
 
 	return true;
 }
@@ -68,6 +93,7 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 
 			if (m_reactionTimer == 0.0f) {
 				m_rocks->SetFalling(true);
+				m_tSoundSystem.PlaySound("fall");
 				m_player->SetState(IDLE);
 				m_player->Position() = m_grid->GetPlayerStartPos();
 			}
@@ -88,14 +114,26 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 			if (m_reactionTimer >= m_reactionTime) {
 				m_reactionTime = m_reactionTime;
 				m_player->SetFlip(false);
+
+				m_timer += deltaTime;
+				alpha = m_timer - 1.0f;
+
+				if (m_timer >= m_time) {
+					m_sceneDone = true;
+				}
 			}
 		}
 	}
+
+	m_fade->SetAlpha(alpha);
+	m_fade->Process(deltaTime);
 
 	if (inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE) == BS_PRESSED)
 	{
 		Game::GetInstance().Quit();
 	}
+
+	m_tSoundSystem.Update();
 }
 
 void StartCutscene::Draw(Renderer& renderer)
@@ -103,13 +141,24 @@ void StartCutscene::Draw(Renderer& renderer)
 	m_grid->Draw(renderer);
 	m_rocks->Draw(renderer);
 	m_player->Draw(renderer);
+	m_fade->Draw(renderer);
 }
 
 void StartCutscene::DebugDraw()
 {
 }
 
-bool StartCutscene::GetStatus()
+void StartCutscene::OnEnter()
 {
-	return false;
+	m_tSoundSystem.PlaySound("bgm");
+}
+
+void StartCutscene::OnExit()
+{
+	m_tSoundSystem.StopSound("bgm");
+}
+
+bool StartCutscene::IsFinished()
+{
+	return m_sceneDone;
 }

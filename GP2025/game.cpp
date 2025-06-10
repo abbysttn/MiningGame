@@ -118,15 +118,6 @@ bool Game::Initialise()
 	}
 
 	// Splash screens
-	Scene* pStartCutscene = new StartCutscene();
-	if (!pStartCutscene->Initialise(*m_pRenderer)) {
-		LogManager::GetInstance().Log("Start Cutscene failed to load!");
-		delete pStartCutscene;
-		return false;
-	}
-	m_scenes.push_back(pStartCutscene);
-
-
 	Scene* pSplashSceneAUT = new SceneSplashScreenAUT();
 	if (!pSplashSceneAUT->Initialise(*m_pRenderer))
 	{
@@ -146,6 +137,15 @@ bool Game::Initialise()
 		return false;
 	}
 	m_scenes.push_back(pSplashSceneFMOD);
+
+	//start cutscene
+	Scene* pStartCutscene = new StartCutscene();
+	if (!pStartCutscene->Initialise(*m_pRenderer)) {
+		LogManager::GetInstance().Log("Start Cutscene failed to load!");
+		delete pStartCutscene;
+		return false;
+	}
+	m_scenes.push_back(pStartCutscene);
 
 	// Titlescreen stuffz
 	Scene* pTitleScene = new SceneTitlescreen(m_pFMODSystem);
@@ -267,7 +267,16 @@ void Game::Process(float deltaTime)
 		SceneSplashScreenFMOD* fmodSplash = dynamic_cast<SceneSplashScreenFMOD*>(m_scenes[m_iCurrentScene]);
 		if (fmodSplash && fmodSplash->IsFinished())
 		{
-			SetCurrentScene(2); // Move to title screen
+			SetCurrentScene(2); // Move to cutscene
+		}
+	}
+
+	else if (m_iCurrentScene == 2)
+	{
+		StartCutscene* cutscene = dynamic_cast<StartCutscene*>(m_scenes[m_iCurrentScene]);
+		if (cutscene && cutscene->IsFinished())
+		{
+			SetCurrentScene(3); // Move to Title
 		}
 	}
 
@@ -352,7 +361,7 @@ void Game::SetCurrentScene(int sceneIndex)
 
 		if (m_pInputSystem)
 		{
-			if (m_iCurrentScene == 2)
+			if (m_iCurrentScene == 3)
 			{
 				m_pInputSystem->ShowMouseCursor(true);
 				m_pInputSystem->SetRelativeMode(false);

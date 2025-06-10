@@ -2,6 +2,9 @@
 #define _STARTCUTSCENE_H__
 
 #include "scene.h"
+#include <fmod.hpp>
+#include <fmod_errors.h>
+#include "soundsystem.h"
 
 using namespace std;
 
@@ -10,6 +13,8 @@ class InputSystem;
 class Grid;
 class CutscenePlayer;
 class FallingRocks;
+
+class Sprite;
 
 class StartCutscene : public Scene {
 public:
@@ -21,7 +26,10 @@ public:
 	virtual void Draw(Renderer& renderer);
 	virtual void DebugDraw();
 
-	bool GetStatus();
+	void OnEnter() override;
+	void OnExit() override;
+
+	bool IsFinished();
 
 protected:
 
@@ -36,10 +44,19 @@ protected:
 	CutscenePlayer* m_player;
 	FallingRocks* m_rocks;
 
-	bool m_sceneDone;
+	Sprite* m_fade;
+
+	bool m_sceneDone = false;
 
 	float m_reactionTimer = 0.0f;
 	float m_reactionTime = 5.0f;
+
+	float m_timer = 0.0f;
+	float m_time = 2.0f;
+
+	float alpha = 0.0f;
+
+	SoundSystem m_tSoundSystem;
 
 private:
 };
