@@ -102,9 +102,7 @@ private:
 
 	// Jumping and Gravity
 	const float GRAVITY = 1000.0f; // Pixels per second squared
-	const float JUMP_FORCE = 550.0f; 
-	
-	// Oxygen 
+
 	float m_oxygen;
 	float m_oxygenTimer;
 	int m_depth;

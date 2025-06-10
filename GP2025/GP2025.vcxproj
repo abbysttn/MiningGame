@@ -144,7 +144,9 @@
   <ItemGroup>
     <ClCompile Include="animatedsprite.cpp" />
     <ClCompile Include="block.cpp" />
+    <ClCompile Include="cutsceneplayer.cpp" />
     <ClCompile Include="entity.cpp" />
+    <ClCompile Include="fallingrocks.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gameobjectpool.cpp" />
@@ -178,6 +180,7 @@
     <ClCompile Include="spider.cpp" />
     <ClCompile Include="spiderstate.cpp" />
     <ClCompile Include="sprite.cpp" />
+    <ClCompile Include="startcutscene.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="texturemanager.cpp" />
     <ClCompile Include="ui.cpp" />
@@ -190,7 +193,9 @@
     <ClInclude Include="animatedsprite.h" />
     <ClInclude Include="block.h" />
     <ClInclude Include="collisionhelper.h" />
+    <ClInclude Include="cutsceneplayer.h" />
     <ClInclude Include="entity.h" />
+    <ClInclude Include="fallingrocks.h" />
     <ClInclude Include="font.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gameobject.h" />
@@ -229,6 +234,7 @@
     <ClInclude Include="spider.h" />
     <ClInclude Include="spiderstate.h" />
     <ClInclude Include="sprite.h" />
+    <ClInclude Include="startcutscene.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="texturemanager.h" />
     <ClInclude Include="ui.h" />

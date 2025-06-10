@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <iostream>
 
-const int LOADING_INDEX = 3;
+const int LOADING_INDEX = 4;
 
 SceneTitlescreen::SceneTitlescreen(FMOD::System* fmodSystem)
 	: m_pStartBtnTexture(nullptr)

@@ -18,6 +18,7 @@
 #include "scenetitlescreen.h"
 #include "SceneSplashScreenAUT.h"
 #include "SceneSplashScreenFMOD.h"
+#include "startcutscene.h"
 #include "sceneloadingscreen.h"
 
 // Static Members:
@@ -89,8 +90,8 @@ void Game::Quit()
 
 bool Game::Initialise()
 {
-	bbWidth = 1000;
-	bbHeight = 800;
+	bbWidth = 960;
+	bbHeight = 540;
 
 	m_pRenderer = new Renderer();
 	if (!m_pRenderer->Initialise(false, (int)bbWidth, (int)bbHeight))
@@ -137,6 +138,15 @@ bool Game::Initialise()
 		return false;
 	}
 	m_scenes.push_back(pSplashSceneFMOD);
+
+	//start cutscene
+	Scene* pStartCutscene = new StartCutscene();
+	if (!pStartCutscene->Initialise(*m_pRenderer)) {
+		LogManager::GetInstance().Log("Start Cutscene failed to load!");
+		delete pStartCutscene;
+		return false;
+	}
+	m_scenes.push_back(pStartCutscene);
 
 	// Titlescreen stuffz
 	Scene* pTitleScene = new SceneTitlescreen(m_pFMODSystem);
@@ -253,10 +263,11 @@ void Game::Process(float deltaTime)
 	* Scenes Order
 	* AUT Splash = 0
 	* FMOD Splash = 1
-	* Title screen = 2
+	* Cutscene = 2
+	* Title screen = 3
 	* (Instructions scene)
-	* Loading Screen = 3
-	* Main Scene = 4
+	* Loading Screen = 4
+	* Main Scene = 5
 	*/
 
 	if (m_iCurrentScene == 0)
@@ -273,12 +284,21 @@ void Game::Process(float deltaTime)
 		SceneSplashScreenFMOD* fmodSplash = dynamic_cast<SceneSplashScreenFMOD*>(m_scenes[m_iCurrentScene]);
 		if (fmodSplash && fmodSplash->IsFinished())
 		{
-			SetCurrentScene(2); // Move to title screen
+			SetCurrentScene(2); // Move to cutscene
+		}
+	}
+
+	else if (m_iCurrentScene == 2)
+	{
+		StartCutscene* cutscene = dynamic_cast<StartCutscene*>(m_scenes[m_iCurrentScene]);
+		if (cutscene && cutscene->IsFinished())
+		{
+			SetCurrentScene(3); // Move to Title
 		}
 	}
 
 	// loading screen
-	else if (m_iCurrentScene == 3)
+	else if (m_iCurrentScene == 4)
 	{
 		SceneLoadingScreen* loadingScreen = dynamic_cast<SceneLoadingScreen*>(m_scenes[m_iCurrentScene]);
 		if (loadingScreen)
@@ -290,7 +310,7 @@ void Game::Process(float deltaTime)
 
 			if (loadingScreen->IsFinished())
 			{
-				SetCurrentScene(4); // Move to main scene
+				SetCurrentScene(5); // Move to main scene
 			}
 		}
 	}
@@ -379,7 +399,7 @@ void Game::SetCurrentScene(int sceneIndex)
 
 		if (m_pInputSystem)
 		{
-			if (m_iCurrentScene == 2)
+			if (m_iCurrentScene == 3)
 			{
 				m_pInputSystem->ShowMouseCursor(true);
 				m_pInputSystem->SetRelativeMode(false);
