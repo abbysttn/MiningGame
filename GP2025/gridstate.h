@@ -45,7 +45,7 @@ public:
 	int GetGem() const { return m_gemCount; }
 
 	void SetPlayer(Player* player) { m_pPlayer = player; }
-
+	void IsPlayerTouchingFood(const Vector2& playerPosition, float bgWidth, float bgHeight, float rendererHeight);
 
 	bool CheckBlockDig();
 	bool CheckBlockBreak();
@@ -73,7 +73,7 @@ protected:
 	Vector2 m_lastBrokenPos;
 
 	bool m_touchingHazard;
-	bool m_touchingFood;
+
 
 	bool update1 = true;
 
@@ -88,6 +88,7 @@ private:
 	bool m_digBlock;
 	bool m_breakBlock;
 	int m_lastBlockType;
+	bool m_touchingFood;
 };
 
 #endif // !__GRIDSTATE_H__
