@@ -109,7 +109,7 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 	m_pTitleSprite->SetY(static_cast<int>(m_screenHeight * m_titleTopMargin));
 
 	// Font
-	const char* fontFilename = "../game/silkscreen.ttf";
+	const char* fontFilename = "../assets/fonts/joystix.otf";
 	int buttonFontSize = 38;
 
 	m_pButtonFont = new Font(fontFilename, buttonFontSize);

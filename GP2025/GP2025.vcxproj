@@ -167,6 +167,9 @@
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="particlesystem.cpp" />
     <ClCompile Include="quadtree.cpp" />
+    <ClCompile Include="scenecontrollercontrols.cpp" />
+    <ClCompile Include="scenecontrolsmenu.cpp" />
+    <ClCompile Include="scenekeyboardcontrols.cpp" />
     <ClCompile Include="sceneloadingscreen.cpp" />
     <ClCompile Include="scenemain.cpp" />
     <ClCompile Include="player.cpp" />
@@ -226,6 +229,9 @@
     <ClInclude Include="resourcetype.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="scenecheckerboards.h" />
+    <ClInclude Include="scenecontrollercontrols.h" />
+    <ClInclude Include="scenecontrolsmenu.h" />
+    <ClInclude Include="scenekeyboardcontrols.h" />
     <ClInclude Include="sceneloadingscreen.h" />
     <ClInclude Include="scenemain.h" />
     <ClInclude Include="scenepausescreen.h" />
