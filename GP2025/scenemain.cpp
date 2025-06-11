@@ -260,7 +260,6 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     if (escapeState == BS_PRESSED || xboxBackState == BS_PRESSED)
     {
         m_paused = true;
-        std::cout << "Escape pressed" << std::endl;
         Game::GetInstance().SetCurrentScene(0);
     }
 
@@ -422,15 +421,13 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
             if (station.IsPlayerInRange(m_pPlayer->GetPosition(), static_cast<float>(m_pMineBackground->GetWidth()), static_cast<float>(m_pMineBackground->GetHeight()), static_cast<float>(m_pRenderer->GetHeight())))
             {
                 m_showUpgradePrompt = true;
-                if (inputSystem.GetKeyState(SDL_SCANCODE_E) == BS_PRESSED
-                    || (inputSystem.GetNumberOfControllersAttached() > 0 && inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_X) == BS_PRESSED))
-                {
+
                     m_upgradeManager.OpenMenu();
                     m_pActiveUpgradeStation = &station;
                     m_isUpgradeMenuUIVisible = true;
                     Game::GetInstance().m_pInputSystem->ShowMouseCursor(true);
                     break;
-                }
+
             }
         }
     }
