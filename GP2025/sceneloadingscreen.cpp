@@ -93,7 +93,7 @@ bool SceneLoadingScreen::Initialise(Renderer& renderer)
     return true;
 }
 
-void SceneLoadingScreen::OnEnter()
+void SceneLoadingScreen::OnEnter(bool reset)
 {
     m_fTimer = 0.0f;
     m_fDisplayStateTimer = 0.0f;

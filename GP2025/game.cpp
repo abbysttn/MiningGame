@@ -429,9 +429,16 @@ void Game::SetCurrentScene(int sceneIndex)
 {
 	if (sceneIndex >= 0 && sceneIndex < static_cast<int>(m_scenes.size()))
 	{
+		if (m_iCurrentScene == 3) {
+			m_isGamePaused = false;
+		}
+		else if (m_iCurrentScene == 7) {
+			m_isGamePaused = true;
+		}
+
 		m_scenes[m_iCurrentScene]->OnExit();
 		m_iCurrentScene = sceneIndex;
-		m_scenes[m_iCurrentScene]->OnEnter();
+		m_scenes[m_iCurrentScene]->OnEnter(!m_isGamePaused);
 
 
 		SceneMain* mainScene = dynamic_cast<SceneMain*>(m_scenes[m_iCurrentScene]);

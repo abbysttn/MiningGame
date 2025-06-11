@@ -22,7 +22,7 @@ public:
 
 	virtual bool IsInitialised() const { return m_bIsInitialised; }
 
-	virtual void OnEnter() {};   //when scene becomes active
+	virtual void OnEnter(bool reset) {};   //when scene becomes active
 	virtual void OnExit() {};
 
 protected:

@@ -136,6 +136,9 @@ void EndCutscene::Process(float deltaTime, InputSystem& inputSystem)
 
 		if (m_rockTimer >= m_rockTime) {
 			m_rocks->SetFalling(true);
+
+			if (!m_rocksFallen) m_tSoundSystem.PlaySound("fall");
+
 			m_rocksFallen = true;
 		}
 
@@ -198,7 +201,7 @@ void EndCutscene::DebugDraw()
 {
 }
 
-void EndCutscene::OnEnter()
+void EndCutscene::OnEnter(bool reset)
 {
 	m_tSoundSystem.PlaySound("bgm");
 }

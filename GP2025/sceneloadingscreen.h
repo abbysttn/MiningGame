@@ -36,7 +36,7 @@ public:
     virtual void Draw(Renderer& renderer);
     virtual void DebugDraw();
 
-    virtual void OnEnter(); 
+    virtual void OnEnter(bool reset); 
 
     bool IsFinished() const;
     void SetActualLoadingComplete(bool complete);

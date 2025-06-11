@@ -142,6 +142,8 @@ void GridState::ResetGrid()
 	m_dirtCount = 0;
 	m_gemCount = 0;
 	m_stoneCount = 0;
+
+	update1 = true;
 }
 
 void GridState::ProcessGrid(float deltaTime, InputSystem& inputSystem)
@@ -266,4 +268,9 @@ bool GridState::SpiderSpawn()
 Vector2 GridState::GetBlockSize()
 {
 	return m_gameGrid->GetBlockSize();
+}
+
+void GridState::SetMiningStrength(int strength)
+{
+	m_gameGrid->SetMiningStrength(strength);
 }

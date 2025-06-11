@@ -7,6 +7,8 @@
 #include "inlinehelper.h"
 #include "logmanager.h"
 
+#include <algorithm>
+
 #include <string>
 #include <cmath>
 
@@ -31,6 +33,8 @@ bool Block::Initialise(Renderer& renderer, int depth, int x)
 		m_sprite->SetBlueTint(1.0f);
 	}
 
+	m_animatingTime = CalcAnimTime(m_depth);
+
 	m_sprite->SetupFrames(8, 8);
 	m_sprite->SetLooping(false);
 	m_sprite->SetFrameDuration(m_animatingTime);
@@ -49,6 +53,9 @@ bool Block::Initialise(Renderer& renderer, int depth, int x)
 void Block::Process(float deltaTime)
 {
 	if (m_active) {
+
+		if (m_cutsceneBlock) m_animatingTime = 0.4f;
+
 		m_sprite->SetX(static_cast<int>(m_position.x));
 		m_sprite->SetY(static_cast<int>(m_position.y));
 
@@ -197,8 +204,45 @@ void Block::SetCutsceneBlock(bool isCutscene)
 	m_cutsceneBlock = isCutscene;
 }
 
+float Block::CalcAnimTime(int depth)
+{
+	float baseTime = 0.2f;
+
+	switch (m_blockType) {
+	case 'D': // Dirt
+		baseTime = 0.4f;
+		break;
+	case 'S': // Stone
+		baseTime = 0.5f;
+		break;
+	case 'G': // Gem
+		baseTime = 0.7f;
+		break;
+	case 'O': // Oxygen
+		baseTime = 0.25f;
+		break;
+	}
+
+	float effectiveStrength = std::max(1.0f, (float)m_strength);
+
+	float calculatedTime = (baseTime + (depth * depthMultiplier)) / effectiveStrength;
+
+	calculatedTime = std::max(minTime, calculatedTime);
+
+	return std::max(minTime, calculatedTime);
+}
+
+void Block::SetStrength(int strength)
+{
+	m_strength = strength;
+
+	m_animatingTime = CalcAnimTime(m_depth);
+}
+
 void Block::GetBlockType(int& depth, const char*& filepath, int x)
 {
+
+
 	if (!m_cutsceneBlock) {
 
 		if (depth <= 0 && (x <= 4 || x >= 15)) {
