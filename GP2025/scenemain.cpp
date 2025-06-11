@@ -506,8 +506,8 @@ void SceneMain::Draw(Renderer& renderer)
     if (m_isUpgradeMenuUIVisible && m_upgradeManager.IsMenuOpen()) 
     {
 
-        ImGui::SetNextWindowPos(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.07f, static_cast<float>(m_pRenderer->GetHeight()) * 0.24f), ImGuiCond_Always);  // fixed position
-        ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.13f, static_cast<float>(m_pRenderer->GetWidth()) * 0.15f), ImGuiCond_Always); // fixed size
+        ImGui::SetNextWindowPos(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.00f, static_cast<float>(m_pRenderer->GetHeight()) * 0.28f), ImGuiCond_Always);  // fixed position
+        ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.27f, static_cast<float>(m_pRenderer->GetWidth()) * 0.2f), ImGuiCond_Always); // fixed size
 
         ImGui::Begin("Upgrade Station", &m_isUpgradeMenuUIVisible,
             ImGuiWindowFlags_NoMove |
@@ -565,13 +565,6 @@ void SceneMain::Draw(Renderer& renderer)
         }
 
         ImGui::Separator();
-        if (ImGui::Button("Close Menu", ImVec2(-1, 0))) 
-        {
-            m_upgradeManager.CloseMenu();
-            m_pActiveUpgradeStation = nullptr;
-            m_isUpgradeMenuUIVisible = false;
-            Game::GetInstance().m_pInputSystem->ShowMouseCursor(false);
-        }
 
         ImGui::End();
     }
