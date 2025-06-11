@@ -430,6 +430,9 @@ void Game::SetCurrentScene(int sceneIndex)
 	if (sceneIndex >= 0 && sceneIndex < static_cast<int>(m_scenes.size()))
 	{
 		m_scenes[m_iCurrentScene]->OnExit();
+
+		int prevScene = m_iCurrentScene;
+
 		m_iCurrentScene = sceneIndex;
 		m_scenes[m_iCurrentScene]->OnEnter();
 

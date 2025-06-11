@@ -426,3 +426,27 @@ void Player::HandleDeath(int deathType) {
 		break;
 	}
 }
+
+void Player::Reset()
+{
+    m_facingLeft = false;
+    m_isMining = false;
+    m_canMine = true;
+    m_instantMine = false;
+    m_infiniteResources = false;
+
+    m_speed = 400.0f;
+    m_health = 100.0f;
+    m_stamina = 100.0f;
+    m_maxStamina = 100.0f;
+    m_jumpHeightMultiplier = 1.0f;
+    m_miningStrengthLevel = 1;
+    m_oxygen = 100.0f;
+    m_oxygenTimer = 0.0f;
+
+    m_inventory[ResourceType::DIRT] = 0;
+    m_inventory[ResourceType::STONE] = 0;
+    m_inventory[ResourceType::GEM] = 0;
+
+    m_position = { 400, 300 };
+}

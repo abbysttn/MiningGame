@@ -91,6 +91,8 @@ public:
 	void SetInstantMine(bool instant) { m_instantMine = instant; }
 	bool IsInstantMine() const { return m_instantMine; }
 
+	void Reset();
+
 private:
 	float m_speed;
 	Renderer* m_pRenderer;

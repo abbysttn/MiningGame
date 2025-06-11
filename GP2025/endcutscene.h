@@ -35,8 +35,8 @@ public:
 protected:
 
 private:
-	EndCutscene(const EndCutscene& startCutScene);
-	EndCutscene& operator=(const EndCutscene& startCutScene);
+	EndCutscene(const EndCutscene& endCutScene);
+	EndCutscene& operator=(const EndCutscene& endCutScene);
 
 public:
 

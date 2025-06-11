@@ -61,6 +61,10 @@ public:
 	bool IsFinished();
 	bool GameWon();
 
+	void Reset();
+	void CleanUp();
+	void Reinitialise();
+
 private:
 	float m_tileSize;
 	int m_aboveGroundOffset = 8; // Change later to correct above ground size

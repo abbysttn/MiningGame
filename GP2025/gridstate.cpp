@@ -140,6 +140,8 @@ void GridState::ResetGrid()
 	m_dirtCount = 0;
 	m_gemCount = 0;
 	m_stoneCount = 0;
+
+	update1 = true;
 }
 
 void GridState::ProcessGrid(float deltaTime, InputSystem& inputSystem)

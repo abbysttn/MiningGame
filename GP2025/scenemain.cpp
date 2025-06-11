@@ -100,23 +100,28 @@ SceneMain::~SceneMain()
         delete m_pGemPickupSprite;
         m_pGemPickupSprite = nullptr;
     }
+
+    m_particleSystems.clear();
     
     m_soundSystem.Release();
 
 }
 
 void SceneMain::OnEnter() {
+
     m_paused = false;
     m_soundSystem.PlaySound("cavebgm");
     m_lightEventTimer = 0.0f;
     m_lightEventSkipped = false;
 
-};
+}
 
 void SceneMain::OnExit()
 {
+    Reset();
     m_soundSystem.StopSound("cavebgm");
 }
+
 void SceneMain::CheckCollision(Player* player, SpiderState* spider)
 {
     Box playerBox(m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPlayerHeight(), m_pPlayer->GetPlayerHeight());
@@ -255,13 +260,6 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
     if (inputSystem.GetNumberOfControllersAttached() > 0) {
         xboxBackState = inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_BACK);
-    }
-
-    if (escapeState == BS_PRESSED || xboxBackState == BS_PRESSED)
-    {
-        m_paused = true;
-        std::cout << "Escape pressed" << std::endl;
-        Game::GetInstance().SetCurrentScene(0);
     }
 
     // To close the Upgrade menu if its open, use ESC to close it
@@ -793,6 +791,58 @@ void SceneMain::LightEvent(float time) {
 bool SceneMain::GameWon()
 {
     return m_pPlayer->IsAtBottom();
+}
+
+void SceneMain::Reset()
+{
+    CleanUp();
+
+    Reinitialise();
+}
+
+void SceneMain::CleanUp()
+{
+    GridState::GetInstance().ResetGrid();
+
+    m_particleSystems.clear();
+}
+
+void SceneMain::Reinitialise()
+{
+    LogManager::GetInstance().Log("Resetting SceneMain...");
+
+
+    float scaleX = static_cast<float>(m_pRenderer->GetWidth()) / m_pMineBackground->GetWidth();
+    float scaleY = static_cast<float>(m_pRenderer->GetHeight()) / m_pMineBackground->GetHeight();
+    float scale = std::max(scaleX, scaleY);
+    float scaledHeight = m_pMineBackground->GetHeight() * scale;
+
+    GridState::GetInstance().CreateGrid(*m_pRenderer, scaledHeight, true);
+
+    m_lightEventInterval = 69.0f;
+    m_lightEventTimer = 0.0f;
+    m_pVisionLevel = 1;
+    m_lightOn = true;
+    m_visionLevels = { 1.0f, 1.2f, 1.3f, 1.5f, 2.0f };
+    m_dirtParticleCooldown = 1.2f;
+
+    m_pVignetteSprite->SetScale(m_pVisionLevel);
+    m_pDarkVignetteSprite->SetScale(m_pVisionLevel);
+
+    m_pPlayer->Reset();
+
+    m_playerY = static_cast<float>(m_pPlayer->GetPosition().y);
+
+    m_pRenderer->SetCameraPosition(static_cast<float>(m_screenX / 2), m_pMineBackground->GetHeight() * 0.1f);
+
+    for (size_t i = 0; i < m_testSpider->totalCount(); i++) {
+        if (GameObject* obj = m_testSpider->getObjectAtIndex(i)) {
+            SpiderState* spider = dynamic_cast<SpiderState*>(obj);
+            spider->SetActive(false);
+        }
+    }
+
+    LogManager::GetInstance().Log("SceneMain Reinitialization complete");
 }
 
 bool SceneMain::IsFinished()
