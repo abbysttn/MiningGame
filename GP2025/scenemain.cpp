@@ -797,7 +797,11 @@ void SceneMain::LightEvent(float time) {
 
 bool SceneMain::GameWon()
 {
-    return m_pPlayer->IsAtBottom();
+    bool won = m_pPlayer->IsAtBottom();
+
+    if (won) Reset();
+
+    return won;
 }
 
 void SceneMain::Reset()
