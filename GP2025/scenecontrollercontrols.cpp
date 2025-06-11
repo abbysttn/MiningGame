@@ -66,9 +66,12 @@ bool SceneControllerControls::Initialise(Renderer& renderer)
     m_pTextFont = new Font("../assets/fonts/joystix.otf", 28);
     SDL_Color textColor = { 255, 255, 255, 255 };
 
-    // Create control display lines
-    int startY = 120;
-    int spacingY = 50;
+    // Lines
+    const int numControlLines = 8;
+    const int spacingY = 50;
+    const int totalBlockHeight = numControlLines * spacingY;
+
+    int startY = static_cast<int>((m_screenHeight / 2.0f) - (totalBlockHeight / 2.0f));
 
     // Text only
     CreateControlLineWithText(renderer, *m_pTextFont, textColor, "Movement:", "Left Joystick", startY, m_controlSprites, m_controlTextures);
@@ -80,8 +83,7 @@ bool SceneControllerControls::Initialise(Renderer& renderer)
     // With icons
     CreateControlLine(renderer, *m_pTextFont, textColor, "Jump: ", { "../assets/controlsSprite/A_Button.png" }, startY + spacingY, m_controlSprites, m_controlTextures);
     CreateControlLine(renderer, *m_pTextFont, textColor, "Interact: ", { "../assets/controlsSprite/X_Button.png" }, startY + spacingY * 6, m_controlSprites, m_controlTextures);
-	// Need to change the sprite for pause (Get the start for Xbox controllers)
-    CreateControlLine(renderer, *m_pTextFont, textColor, "Pause: ", { "../assets/controlsSprite/ESC_Key.png" }, startY + spacingY * 7, m_controlSprites, m_controlTextures);
+    CreateControlLine(renderer, *m_pTextFont, textColor, "Pause: ", { "../assets/controlsSprite/Start_XboxButton.png" }, startY + spacingY * 7, m_controlSprites, m_controlTextures);
 
     // Back Button
     m_pBackBtnTexture = new Texture();

@@ -63,8 +63,11 @@ bool SceneKeyboardControls::Initialise(Renderer& renderer)
     SDL_Color textColor = { 255, 255, 255, 255 };
 
     // Create control display lines
-    int startY = 120;
-    int spacingY = 50;
+    const int numControlLines = 8;
+    const int spacingY = 50;
+    const int totalBlockHeight = numControlLines * spacingY;
+
+    int startY = static_cast<int>((m_screenHeight / 2.0f) - (totalBlockHeight / 2.0f));
 
     CreateControlLine(renderer, *m_pTextFont, textColor, "Movement: ", { "../assets/controlsSprite/W_Key.png", "../assets/controlsSprite/A_Key.png", "../assets/controlsSprite/S_Key.png", "../assets/controlsSprite/D_Key.png" }, startY, m_controlSprites, m_controlTextures);
     CreateControlLine(renderer, *m_pTextFont, textColor, "Jump: ", { "../assets/controlsSprite/Spacebar.png" }, startY + spacingY, m_controlSprites, m_controlTextures);
