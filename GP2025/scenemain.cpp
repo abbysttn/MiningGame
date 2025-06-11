@@ -140,6 +140,7 @@ void SceneMain::CheckCollision(Player* player, SpiderState* spider)
                 }
                 else {
                     spider->ApplyPushback(pushDirection);
+                    m_soundSystem.PlaySound("spiderHit");
                     m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 1.0f);
                 }
             }
@@ -167,6 +168,8 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_soundSystem.LoadSound("blockBreak", "../assets/sound/blockBreak.wav");
     m_soundSystem.LoadSound("cavebgm", "../assets/sound/cavebgm.mp3");
     m_soundSystem.LoadSound("lightflicker", "../assets/sound/lightFlicker.wav");
+    m_soundSystem.LoadSound("spiderHit", "../assets/sound/spiderHit.wav");
+    m_soundSystem.LoadSound("playerEat", "../assets/sound/playerEat.wav");
 
     m_pRenderer = &renderer;
     m_screenWidth = static_cast<float>(renderer.GetWidth());
@@ -344,6 +347,22 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     default:
 
         break;
+    }
+    //if player is eating
+    if (GridState::GetInstance().CheckFood()) {
+        float m_munchInterval = 0.5f;
+        m_munchTimer += deltaTime;
+
+
+        if (m_munchTimer >= m_munchInterval) {
+            m_munching = false;
+            m_munchTimer = 0.0f;
+        }
+        if (!m_munching) {
+            m_soundSystem.PlaySound("playerEat");
+            m_munching = true;
+        }
+
     }
 
 

@@ -115,6 +115,9 @@ private:
 
 	bool m_lightOn;
 
+	bool m_munching;
+	float m_munchTimer;
+
 	//Particle System
 	Sprite* m_pCoinSprite = nullptr;
 	Sprite* m_pDirtSprite = nullptr;

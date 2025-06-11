@@ -132,6 +132,8 @@ private:
 	AnimatedSprite* m_pJumpSprite = nullptr;
 	AnimatedSprite* m_pMineSprite = nullptr;
 
+	bool m_playerEating;
+
 	bool m_facingLeft = false;
 	bool m_isMining = false;
 	bool m_canMine = true;
