@@ -7,6 +7,8 @@
 #include "renderer.h"
 #include "sprite.h"
 
+#include <cmath>
+
 Grid::Grid() : m_tileSize(48.0f), m_grid(nullptr) {}
 
 Grid::~Grid()
@@ -29,6 +31,8 @@ bool Grid::Initialise(Renderer& renderer)
 
 	screenOffsetX = ((screenWidth - levelPixelWidth) / 2.0f) + (m_tileSize / 2.0f);
 	screenOffsetY = (m_backgroundHeight / 7.05f);
+
+	m_rows = static_cast<int>(roundf((m_backgroundHeight - screenOffsetY) / m_tileSize)) + 1;
 
 	if (m_isRegular) {
 
@@ -171,6 +175,17 @@ Vector2 Grid::GetRockEndPos()
 void Grid::SetMiningStrength(int strength)
 {
 	m_miningStrength = strength;
+
+	for (size_t i = 0; i < m_grid->totalCount(); i++) {
+		if (GameObject* obj = m_grid->getObjectAtIndex(i)) {
+			if (obj && dynamic_cast<Block*>(obj)) {
+				Block* block = dynamic_cast<Block*>(obj);
+				if (block->IsActive()) {
+					block->SetStrength(m_miningStrength);
+				}
+			}
+		}
+	}
 }
 
 bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)

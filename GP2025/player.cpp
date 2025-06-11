@@ -427,6 +427,12 @@ void Player::HandleDeath(int deathType) {
 	}
 }
 
+void Player::SetMiningStrengthLevel(int level)
+{
+    m_miningStrengthLevel = level;
+    GridState::GetInstance().SetMiningStrength(m_miningStrengthLevel);
+}
+
 void Player::Reset()
 {
     m_facingLeft = false;

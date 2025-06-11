@@ -33,7 +33,7 @@ bool Block::Initialise(Renderer& renderer, int depth, int x)
 		m_sprite->SetBlueTint(1.0f);
 	}
 
-	m_animatingTime = CalcAnimTime(depth);
+	m_animatingTime = CalcAnimTime(m_depth);
 
 	m_sprite->SetupFrames(8, 8);
 	m_sprite->SetLooping(false);
@@ -53,6 +53,9 @@ bool Block::Initialise(Renderer& renderer, int depth, int x)
 void Block::Process(float deltaTime)
 {
 	if (m_active) {
+
+		if (m_cutsceneBlock) m_animatingTime = 0.4f;
+
 		m_sprite->SetX(static_cast<int>(m_position.x));
 		m_sprite->SetY(static_cast<int>(m_position.y));
 
@@ -220,8 +223,20 @@ float Block::CalcAnimTime(int depth)
 		break;
 	}
 
-	float calculatedTime = (baseTime + (depth * depthMultiplier)) * m_strength;
+	float effectiveStrength = std::max(1.0f, (float)m_strength);
+
+	float calculatedTime = (baseTime + (depth * depthMultiplier)) / effectiveStrength;
+
+	calculatedTime = std::max(minTime, calculatedTime);
+
 	return std::max(minTime, calculatedTime);
+}
+
+void Block::SetStrength(int strength)
+{
+	m_strength = strength;
+
+	m_animatingTime = CalcAnimTime(m_depth);
 }
 
 void Block::GetBlockType(int& depth, const char*& filepath, int x)

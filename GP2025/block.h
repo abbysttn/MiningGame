@@ -40,9 +40,8 @@ public:
 	bool IsFood();
 	void SetCutsceneBlock(bool isCutscene);
 
-	void UpdateBreakingSpeed();
-
 	float CalcAnimTime(int depth);
+	void SetStrength(int strength);
 
 protected:
 	void GetBlockType(int& depth, const char*& filepath, int x);
@@ -75,7 +74,7 @@ protected:
 	int m_strength = 1;
 
 	const float minTime = 0.1f;
-	const float depthMultiplier = 0.01f;
+	const float depthMultiplier = 0.05f;
 
 	float m_animatingTime = 0.5f;
 	float m_currentTime = 0.0f;
