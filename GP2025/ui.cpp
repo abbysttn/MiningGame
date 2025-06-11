@@ -50,7 +50,7 @@ void UI::Update(Player* player, Renderer* renderer, float deltaTime)
 	}
 
 	// HEALTH, STAMINA, OXYGEN BARS
-	healthPercent = static_cast<float>(player->GetHealth()) / 100.0f; 
+	healthPercent = static_cast<float>(player->GetCurrentHealth()) / player->GetMaxHealth(); 
 	staminaPercent = static_cast<float>(player->GetCurrentStamina()) / player->GetMaxStamina(); 
 	oxygenPercent = static_cast<float>(player->GetOxygen()) / 100.0f;
 

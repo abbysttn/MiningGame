@@ -140,7 +140,7 @@ void SceneMain::CheckCollision(Player* player, SpiderState* spider)
                 }
                 else {
                     spider->ApplyPushback(pushDirection);
-                    m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 1.0f);
+                    m_pPlayer->SetCurrentHealth(m_pPlayer->GetCurrentHealth() - 1.0f);
                 }
             }
         }
@@ -291,6 +291,12 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         return;
     }
 
+	// Sets the vision level based on the player's headlamp level
+    if (m_pPlayer && (int)m_pVisionLevel != m_pPlayer->GetHeadlampLevel())
+    {
+        SetVisionLevel(m_pPlayer->GetHeadlampLevel());
+    }
+
     if (m_pPlayer)
     {
         if (!m_upgradeManager.IsMenuOpen() ||
@@ -301,8 +307,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
 
         if (m_godMode) {
-            m_pPlayer->SetHealth(100.0f);
-            m_pPlayer->SetCurrentStamina(100.0f);
+            m_pPlayer->SetCurrentHealth(1000.0f);
+            m_pPlayer->SetCurrentStamina(1000.0f);
             m_pPlayer->AddOxygen(100.0f);
         }
 
@@ -757,10 +763,15 @@ void SceneMain::DebugFunctions(InputSystem& inputSystem) {
     }
 }
 
-void SceneMain::SetVisionLevel(int level) {
-    m_pVisionLevel = (float)level;
-    float newScale = m_visionLevels[level-1];
-    m_pVignetteSprite->SetScale(newScale);
+void SceneMain::SetVisionLevel(int level) 
+{
+    if (level > 0 && level <= m_visionLevels.size())
+    {
+        m_pVisionLevel = (float)level;
+        float newScale = m_visionLevels[level - 1];
+        m_pVignetteSprite->SetScale(newScale);
+        m_pDarkVignetteSprite->SetScale(newScale);
+    }
 }
 
 void SceneMain::LightEvent(float time) {
