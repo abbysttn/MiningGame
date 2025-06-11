@@ -7,6 +7,8 @@
 #include "inlinehelper.h"
 #include "logmanager.h"
 
+#include <algorithm>
+
 #include <string>
 #include <cmath>
 
@@ -30,6 +32,8 @@ bool Block::Initialise(Renderer& renderer, int depth, int x)
 		m_sprite->SetGreenTint(0.3f);
 		m_sprite->SetBlueTint(1.0f);
 	}
+
+	m_animatingTime = CalcAnimTime(depth);
 
 	m_sprite->SetupFrames(8, 8);
 	m_sprite->SetLooping(false);
@@ -197,8 +201,33 @@ void Block::SetCutsceneBlock(bool isCutscene)
 	m_cutsceneBlock = isCutscene;
 }
 
+float Block::CalcAnimTime(int depth)
+{
+	float baseTime = 0.2f;
+
+	switch (m_blockType) {
+	case 'D': // Dirt
+		baseTime = 0.4f;
+		break;
+	case 'S': // Stone
+		baseTime = 0.5f;
+		break;
+	case 'G': // Gem
+		baseTime = 0.7f;
+		break;
+	case 'O': // Oxygen
+		baseTime = 0.25f;
+		break;
+	}
+
+	float calculatedTime = (baseTime + (depth * depthMultiplier)) * m_strength;
+	return std::max(minTime, calculatedTime);
+}
+
 void Block::GetBlockType(int& depth, const char*& filepath, int x)
 {
+
+
 	if (!m_cutsceneBlock) {
 
 		if (depth <= 0 && (x <= 4 || x >= 15)) {

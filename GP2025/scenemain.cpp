@@ -107,18 +107,18 @@ SceneMain::~SceneMain()
 
 }
 
-void SceneMain::OnEnter() {
+void SceneMain::OnEnter(bool reset) {
 
     m_paused = false;
     m_soundSystem.PlaySound("cavebgm");
     m_lightEventTimer = 0.0f;
     m_lightEventSkipped = false;
 
+    if (reset) Reset();
 }
 
 void SceneMain::OnExit()
 {
-    Reset();
     m_soundSystem.StopSound("cavebgm");
 }
 

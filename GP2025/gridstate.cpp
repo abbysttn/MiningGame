@@ -250,3 +250,8 @@ Vector2 GridState::GetBlockSize()
 {
 	return m_gameGrid->GetBlockSize();
 }
+
+void GridState::SetMiningStrength(int strength)
+{
+	m_gameGrid->SetMiningStrength(strength);
+}

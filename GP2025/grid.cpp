@@ -168,6 +168,11 @@ Vector2 Grid::GetRockEndPos()
 	return m_fallingEnd;
 }
 
+void Grid::SetMiningStrength(int strength)
+{
+	m_miningStrength = strength;
+}
+
 bool Grid::InitObjects(Renderer& renderer, size_t x, size_t y)
 {
 	int spriteIndex = y * m_cols + x;

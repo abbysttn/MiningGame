@@ -24,7 +24,7 @@ public:
 	virtual void Draw(Renderer& renderer);
 	virtual void DebugDraw();
 
-	void OnEnter();
+	void OnEnter(bool reset);
 	void OnExit();
 
 private:

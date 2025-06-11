@@ -47,7 +47,7 @@ public:
 
 	int GetBackgroundHeight();
 
-	void OnEnter() override;
+	void OnEnter(bool reset) override;
 	void OnExit() override;
 
 	void CheckCollision(Player* player, SpiderState* spider);
@@ -66,6 +66,7 @@ public:
 	void Reinitialise();
 
 private:
+
 	float m_tileSize;
 	int m_aboveGroundOffset = 8; // Change later to correct above ground size
 

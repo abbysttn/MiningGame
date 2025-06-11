@@ -201,7 +201,7 @@ void EndCutscene::DebugDraw()
 {
 }
 
-void EndCutscene::OnEnter()
+void EndCutscene::OnEnter(bool reset)
 {
 	m_tSoundSystem.PlaySound("bgm");
 }

@@ -64,7 +64,7 @@ ScenePauseScreen::~ScenePauseScreen()
 	m_pSoundSystem.Release();
 }
 
-void ScenePauseScreen::OnEnter()
+void ScenePauseScreen::OnEnter(bool reset)
 {
 	Game::GetInstance().m_pInputSystem->ShowMouseCursor(true);
 }

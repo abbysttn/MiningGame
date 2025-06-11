@@ -27,7 +27,7 @@ public:
 	virtual void Draw(Renderer& renderer);
 	virtual void DebugDraw();
 
-	void OnEnter() override;
+	void OnEnter(bool reset) override;
 	void OnExit() override;
 
 	bool IsFinished();

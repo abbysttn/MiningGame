@@ -65,13 +65,13 @@ SceneTitlescreen::~SceneTitlescreen()
 	m_tSoundSystem.Release();
 }
 
-void SceneTitlescreen::OnEnter() 
+void SceneTitlescreen::OnEnter(bool reset)
 {
 	m_tSoundSystem.PlaySound("bgm");
 
 }
 
-void SceneTitlescreen::OnExit() 
+void SceneTitlescreen::OnExit()
 {
 	m_tSoundSystem.StopSound("bgm");
 
