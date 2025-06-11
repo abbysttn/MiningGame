@@ -257,7 +257,7 @@ bool GridState::IsBlockBroken()
 
 bool GridState::SpiderSpawn()
 {
-	if (m_brokenBlockTile < 1) return false;
+	if (m_brokenBlockTile < 10) return false;
 
 	float spawnChance = 0.05f;
 
