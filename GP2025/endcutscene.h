@@ -27,7 +27,7 @@ public:
 	virtual void Draw(Renderer& renderer);
 	virtual void DebugDraw();
 
-	void OnEnter() override;
+	void OnEnter(bool reset) override;
 	void OnExit() override;
 
 	bool IsFinished();
@@ -35,8 +35,8 @@ public:
 protected:
 
 private:
-	EndCutscene(const EndCutscene& startCutScene);
-	EndCutscene& operator=(const EndCutscene& startCutScene);
+	EndCutscene(const EndCutscene& endCutScene);
+	EndCutscene& operator=(const EndCutscene& endCutScene);
 
 public:
 

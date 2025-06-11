@@ -56,6 +56,8 @@ public:
 
 	Vector2 GetBlockSize();
 
+	void SetMiningStrength(int strength);
+
 protected:
 
 private:

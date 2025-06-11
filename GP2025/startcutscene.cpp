@@ -80,6 +80,7 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 {
 	m_player->SetColour(0.8f, 1.0f, 0.8f);
 
+	m_grid->SetMiningStrength(5);
 	m_grid->Process(deltaTime, inputSystem);
 
 	m_rocks->Process(deltaTime, inputSystem);
@@ -169,7 +170,7 @@ void StartCutscene::DebugDraw()
 {
 }
 
-void StartCutscene::OnEnter()
+void StartCutscene::OnEnter(bool reset)
 {
 	m_tSoundSystem.PlaySound("bgm");
 }

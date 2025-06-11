@@ -83,13 +83,15 @@ public:
 
 	// Mining strength
 	int GetMiningStrengthLevel() const { return m_miningStrengthLevel; }
-	void SetMiningStrengthLevel(int level) { m_miningStrengthLevel = level; }
+	void SetMiningStrengthLevel(int level);
 
 	void SetInfiniteResources(bool infinite) { m_infiniteResources = infinite; }
 	bool IsInfiniteResources() const { return m_infiniteResources; }
 
 	void SetInstantMine(bool instant) { m_instantMine = instant; }
 	bool IsInstantMine() const { return m_instantMine; }
+
+	void Reset();
 
 private:
 	float m_speed;

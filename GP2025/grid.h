@@ -45,6 +45,8 @@ public:
 	Vector2 GetRockStartPos();
 	Vector2 GetRockEndPos();
 
+	void SetMiningStrength(int strength);
+
 
 protected:
 	bool InitObjects(Renderer& renderer, size_t x, size_t y);
@@ -72,6 +74,8 @@ private:
 
 	float screenOffsetX;
 	float screenOffsetY;
+
+	int m_miningStrength = 1;
 
 	Vector2 m_blockSize;
 

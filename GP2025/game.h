@@ -61,6 +61,8 @@ public:
 	InputSystem* m_pInputSystem;
 
 protected:
+	bool m_isGamePaused;
+
 	static Game* sm_pInstance;
 	Renderer* m_pRenderer;
 	Sprite* m_pCheckerboard;
