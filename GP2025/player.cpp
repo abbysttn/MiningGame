@@ -17,10 +17,12 @@
 Player::Player()
     : m_speed(400.0f)
     , m_health(100.0f)
+	, m_maxHealth(100.0f)
 	, m_stamina(100.0f)
 	, m_maxStamina(100.0f)
     , m_jumpHeightMultiplier(1.0f)
 	, m_miningStrengthLevel(1)
+	, m_headlampLevel(1)
     , m_oxygen(100.0f)
     , m_oxygenTimer(0.0f)
 {
@@ -361,6 +363,16 @@ bool Player::IsAtBottom()
     return m_position.y >= maxHeight;
 }
 
+void Player::SetMaxHealth(float newMaxHealth)
+{
+    m_maxHealth = newMaxHealth;
+
+    if (m_health > m_maxHealth)
+    {
+        m_health = m_maxHealth;
+    }
+}
+
 void Player::SetMaxStamina(float newMaxStamina) 
 {
     m_maxStamina = newMaxStamina;
@@ -443,10 +455,12 @@ void Player::Reset()
 
     m_speed = 400.0f;
     m_health = 100.0f;
+	m_maxHealth = 100.0f;
     m_stamina = 100.0f;
     m_maxStamina = 100.0f;
     m_jumpHeightMultiplier = 1.0f;
     m_miningStrengthLevel = 1;
+	m_headlampLevel = 1;
     m_oxygen = 100.0f;
     m_oxygenTimer = 0.0f;
 

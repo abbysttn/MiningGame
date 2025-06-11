@@ -114,9 +114,55 @@ void UpgradeManager::DefineUpgrades()
         }
     });
 
-	// Oxygen Upgrade
+	// Headlamp Upgrade
+    m_availableUpgrades.push_back(Upgrade
+    {
+        "headlamp",          // ID
+        "Headlamp",          // Display Name
+        3,                   // Max Level
+        [](int targetLevel) -> UpgradeCost
+        {
+            // Base cost for first upgrade
+            if (targetLevel <= 1) return {ResourceType::GEM, 3};
+            return {ResourceType::GEM, 3 + (2 * (targetLevel - 2))};
+        },
+        [this](Player& player, int newLevel)
+        {
+            player.SetHeadlampLevel(newLevel + 1);
+            m_statusMessage = "Headlamp upgraded to Lvl " + std::to_string(newLevel) + "!";
+        },
+        [](int currentLevel, int costAmount, const std::string& costType) -> std::string
+        {
+            float currentVisibility = 1.0f + (currentLevel * 0.15f);
+            if (currentLevel == 0) return "Improves your headlamp to see further in the dark.";
+            return "Increases your light radius. Next level provides even more visibility.";
+        }
+    });
 
     // Health Upgrade
+    m_availableUpgrades.push_back(Upgrade
+        {
+            "max_health",        // ID
+            "Max Health",        // Display Name
+            5,                   // Max Level
+            [](int targetLevel) -> UpgradeCost
+            {
+                return {ResourceType::DIRT, 10 + (5 * targetLevel)};
+            },
+            [this](Player& player, int newLevel)
+            {
+                float baseMaxHealth = 100.0f;
+                float newUpgradedHealth = baseMaxHealth + ((float)newLevel * 25.0f);
+                player.SetMaxHealth(newUpgradedHealth);
+                player.SetCurrentHealth(player.GetMaxHealth());
+                m_statusMessage = "Max Health upgraded to " + std::to_string(static_cast<int>(player.GetMaxHealth())) + "!";
+            },
+            [](int currentLevel, int costAmount, const std::string& costType) -> std::string
+            {
+                if (currentLevel == 0) return "Increases your maximum health for those pesky spiders!!";
+                return "Current Max Health: " + std::to_string(static_cast<int>(100.0f + currentLevel * 25.0f)) + ". Next level increases max health by 25.";
+            }
+        });
 }
 
 void UpgradeManager::SyncUpgradeLevelsWithPlayer() 
@@ -156,6 +202,24 @@ void UpgradeManager::SyncUpgradeLevelsWithPlayer()
                 upgrade.currentLevel = 0;
             }
         }
+        else if (upgrade.id == "headlamp")
+        {
+            upgrade.currentLevel = m_player->GetHeadlampLevel() - 1;
+        }
+        else if (upgrade.id == "max_health")
+        {
+            float baseMaxHealth = 100.0f;
+            float incrementPerLevel = 20.0f;
+            if (m_player->GetMaxHealth() > baseMaxHealth && incrementPerLevel > 0)
+            {
+                upgrade.currentLevel = static_cast<int>(round((m_player->GetMaxHealth() - baseMaxHealth) / incrementPerLevel));
+            }
+            else
+            {
+                upgrade.currentLevel = 0;
+            }
+        }
+
         // Ensure levels are within bounds
         if (upgrade.currentLevel < 0) upgrade.currentLevel = 0;
         if (upgrade.currentLevel > upgrade.maxLevel) upgrade.currentLevel = upgrade.maxLevel;
