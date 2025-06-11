@@ -315,6 +315,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
     LightEvent(deltaTime);
     DebugFunctions(inputSystem);
 
+
+    GridState::GetInstance().IsPlayerTouchingFood(m_pPlayer->GetPosition(), static_cast<float>(m_pMineBackground->GetWidth()), static_cast<float>(m_pMineBackground->GetHeight()), static_cast<float>(m_pRenderer->GetHeight()));
     float pX = m_pPlayer->GetPosition().x;
     float pY = m_pPlayer->GetPosition().y;
     Vector2 pPos = Vector2(pX, pY);

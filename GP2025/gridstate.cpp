@@ -14,6 +14,8 @@
 #include <cmath>
 #include "inlinehelper.h"
 
+#include <iostream>
+
 void GridState::CreateGrid(Renderer& renderer, float backgroundScale, bool isRegular)
 {
 	m_gameGrid = new Grid();
@@ -186,6 +188,23 @@ bool GridState::CheckCollision(Box& box)
 	}
 
 	return false;
+}
+
+void GridState::IsPlayerTouchingFood(const Vector2& playerPosition, float bgWidth, float bgHeight, float rendererHeight){
+	float rightBoundary = bgWidth * 0.75f;
+	float topBoundary = rendererHeight * 0.74f;
+
+
+	if (playerPosition.x >= rightBoundary && playerPosition.y <= topBoundary) {
+		m_touchingFood = true;
+
+	}
+	else {
+		m_touchingFood = false;
+	}
+
+
+
 }
 
 bool GridState::CheckHazards()
