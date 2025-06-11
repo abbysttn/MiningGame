@@ -19,12 +19,15 @@
 // Imgui
 #include "imgui/imgui.h"
 
-const int MAIN_SCENE_INDEX = 5;
 const int TITLE_SCENE_INDEX = 3;
+const int MAIN_SCENE_INDEX = 5;
+const int CONTROLS_SCENE_INDEX = 8;
 
 ScenePauseScreen::ScenePauseScreen()
 	: m_pResumeBtnTexture(nullptr)
 	, m_pResumeBtnSprite(nullptr)
+	, m_pControlsBtnTexture(nullptr)
+	, m_pControlsBtnSprite(nullptr)
 	, m_pToTitleBtnTexture(nullptr)
 	, m_pToTitleBtnSprite(nullptr)
 	, m_pExitBtnTexture(nullptr)
@@ -32,6 +35,7 @@ ScenePauseScreen::ScenePauseScreen()
 	, m_pBackgroundSprite(nullptr)
 	, m_pButtonFont(nullptr)
 	, m_bisMouseOverResume(false)
+	, m_bisMouseOverControls(false)
 	, m_bisMouseOverToTitle(false)
 	, m_bisMouseOverExit(false)
 	, m_screenWidth(0.0f)
@@ -43,6 +47,8 @@ ScenePauseScreen::~ScenePauseScreen()
 {
 	delete m_pResumeBtnSprite;
 	m_pResumeBtnSprite = nullptr;
+	delete m_pControlsBtnSprite;
+	m_pControlsBtnSprite = nullptr;
 	delete m_pToTitleBtnSprite;
 	m_pToTitleBtnSprite = nullptr;
 	delete m_pExitBtnSprite;
@@ -53,6 +59,8 @@ ScenePauseScreen::~ScenePauseScreen()
 
 	delete m_pResumeBtnTexture;
 	m_pResumeBtnTexture = nullptr;
+	delete m_pControlsBtnTexture;
+	m_pControlsBtnTexture = nullptr;
 	delete m_pToTitleBtnTexture;
 	m_pToTitleBtnTexture = nullptr;
 	delete m_pExitBtnTexture;
@@ -97,7 +105,7 @@ bool ScenePauseScreen::Initialise(Renderer& renderer)
 	m_pBackgroundSprite->SetScale(std::max(bgScaleX, bgScaleY));
 
 	// Font
-	const char* fontFilename = "../game/silkscreen.ttf";
+	const char* fontFilename = "../assets/fonts/joystix.otf";
 	int buttonFontSize = 38;
 	m_pButtonFont = new Font(fontFilename, buttonFontSize);
 	SDL_Color textColor = { 255, 255, 255, 255 };
@@ -113,14 +121,26 @@ bool ScenePauseScreen::Initialise(Renderer& renderer)
 	m_pResumeBtnSprite->SetGreenTint(m_defaultGreen);
 	m_pResumeBtnSprite->SetBlueTint(m_defaultBlue);
 
+	// Controls Button
+	m_pControlsBtnTexture = new Texture();
+	m_pControlsBtnTexture->LoadTextTexture(sdlRenderer, "Controls", *m_pButtonFont, textColor);
+	m_pControlsBtnSprite = new Sprite();
+	m_pControlsBtnSprite->Initialise(*m_pControlsBtnTexture);
+	m_pControlsBtnSprite->SetX(static_cast<int>(m_screenWidth / 2));
+	int resumeBtnHeight = m_pResumeBtnTexture->GetHeight();
+	m_pControlsBtnSprite->SetY(m_pResumeBtnSprite->GetY() + resumeBtnHeight + 20);
+	m_pControlsBtnSprite->SetRedTint(m_defaultRed);
+	m_pControlsBtnSprite->SetGreenTint(m_defaultGreen);
+	m_pControlsBtnSprite->SetBlueTint(m_defaultBlue);
+
 	// Quit to Main Menu Button
 	m_pToTitleBtnTexture = new Texture();
 	m_pToTitleBtnTexture->LoadTextTexture(sdlRenderer, "Quit to Main Menu", *m_pButtonFont, textColor);
 	m_pToTitleBtnSprite = new Sprite();
 	m_pToTitleBtnSprite->Initialise(*m_pToTitleBtnTexture);
 	m_pToTitleBtnSprite->SetX(static_cast<int>(m_screenWidth / 2));
-	int resumeBtnHeight = m_pResumeBtnTexture->GetHeight();
-	m_pToTitleBtnSprite->SetY(m_pResumeBtnSprite->GetY() + resumeBtnHeight + 30);
+	int controlsBtnHeight = m_pControlsBtnTexture->GetHeight();
+	m_pToTitleBtnSprite->SetY(m_pControlsBtnSprite->GetY() + controlsBtnHeight + 30);
 	m_pToTitleBtnSprite->SetRedTint(m_defaultRed);
 	m_pToTitleBtnSprite->SetGreenTint(m_defaultGreen);
 	m_pToTitleBtnSprite->SetBlueTint(m_defaultBlue);
@@ -171,6 +191,26 @@ void ScenePauseScreen::Process(float deltaTime, InputSystem& inputSystem)
 		m_pResumeBtnSprite->SetRedTint(m_defaultRed);
 		m_pResumeBtnSprite->SetGreenTint(m_defaultGreen);
 		m_pResumeBtnSprite->SetBlueTint(m_defaultBlue);
+	}
+
+	// Controls button
+	m_bisMouseOverControls = IsMouseOverSprite(inputSystem, m_pControlsBtnSprite);
+	if (m_bisMouseOverControls)
+	{
+		m_pControlsBtnSprite->SetRedTint(m_hoverRed);
+		m_pControlsBtnSprite->SetGreenTint(m_hoverGreen);
+		m_pControlsBtnSprite->SetBlueTint(m_hoverBlue);
+		if (inputSystem.GetMouseButtonState(SDL_BUTTON_LEFT) == BS_PRESSED)
+		{
+			m_pSoundSystem.PlaySound("click");
+			Game::GetInstance().SetCurrentScene(CONTROLS_SCENE_INDEX);
+		}
+	}
+	else
+	{
+		m_pControlsBtnSprite->SetRedTint(m_defaultRed);
+		m_pControlsBtnSprite->SetGreenTint(m_defaultGreen);
+		m_pControlsBtnSprite->SetBlueTint(m_defaultBlue);
 	}
 
 	// To Titlescreen button
@@ -228,6 +268,10 @@ void ScenePauseScreen::Draw(Renderer& renderer)
 	if (m_pResumeBtnSprite)
 	{
 		m_pResumeBtnSprite->Draw(renderer);
+	}
+	if (m_pControlsBtnSprite)
+	{
+		m_pControlsBtnSprite->Draw(renderer);
 	}
 	if (m_pToTitleBtnSprite)
 	{

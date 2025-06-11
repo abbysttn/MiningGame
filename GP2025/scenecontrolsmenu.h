@@ -1,6 +1,7 @@
-#ifndef __SCENEPAUSESCREEN_H__
-#define __SCENEPAUSESCREEN_H__
+#ifndef __SCENECONTROLSMENU_H__
+#define __SCENECONTROLSMENU_H__
 
+// Local includes
 #include "scene.h"
 #include "soundsystem.h"
 
@@ -9,50 +10,41 @@ class Texture;
 class Renderer;
 class InputSystem;
 class Font;
-class Vector2;
 
-class ScenePauseScreen : public Scene
+class SceneControlsMenu : public Scene
 {
 public:
-	ScenePauseScreen();
-	virtual ~ScenePauseScreen();
+	SceneControlsMenu();
+	virtual ~SceneControlsMenu();
 
 	virtual bool Initialise(Renderer& renderer);
 	virtual void Process(float deltaTime, InputSystem& inputSystem);
 	virtual void Draw(Renderer& renderer);
 	virtual void DebugDraw();
 
-	void OnEnter(bool reset);
-	void OnExit();
-
 private:
-	ScenePauseScreen(const ScenePauseScreen& scene);
-	ScenePauseScreen& operator=(const ScenePauseScreen& scene);
+	SceneControlsMenu(const SceneControlsMenu& scene);
+	SceneControlsMenu& operator=(const SceneControlsMenu& scene);
 
 	bool IsMouseOverSprite(InputSystem& inputSystem, Sprite* sprite);
 
 protected:
-	// Buttonz
-	Texture* m_pResumeBtnTexture;
-	Sprite* m_pResumeBtnSprite;
-
-	Texture* m_pControlsBtnTexture;
-	Sprite* m_pControlsBtnSprite;
-
-	Texture* m_pToTitleBtnTexture;
-	Sprite* m_pToTitleBtnSprite;
-	Texture* m_pExitBtnTexture;
-	Sprite* m_pExitBtnSprite;
+	// Buttonsss
+	Texture* m_pKeyboardBtnTexture;
+	Sprite* m_pKeyboardBtnSprite;
+	Texture* m_pControllerBtnTexture;
+	Sprite* m_pControllerBtnSprite;
+	Texture* m_pBackBtnTexture;
+	Sprite* m_pBackBtnSprite;
 
 	// Visuals
 	Sprite* m_pBackgroundSprite;
 	Font* m_pButtonFont;
 
 	// State
-	bool m_bisMouseOverResume;
-	bool m_bisMouseOverToTitle;
-	bool m_bisMouseOverExit;
-	bool m_bisMouseOverControls;
+	bool m_bisMouseOverKeyboard;
+	bool m_bisMouseOverController;
+	bool m_bisMouseOverBack;
 
 	float m_screenWidth;
 	float m_screenHeight;
@@ -70,4 +62,4 @@ protected:
 	const float m_hoverBlue = 0.0f;
 };
 
-#endif // __SCENEPAUSESCREEN_H__
+#endif // __SCENECONTROLSMENU_H__

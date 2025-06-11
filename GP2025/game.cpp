@@ -22,6 +22,9 @@
 #include "sceneloadingscreen.h"
 #include "endcutscene.h"
 #include "scenepausescreen.h"
+#include "scenecontrolsmenu.h"
+#include "scenekeyboardcontrols.h"
+#include "scenecontrollercontrols.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -201,6 +204,36 @@ bool Game::Initialise()
 	}
 	m_scenes.push_back(pPauseScene);
 
+	// Controls scene
+	Scene* pControlsMenuScene = new SceneControlsMenu();
+	if (!pControlsMenuScene->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("Controls Menu scene failed to load!!!");
+		delete pControlsMenuScene;
+		return false;
+	}
+	m_scenes.push_back(pControlsMenuScene);
+
+	// Keyboard Controls scene
+	Scene* pKeyboardControlsScene = new SceneKeyboardControls();
+	if (!pKeyboardControlsScene->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("Keyboard Controls scene failed to load!!!!");
+		delete pKeyboardControlsScene;
+		return false;
+	}
+	m_scenes.push_back(pKeyboardControlsScene);
+
+	// Controller Controls scene
+	Scene* pControllerControlsScene = new SceneControllerControls();
+	if (!pControllerControlsScene->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("Controller Controls scene failed to load!!! :(");
+		delete pControllerControlsScene;
+		return false;
+	}
+	m_scenes.push_back(pControllerControlsScene);
+
 	m_iCurrentScene = 0;
 	SetCurrentScene(m_iCurrentScene);
 
@@ -284,6 +317,9 @@ void Game::Process(float deltaTime)
 	* End cutscene = 6
 	* ----------------
 	* Pause screen = 7
+	* Controls screen = 8
+	* Keyboard controls screen = 9
+	* Controller controls screen = 10
 	*/
 
 	if (m_iCurrentScene == 0)
@@ -446,7 +482,7 @@ void Game::SetCurrentScene(int sceneIndex)
 
 		if (m_pInputSystem)
 		{
-			if (m_iCurrentScene == 3 || m_iCurrentScene == 7)
+			if (m_iCurrentScene == 3 || m_iCurrentScene == 7 || m_iCurrentScene == 8 || m_iCurrentScene == 9 || m_iCurrentScene == 10)
 			{
 				m_pInputSystem->ShowMouseCursor(true);
 				m_pInputSystem->SetRelativeMode(false);
