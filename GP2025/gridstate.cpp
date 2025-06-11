@@ -179,7 +179,6 @@ bool GridState::CheckCollision(Box& box)
 				if (CollisionHelper::IsColliding(blockBox, box)) {
 
 					m_touchingHazard = block->IsHazard();
-					m_touchingFood = false; //fix
 
 					return true;
 				}
