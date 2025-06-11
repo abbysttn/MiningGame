@@ -512,14 +512,20 @@ void SceneMain::Draw(Renderer& renderer)
     if (m_isUpgradeMenuUIVisible && m_upgradeManager.IsMenuOpen()) 
     {
 
-        ImGui::SetNextWindowPos(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.00f, static_cast<float>(m_pRenderer->GetHeight()) * 0.28f), ImGuiCond_Always);  // fixed position
-        ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.27f, static_cast<float>(m_pRenderer->GetWidth()) * 0.2f), ImGuiCond_Always); // fixed size
+        if (renderer.GetHeight() < 800) {
+            ImGui::SetNextWindowPos(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.00f, static_cast<float>(m_pRenderer->GetHeight()) * 0.28f), ImGuiCond_Always);  // fixed position
+            ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.27f, static_cast<float>(m_pRenderer->GetWidth()) * 0.2f), ImGuiCond_Always); // fixed size
+
+        }
+        else {
+            ImGui::SetNextWindowPos(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.07f, static_cast<float>(m_pRenderer->GetHeight()) * 0.24f), ImGuiCond_Always);  // fixed position
+            ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.18f, static_cast<float>(m_pRenderer->GetWidth()) * 0.15f), ImGuiCond_Always); // fixed size
+        }
 
         ImGui::Begin("Upgrade Station", &m_isUpgradeMenuUIVisible,
             ImGuiWindowFlags_NoMove |
             ImGuiWindowFlags_NoResize |
-            ImGuiWindowFlags_NoCollapse |
-            ImGuiWindowFlags_NoScrollbar
+            ImGuiWindowFlags_NoCollapse
         );
 
         if (!m_isUpgradeMenuUIVisible) 
