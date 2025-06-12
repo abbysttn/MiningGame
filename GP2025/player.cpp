@@ -54,7 +54,7 @@ bool Player::Initialise(Renderer& renderer)
 
     m_position = { static_cast<float>(renderer.GetWidth()/2), static_cast<float>(renderer.GetHeight())*0.3f};
     m_screenX = static_cast<float>(renderer.GetWidth() / 2);
-    m_screenY = static_cast<float>(renderer.GetHeight()) * 0.3f;
+    m_screenY = 20.0f;
     m_bAlive = true;
 
     //responsive jump height for different screen sizes
@@ -74,7 +74,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     }
     else 
     {
-        SetCurrentStamina(m_stamina - deltaTime);
+        SetCurrentStamina(m_stamina - (deltaTime / 2));
     }
 
     if (GetCurrentStamina() <= 0.0f)
@@ -104,8 +104,8 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     // Oxygen depletion logic
     m_oxygenTimer += deltaTime;
 
-	// Reduce oxygen by 1% every 2 seconds
-    if (m_oxygenTimer >= 2.0f) {
+	// Reduce oxygen by 1% every 3 seconds
+    if (m_oxygenTimer >= 3.0f) {
         m_oxygen -= 1.0f; 
         if (m_oxygen < 0.0f) m_oxygen = 0.0f;
         m_oxygenTimer = 0.0f;
