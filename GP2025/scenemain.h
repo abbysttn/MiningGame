@@ -117,6 +117,7 @@ private:
 
 	bool m_munching;
 	float m_munchTimer;
+	float m_hitTimer;
 
 	//Particle System
 	Sprite* m_pCoinSprite = nullptr;

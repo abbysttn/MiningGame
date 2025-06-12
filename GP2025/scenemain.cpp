@@ -145,7 +145,11 @@ void SceneMain::CheckCollision(Player* player, SpiderState* spider)
                 }
                 else {
                     spider->ApplyPushback(pushDirection);
-                    m_soundSystem.PlaySound("spiderHit");
+                    if (m_hitTimer >= 0.3f) {
+                        m_soundSystem.PlaySound("spiderHit");
+                        m_hitTimer = 0.0f;
+                    }
+
 
                     m_pPlayer->SetCurrentHealth(m_pPlayer->GetCurrentHealth() - 1.0f);
                 }
@@ -261,6 +265,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 {
 
     m_timer += deltaTime;
+    m_hitTimer += deltaTime;
 
     m_collisionTree->clear();
 
