@@ -55,6 +55,7 @@ public:
 	bool SpiderSpawn();
 
 	Vector2 GetBlockSize();
+	Vector2 GetBrokenBlockGridPos();
 
 	void SetMiningStrength(int strength);
 
@@ -71,6 +72,7 @@ protected:
 
 	bool m_blockBroken = false;
 	Vector2 m_brokenBlockPos;
+	Vector2 m_brokenBlockGridPos;
 	int m_brokenBlockTile;
 	Vector2 m_lastBrokenPos;
 

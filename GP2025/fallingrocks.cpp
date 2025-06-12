@@ -158,3 +158,18 @@ bool FallingRocks::GetStatus()
 {
 	return false;
 }
+
+void FallingRocks::Reset()
+{
+	for (size_t i = 0; i < m_blocks->totalCount(); i++) {
+		if (GameObject* obj = m_blocks->getObjectAtIndex(i)) {
+			Block* block = dynamic_cast<Block*>(obj);
+			block->Position() = m_startPos;
+		}
+	}
+
+	m_scale = 40.0f;
+
+	m_fallSpeed = 0.0f;
+	m_falling = false;
+}

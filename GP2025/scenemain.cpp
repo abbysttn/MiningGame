@@ -621,6 +621,24 @@ void SceneMain::DebugDraw()
         {
             m_pPlayer->SetNoClip(noclip);
         }
+
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
+
+        ImGui::Text("Player Information");
+        ImGui::Text("Player Coords: %.2f, %.2f", m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y);
+        ImGui::Text("Player Health: %.1f health", m_pPlayer->GetCurrentHealth());
+
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
+
+        ImGui::Text("Grid Information");
+        ImGui::Text("Last Broken Block Coords: %.2f, %.2f", GridState::GetInstance().GetBrokenBlockPos().x, GridState::GetInstance().GetBrokenBlockPos().y);
+        ImGui::Text("Last Broken Block Grid Coords: %.0f, %.0f", GridState::GetInstance().GetBrokenBlockGridPos().x, GridState::GetInstance().GetBrokenBlockGridPos().y);
+
+        ImGui::NewLine();
     }
 }
 
@@ -765,7 +783,7 @@ void SceneMain::DebugFunctions(InputSystem& inputSystem) {
 
 void SceneMain::SetVisionLevel(int level) 
 {
-    if (level > 0 && level <= m_visionLevels.size())
+    if (level > 0 && level <= (int)m_visionLevels.size())
     {
         m_pVisionLevel = (float)level;
         float newScale = m_visionLevels[level - 1];

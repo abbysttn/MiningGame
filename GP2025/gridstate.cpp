@@ -69,6 +69,7 @@ void GridState::BreakBlock(Vector2 position, char direction, Player* player)
 	Block* block = m_gameGrid->GetBlockFromGrid(gridCoords);
 
 	if (block != nullptr) {
+		m_brokenBlockGridPos = { static_cast<float>(targetX), static_cast<float>(targetY) };
 		if (block->CanBreak()) {
 			block->BreakBlock(player->IsInstantMine());
 
@@ -267,6 +268,11 @@ bool GridState::SpiderSpawn()
 Vector2 GridState::GetBlockSize()
 {
 	return m_gameGrid->GetBlockSize();
+}
+
+Vector2 GridState::GetBrokenBlockGridPos()
+{
+	return m_brokenBlockGridPos;
 }
 
 void GridState::SetMiningStrength(int strength)

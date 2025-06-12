@@ -203,12 +203,52 @@ void EndCutscene::DebugDraw()
 
 void EndCutscene::OnEnter(bool reset)
 {
+	if (reset) Reset();
 	m_tSoundSystem.PlaySound("bgm");
 }
 
 void EndCutscene::OnExit()
 {
 	m_tSoundSystem.StopSound("bgm");
+}
+
+void EndCutscene::Reset()
+{
+	m_sceneDone = false;
+	m_rocksFallen = false;
+
+	m_hitSound = false;
+	m_hitSound2 = false;
+
+	m_startTimer = 0.0f;
+	m_startTime = 2.0f;
+
+	m_rockTimer = 0.0f;
+	m_rockTime = 3.5f;
+
+	m_reactionTimer = 0.0f;
+	m_reactionTime = 3.0f;
+
+	m_timer = 0.0f;
+	m_time = 5.0f;
+
+	alpha = 0.0f;
+
+	m_player->Position() = m_grid->GetPlayerStartPos();
+	m_player->Position().x += m_grid->GetBlockSize().x * 15.0f;
+
+	m_player->SetState(IDLE);
+	m_player->SetFlip(true);
+
+	m_trappedMiner->Position() = m_grid->GetPlayerStartPos();
+
+	m_trappedMiner->SetState(IDLE);
+	m_trappedMiner->SetFlip(false);
+	m_trappedMiner->SetRotation(45.0f);
+
+	m_fade->SetAlpha(alpha);
+
+	m_rocks->Reset();
 }
 
 bool EndCutscene::IsFinished()
