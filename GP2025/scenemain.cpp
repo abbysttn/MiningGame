@@ -101,6 +101,11 @@ SceneMain::~SceneMain()
         m_pGemPickupSprite = nullptr;
     }
 
+    if (m_pOxygenPickupSprite) {
+        delete m_pOxygenPickupSprite;
+        m_pOxygenPickupSprite = nullptr;
+    }
+
     m_particleSystems.clear();
     
     m_soundSystem.Release();
@@ -141,7 +146,7 @@ void SceneMain::CheckCollision(Player* player, SpiderState* spider)
                 else {
                     spider->ApplyPushback(pushDirection);
                     m_soundSystem.PlaySound("spiderHit");
-                    m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 1.0f);
+
                     m_pPlayer->SetCurrentHealth(m_pPlayer->GetCurrentHealth() - 1.0f);
                 }
             }
@@ -231,6 +236,7 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_pDirtPickupSprite = renderer.CreateSprite("../assets/dirt_icon.png");
     m_pStonePickupSprite = renderer.CreateSprite("../assets/stone_icon.png");
     m_pGemPickupSprite = renderer.CreateSprite("../assets/gem_icon.png");
+    m_pOxygenPickupSprite = renderer.CreateSprite("../assets/bubble.png");
 
     renderer.SetCameraPosition(static_cast<float>(m_screenX/2), m_pMineBackground->GetHeight() * 0.1f);
 
@@ -351,6 +357,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         pickupSprite = m_pGemPickupSprite;
 
         break;
+    case 3:
+        pickupSprite = m_pOxygenPickupSprite;
     default:
 
         break;

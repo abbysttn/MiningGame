@@ -130,7 +130,7 @@ private:
 	Sprite* m_pDirtPickupSprite = nullptr;
 	Sprite* m_pStonePickupSprite = nullptr;
 	Sprite* m_pGemPickupSprite = nullptr;
-
+	Sprite* m_pOxygenPickupSprite = nullptr;
 
 	std::list<ParticleSystem> m_particleSystems;
 	std::unique_ptr<QuadTree> m_collisionTree;

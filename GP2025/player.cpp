@@ -52,7 +52,9 @@ bool Player::Initialise(Renderer& renderer)
         return false;
     }
 
-    m_position = { 400, 300 };
+    m_position = { static_cast<float>(renderer.GetWidth()/2), static_cast<float>(renderer.GetHeight())*0.3f};
+    m_screenX = static_cast<float>(renderer.GetWidth() / 2);
+    m_screenY = static_cast<float>(renderer.GetHeight()) * 0.3f;
     m_bAlive = true;
 
     //responsive jump height for different screen sizes
@@ -468,5 +470,5 @@ void Player::Reset()
     m_inventory[ResourceType::STONE] = 0;
     m_inventory[ResourceType::GEM] = 0;
 
-    m_position = { 400, 300 };
+    m_position = { m_screenX, m_screenY};
 }
