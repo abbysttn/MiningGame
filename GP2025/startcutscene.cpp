@@ -12,6 +12,7 @@
 
 #include "logmanager.h"
 #include "sprite.h"
+#include "xboxcontroller.h"
 
 StartCutscene::StartCutscene() : m_grid(nullptr), m_player(nullptr), m_rocks(nullptr), m_fade(nullptr) {}
 
@@ -86,6 +87,15 @@ void StartCutscene::Process(float deltaTime, InputSystem& inputSystem)
 	m_rocks->Process(deltaTime, inputSystem);
 
 	m_player->Process(deltaTime);
+
+	// Skip Cutscene
+	if (inputSystem.GetKeyState(SDL_SCANCODE_RETURN) == BS_PRESSED ||
+		(inputSystem.GetNumberOfControllersAttached() > 0 &&
+		inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_START) == BS_PRESSED))
+	{
+		m_tSoundSystem.PlaySound("click");
+		m_sceneDone = true;
+	}
 
 	if (m_startTimer < m_startTime) {
 		m_startTimer += deltaTime;

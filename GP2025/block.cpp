@@ -280,7 +280,7 @@ void Block::GetBlockType(int& depth, const char*& filepath, int x)
 	}
 
 	// 5% Oxygen Chance. Runs before gem chance.
-	if (depth >= 5 && GetRandomPercentage() < 0.05f && !m_cutsceneBlock) {
+	if (depth >= 2 && GetRandomPercentage() < 0.05f && !m_cutsceneBlock) {
 		filepath = "../assets/stone.png";
 		m_blockType = 'O';
 		return;
