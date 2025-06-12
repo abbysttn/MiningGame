@@ -101,6 +101,11 @@ SceneMain::~SceneMain()
         m_pGemPickupSprite = nullptr;
     }
 
+    if (m_pOxygenPickupSprite) {
+        delete m_pOxygenPickupSprite;
+        m_pOxygenPickupSprite = nullptr;
+    }
+
     m_particleSystems.clear();
     
     m_soundSystem.Release();
@@ -140,6 +145,8 @@ void SceneMain::CheckCollision(Player* player, SpiderState* spider)
                 }
                 else {
                     spider->ApplyPushback(pushDirection);
+                    m_soundSystem.PlaySound("spiderHit");
+
                     m_pPlayer->SetCurrentHealth(m_pPlayer->GetCurrentHealth() - 1.0f);
                 }
             }
@@ -167,6 +174,8 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_soundSystem.LoadSound("blockBreak", "../assets/sound/blockBreak.wav");
     m_soundSystem.LoadSound("cavebgm", "../assets/sound/cavebgm.mp3");
     m_soundSystem.LoadSound("lightflicker", "../assets/sound/lightFlicker.wav");
+    m_soundSystem.LoadSound("spiderHit", "../assets/sound/spiderHit.wav");
+    m_soundSystem.LoadSound("playerEat", "../assets/sound/playerEat.wav");
 
     m_pRenderer = &renderer;
     m_screenWidth = static_cast<float>(renderer.GetWidth());
@@ -227,6 +236,7 @@ bool SceneMain::Initialise(Renderer& renderer)
     m_pDirtPickupSprite = renderer.CreateSprite("../assets/dirt_icon.png");
     m_pStonePickupSprite = renderer.CreateSprite("../assets/stone_icon.png");
     m_pGemPickupSprite = renderer.CreateSprite("../assets/gem_icon.png");
+    m_pOxygenPickupSprite = renderer.CreateSprite("../assets/bubble.png");
 
     renderer.SetCameraPosition(static_cast<float>(m_screenX/2), m_pMineBackground->GetHeight() * 0.1f);
 
@@ -347,9 +357,27 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         pickupSprite = m_pGemPickupSprite;
 
         break;
+    case 3:
+        pickupSprite = m_pOxygenPickupSprite;
     default:
 
         break;
+    }
+    //if player is eating
+    if (GridState::GetInstance().CheckFood()) {
+        float m_munchInterval = 0.5f;
+        m_munchTimer += deltaTime;
+
+
+        if (m_munchTimer >= m_munchInterval) {
+            m_munching = false;
+            m_munchTimer = 0.0f;
+        }
+        if (!m_munching) {
+            m_soundSystem.PlaySound("playerEat");
+            m_munching = true;
+        }
+
     }
 
 
@@ -518,14 +546,20 @@ void SceneMain::Draw(Renderer& renderer)
     if (m_isUpgradeMenuUIVisible && m_upgradeManager.IsMenuOpen()) 
     {
 
-        ImGui::SetNextWindowPos(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.00f, static_cast<float>(m_pRenderer->GetHeight()) * 0.28f), ImGuiCond_Always);  // fixed position
-        ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.27f, static_cast<float>(m_pRenderer->GetWidth()) * 0.2f), ImGuiCond_Always); // fixed size
+        if (renderer.GetHeight() < 800) {
+            ImGui::SetNextWindowPos(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.00f, static_cast<float>(m_pRenderer->GetHeight()) * 0.28f), ImGuiCond_Always);  // fixed position
+            ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.27f, static_cast<float>(m_pRenderer->GetWidth()) * 0.2f), ImGuiCond_Always); // fixed size
+
+        }
+        else {
+            ImGui::SetNextWindowPos(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.07f, static_cast<float>(m_pRenderer->GetHeight()) * 0.24f), ImGuiCond_Always);  // fixed position
+            ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_pRenderer->GetWidth()) * 0.18f, static_cast<float>(m_pRenderer->GetWidth()) * 0.15f), ImGuiCond_Always); // fixed size
+        }
 
         ImGui::Begin("Upgrade Station", &m_isUpgradeMenuUIVisible,
             ImGuiWindowFlags_NoMove |
             ImGuiWindowFlags_NoResize |
-            ImGuiWindowFlags_NoCollapse |
-            ImGuiWindowFlags_NoScrollbar
+            ImGuiWindowFlags_NoCollapse
         );
 
         if (!m_isUpgradeMenuUIVisible) 

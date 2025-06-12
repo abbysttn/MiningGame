@@ -142,10 +142,15 @@ private:
 	AnimatedSprite* m_pJumpSprite = nullptr;
 	AnimatedSprite* m_pMineSprite = nullptr;
 
+	bool m_playerEating;
+
 	bool m_facingLeft = false;
 	bool m_isMining = false;
 	bool m_canMine = true;
 	bool m_instantMine = false;
+
+	float m_screenX;
+	float m_screenY;
 };
 
 #endif // PLAYER_H
