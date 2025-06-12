@@ -169,6 +169,7 @@
     <ClCompile Include="quadtree.cpp" />
     <ClCompile Include="scenecontrollercontrols.cpp" />
     <ClCompile Include="scenecontrolsmenu.cpp" />
+    <ClCompile Include="scenegameover.cpp" />
     <ClCompile Include="scenekeyboardcontrols.cpp" />
     <ClCompile Include="sceneloadingscreen.cpp" />
     <ClCompile Include="scenemain.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="scenecheckerboards.h" />
     <ClInclude Include="scenecontrollercontrols.h" />
     <ClInclude Include="scenecontrolsmenu.h" />
+    <ClInclude Include="scenegameover.h" />
     <ClInclude Include="scenekeyboardcontrols.h" />
     <ClInclude Include="sceneloadingscreen.h" />
     <ClInclude Include="scenemain.h" />

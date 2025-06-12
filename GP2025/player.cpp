@@ -424,8 +424,11 @@ int Player::GetResourceCount(ResourceType type) const
     return 0;
 }
 
-void Player::HandleDeath(int deathType) {
-	switch (deathType) {
+void Player::HandleDeath(int deathType) 
+{
+    SetDead();
+	switch (deathType) 
+    {
 	case 1: // Health depleted
 		LogManager::GetInstance().Log("Player died due to health depletion.");
 		break;
@@ -449,6 +452,7 @@ void Player::SetMiningStrengthLevel(int level)
 
 void Player::Reset()
 {
+    m_bAlive = true;
     m_facingLeft = false;
     m_isMining = false;
     m_canMine = true;

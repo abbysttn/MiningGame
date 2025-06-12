@@ -42,6 +42,8 @@ private:
 	// Member data:
 public:
 
+	Renderer& GetRenderer() { return *m_pRenderer; }
+
 	// Ball struct
 	struct Ball
 	{

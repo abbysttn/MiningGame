@@ -21,6 +21,9 @@
 #include "imgui/imgui_impl_sdl2.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+const int PAUSE_INDEX = 7; // Index for the pause scene
+const int GAMEOVER_INDEX = 11; // Index for the game over scene
+
 SceneMain::SceneMain() 
     : m_tileSize(0.0f)
     , m_screenWidth(0.0f)
@@ -214,11 +217,6 @@ bool SceneMain::Initialise(Renderer& renderer)
     }
 	GridState::GetInstance().SetPlayer(m_pPlayer);
 
-    // Give resources just for testing purposes
-    m_pPlayer->AddResource(ResourceType::DIRT, 500);
-    m_pPlayer->AddResource(ResourceType::STONE, 500);
-    m_pPlayer->AddResource(ResourceType::GEM, 500);
-
     m_tileSize = GridState::GetInstance().GetTileSize();
 
     ui = std::make_unique<UI>(&renderer);
@@ -277,13 +275,6 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         xboxBackState = inputSystem.GetController(0)->GetButtonState(SDL_CONTROLLER_BUTTON_BACK);
     }
 
-    if (escapeState == BS_PRESSED || xboxBackState == BS_PRESSED)
-    {
-        m_paused = true;
-        std::cout << "Escape pressed" << std::endl;
-        Game::GetInstance().SetCurrentScene(0);
-    }
-
     // To close the Upgrade menu if its open, use ESC to close it
     if (escapeState == BS_PRESSED || xboxBackState == BS_PRESSED)
     {
@@ -297,7 +288,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         else
         {
             m_paused = true;
-            Game::GetInstance().SetCurrentScene(7); // 7 is pause screen
+            Game::GetInstance().SetCurrentScene(PAUSE_INDEX); // 7 is pause screen
             return;
         }
     }
@@ -320,6 +311,17 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
             m_pPlayer->Process(deltaTime, inputSystem);
         }
         m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
+
+        if (!m_pPlayer->IsAlive())
+        {
+			m_gameOver = true;
+        }
+
+        if (IsFinished())
+        {
+            Game::GetInstance().SetCurrentScene(GAMEOVER_INDEX);
+            return;
+        }
 
         if (m_godMode) {
             m_pPlayer->SetCurrentHealth(1000.0f);
@@ -867,6 +869,8 @@ bool SceneMain::GameWon()
 
 void SceneMain::Reset()
 {
+    m_gameOver = false;
+
     CleanUp();
 
     Reinitialise();
