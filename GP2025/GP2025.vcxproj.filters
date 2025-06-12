@@ -49,6 +49,9 @@
     <ClCompile Include="fallingrocks.cpp" />
     <ClCompile Include="startcutscene.cpp" />
     <ClCompile Include="scenepausescreen.cpp" />
+    <ClCompile Include="scenecontrolsmenu.cpp" />
+    <ClCompile Include="scenekeyboardcontrols.cpp" />
+    <ClCompile Include="scenecontrollercontrols.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animatedsprite.h" />
@@ -106,6 +109,9 @@
     <ClInclude Include="fallingrocks.h" />
     <ClInclude Include="startcutscene.h" />
     <ClInclude Include="scenepausescreen.h" />
+    <ClInclude Include="scenecontrolsmenu.h" />
+    <ClInclude Include="scenekeyboardcontrols.h" />
+    <ClInclude Include="scenecontrollercontrols.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="game\shaders\sprite.frag" />

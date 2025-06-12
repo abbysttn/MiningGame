@@ -142,6 +142,7 @@ void SceneMain::CheckCollision(Player* player, SpiderState* spider)
                     spider->ApplyPushback(pushDirection);
                     m_soundSystem.PlaySound("spiderHit");
                     m_pPlayer->SetHealth(m_pPlayer->GetHealth() - 1.0f);
+                    m_pPlayer->SetCurrentHealth(m_pPlayer->GetCurrentHealth() - 1.0f);
                 }
             }
         }
@@ -294,6 +295,12 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         return;
     }
 
+	// Sets the vision level based on the player's headlamp level
+    if (m_pPlayer && (int)m_pVisionLevel != m_pPlayer->GetHeadlampLevel())
+    {
+        SetVisionLevel(m_pPlayer->GetHeadlampLevel());
+    }
+
     if (m_pPlayer)
     {
         if (!m_upgradeManager.IsMenuOpen() ||
@@ -304,8 +311,8 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
         m_pPlayer->SetDepth(static_cast<int>((m_pPlayer->GetPosition().y / m_tileSize) - m_aboveGroundOffset));
 
         if (m_godMode) {
-            m_pPlayer->SetHealth(100.0f);
-            m_pPlayer->SetCurrentStamina(100.0f);
+            m_pPlayer->SetCurrentHealth(1000.0f);
+            m_pPlayer->SetCurrentStamina(1000.0f);
             m_pPlayer->AddOxygen(100.0f);
         }
 
@@ -640,6 +647,24 @@ void SceneMain::DebugDraw()
         {
             m_pPlayer->SetNoClip(noclip);
         }
+
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
+
+        ImGui::Text("Player Information");
+        ImGui::Text("Player Coords: %.2f, %.2f", m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y);
+        ImGui::Text("Player Health: %.1f health", m_pPlayer->GetCurrentHealth());
+
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
+
+        ImGui::Text("Grid Information");
+        ImGui::Text("Last Broken Block Coords: %.2f, %.2f", GridState::GetInstance().GetBrokenBlockPos().x, GridState::GetInstance().GetBrokenBlockPos().y);
+        ImGui::Text("Last Broken Block Grid Coords: %.0f, %.0f", GridState::GetInstance().GetBrokenBlockGridPos().x, GridState::GetInstance().GetBrokenBlockGridPos().y);
+
+        ImGui::NewLine();
     }
 }
 
@@ -782,10 +807,15 @@ void SceneMain::DebugFunctions(InputSystem& inputSystem) {
     }
 }
 
-void SceneMain::SetVisionLevel(int level) {
-    m_pVisionLevel = (float)level;
-    float newScale = m_visionLevels[level-1];
-    m_pVignetteSprite->SetScale(newScale);
+void SceneMain::SetVisionLevel(int level) 
+{
+    if (level > 0 && level <= (int)m_visionLevels.size())
+    {
+        m_pVisionLevel = (float)level;
+        float newScale = m_visionLevels[level - 1];
+        m_pVignetteSprite->SetScale(newScale);
+        m_pDarkVignetteSprite->SetScale(newScale);
+    }
 }
 
 void SceneMain::LightEvent(float time) {

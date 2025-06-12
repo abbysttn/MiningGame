@@ -30,6 +30,8 @@ public:
 	void OnEnter(bool reset) override;
 	void OnExit() override;
 
+	void Reset();
+
 	bool IsFinished();
 
 protected:

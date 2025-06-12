@@ -29,11 +29,9 @@ public:
 
 	bool GetStatus();
 
-	Vector2 CalcFinalPosition(int index, int total);
+	void Reset();
 
 protected:
-	Vector2 Normalise(Vector2 a);
-	float Distance(Vector2 a, Vector2 b);
 
 private:
 	FallingRocks(const FallingRocks& fallingRocks);

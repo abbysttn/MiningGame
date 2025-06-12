@@ -29,8 +29,15 @@ public:
 
 	Vector2 GetPosition() const { return m_position; };
 
-	float GetHealth() const { return m_health; }
-	void SetHealth(float newHealth) { m_health = std::max(0.0f, std::min(newHealth, 100.0f)); }
+	// Health for upgrade
+	float GetCurrentHealth() const { return m_health; }
+	void SetCurrentHealth(float newHealth) { m_health = std::max(0.0f, std::min(newHealth, m_maxHealth)); }
+	float GetMaxHealth() const { return m_maxHealth; }
+	void SetMaxHealth(float newMaxHealth);
+
+	// Headlamp upgrade
+	int GetHeadlampLevel() const { return m_headlampLevel; }
+	void SetHeadlampLevel(int level) { m_headlampLevel = level; }
 
 	// Stamina for upgrades
 	float GetCurrentStamina() const { return m_stamina; }
@@ -98,7 +105,9 @@ private:
 	Renderer* m_pRenderer;
 	float m_heightMultiple = 3.0f; //The height multiple vs the height of the renderer. e.g. the renderer height is 1080, 3240 = 3*1080. NEEED to make this dynamic
 
+	// Player stats
 	float m_health;
+	float m_maxHealth;
 	float m_stamina;
 	float m_maxStamina;
 
@@ -117,7 +126,8 @@ private:
 	int m_staminaCost = 8;			 // Cost to mine a block
 	float m_jumpHeight;	 // Jump Height
 	float m_jumpHeightMultiplier; // Jump Height Multiplier for upgrades
-	int m_miningStrengthLevel; // Mining Strength Level (does nothing rn but can be used for upgrades)
+	int m_miningStrengthLevel; // Mining Strength Level 
+	int m_headlampLevel;
 	// int m_miningSpeed = 1;
 
 	Vector2 m_Velocity;
