@@ -53,6 +53,9 @@ Renderer::~Renderer()
 	delete m_pTextureManager;
 	m_pTextureManager = 0;
 
+	delete m_pWhiteTexture;
+	m_pWhiteTexture = nullptr;
+
 	if (m_pSDLRenderer)
 	{
 		SDL_DestroyRenderer(m_pSDLRenderer);
