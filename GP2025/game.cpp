@@ -25,6 +25,7 @@
 #include "scenecontrolsmenu.h"
 #include "scenekeyboardcontrols.h"
 #include "scenecontrollercontrols.h"
+#include "scenegameover.h"
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -234,6 +235,16 @@ bool Game::Initialise()
 	}
 	m_scenes.push_back(pControllerControlsScene);
 
+	// Game over scene
+	Scene* pGameOverScene = new SceneGameOver();
+	if (!pGameOverScene->Initialise(*m_pRenderer))
+	{
+		LogManager::GetInstance().Log("Game Over scene failed to load!");
+		delete pGameOverScene;
+		return false;
+	}
+	m_scenes.push_back(pGameOverScene);
+
 	m_iCurrentScene = 0;
 	SetCurrentScene(m_iCurrentScene);
 
@@ -320,6 +331,7 @@ void Game::Process(float deltaTime)
 	* Controls screen = 8
 	* Keyboard controls screen = 9
 	* Controller controls screen = 10
+	* Game over = 11
 	*/
 
 	if (m_iCurrentScene == 0)
@@ -482,7 +494,7 @@ void Game::SetCurrentScene(int sceneIndex)
 
 		if (m_pInputSystem)
 		{
-			if (m_iCurrentScene == 3 || m_iCurrentScene == 7 || m_iCurrentScene == 8 || m_iCurrentScene == 9 || m_iCurrentScene == 10)
+			if (m_iCurrentScene == 3 || m_iCurrentScene == 7 || m_iCurrentScene == 8 || m_iCurrentScene == 9 || m_iCurrentScene == 10 || m_iCurrentScene == 11)
 			{
 				m_pInputSystem->ShowMouseCursor(true);
 				m_pInputSystem->SetRelativeMode(false);

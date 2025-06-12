@@ -66,6 +66,8 @@ public:
 	int GetGem() const { return GetResourceCount(ResourceType::GEM); }
 	void SetGem(int gem) { m_inventory[ResourceType::GEM] = std::max(0, gem); }
 
+	bool IsInvincible() const;
+
 	// Oxygen (can be turned into a upgradeable stat)
 	float GetOxygen() const { return m_oxygen; }
 	void AddOxygen(float amount) { m_oxygen = std::max(0.0f, std::min(m_oxygen + amount, 100.0f)); }
@@ -104,6 +106,9 @@ private:
 	float m_speed;
 	Renderer* m_pRenderer;
 	float m_heightMultiple = 3.0f; //The height multiple vs the height of the renderer. e.g. the renderer height is 1080, 3240 = 3*1080. NEEED to make this dynamic
+
+	const float INVINSIBILITY_DURATION = 5.0f;
+	float m_invincibilityTimer;
 
 	// Player stats
 	float m_health;

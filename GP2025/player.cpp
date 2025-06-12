@@ -17,12 +17,12 @@
 Player::Player()
     : m_speed(400.0f)
     , m_health(100.0f)
-	, m_maxHealth(100.0f)
-	, m_stamina(100.0f)
-	, m_maxStamina(100.0f)
+    , m_maxHealth(100.0f)
+    , m_stamina(100.0f)
+    , m_maxStamina(100.0f)
     , m_jumpHeightMultiplier(1.0f)
-	, m_miningStrengthLevel(1)
-	, m_headlampLevel(1)
+    , m_miningStrengthLevel(1)
+    , m_headlampLevel(1)
     , m_oxygen(100.0f)
     , m_oxygenTimer(0.0f)
 {
@@ -56,6 +56,7 @@ bool Player::Initialise(Renderer& renderer)
     m_screenX = static_cast<float>(renderer.GetWidth() / 2);
     m_screenY = 20.0f;
     m_bAlive = true;
+    m_invincibilityTimer = INVINSIBILITY_DURATION;
 
     //responsive jump height for different screen sizes
     m_jumpHeight = std::sqrtf(2.0f * GRAVITY * (GridState::GetInstance().GetBlockSize().y * 2.3f));
@@ -64,6 +65,11 @@ bool Player::Initialise(Renderer& renderer)
 
 void Player::Process(float deltaTime, InputSystem& inputSystem)
 {
+    if (m_invincibilityTimer > 0.0f)
+    {
+        m_invincibilityTimer -= deltaTime;
+    }
+
     Vector2 direction(0.0f, 0.0f);
 
     bool staminaRepletion = GridState::GetInstance().CheckFood();
@@ -96,7 +102,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
 		m_canMine = true;
     }
 
-	if (m_health <= 0.0f) {
+	if (!IsInvincible() && m_health <= 0.0f) {
 		HandleDeath(1);
         //return;
 	}
@@ -284,7 +290,7 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
     }
 
     //check if player is colliding with a hazard
-    if (!m_noClip && GridState::GetInstance().CheckHazards()) {
+    if (!IsInvincible() && !m_noClip && GridState::GetInstance().CheckHazards()) {
         m_health = 0.0f;
         HandleDeath(3);
     }
@@ -424,8 +430,11 @@ int Player::GetResourceCount(ResourceType type) const
     return 0;
 }
 
-void Player::HandleDeath(int deathType) {
-	switch (deathType) {
+void Player::HandleDeath(int deathType) 
+{
+    SetDead();
+	switch (deathType) 
+    {
 	case 1: // Health depleted
 		LogManager::GetInstance().Log("Player died due to health depletion.");
 		break;
@@ -449,6 +458,7 @@ void Player::SetMiningStrengthLevel(int level)
 
 void Player::Reset()
 {
+    m_bAlive = true;
     m_facingLeft = false;
     m_isMining = false;
     m_canMine = true;
@@ -465,10 +475,21 @@ void Player::Reset()
 	m_headlampLevel = 1;
     m_oxygen = 100.0f;
     m_oxygenTimer = 0.0f;
+	m_invincibilityTimer = INVINSIBILITY_DURATION;
 
     m_inventory[ResourceType::DIRT] = 0;
     m_inventory[ResourceType::STONE] = 0;
     m_inventory[ResourceType::GEM] = 0;
 
     m_position = { m_screenX, m_screenY};
+
+    m_Velocity = { 0.0f, 0.0f };
+    m_OnGround = false;
+    m_pAnimSprite = m_pIdleSprite;
+    m_animationState = IDLE;
+}
+
+bool Player::IsInvincible() const
+{
+	return m_invincibilityTimer > 0.0f;
 }
