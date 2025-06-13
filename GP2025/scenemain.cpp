@@ -646,11 +646,6 @@ void SceneMain::DebugDraw()
             m_pPlayer->SetInfiniteResources(infiniteResources);
         }
 
-        if (ImGui::Button("Unlock All Upgrades (F3)"))
-        {
-            // TODO: Implement upgrade unlocking logic
-        }
-
         bool instantMine = m_pPlayer->IsInstantMine();
         if (ImGui::Checkbox("Instant Mine (F4)", &instantMine))
         {
