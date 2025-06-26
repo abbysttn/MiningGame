@@ -38,7 +38,6 @@
     <ClCompile Include="quadtree.cpp" />
     <ClCompile Include="gridstate.cpp" />
     <ClCompile Include="soundsystem.cpp" />
-    <ClCompile Include="SceneSplashScreenAUT.cpp" />
     <ClCompile Include="SceneSplashScreenFMOD.cpp" />
     <ClCompile Include="spider.cpp" />
     <ClCompile Include="spiderstate.cpp" />
@@ -52,6 +51,7 @@
     <ClCompile Include="scenecontrolsmenu.cpp" />
     <ClCompile Include="scenekeyboardcontrols.cpp" />
     <ClCompile Include="scenecontrollercontrols.cpp" />
+    <ClCompile Include="scenegameover.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animatedsprite.h" />
@@ -96,7 +96,6 @@
     <ClInclude Include="gridstate.h" />
     <ClInclude Include="collisionhelper.h" />
     <ClInclude Include="soundsystem.h" />
-    <ClInclude Include="SceneSplashScreenAUT.h" />
     <ClInclude Include="SceneSplashScreenFMOD.h" />
     <ClInclude Include="resourcetype.h" />
     <ClInclude Include="spider.h" />
@@ -112,6 +111,7 @@
     <ClInclude Include="scenecontrolsmenu.h" />
     <ClInclude Include="scenekeyboardcontrols.h" />
     <ClInclude Include="scenecontrollercontrols.h" />
+    <ClInclude Include="scenegameover.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="game\shaders\sprite.frag" />

@@ -21,8 +21,8 @@
 #include "imgui/imgui_impl_sdl2.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-const int PAUSE_INDEX = 7; // Index for the pause scene
-const int GAMEOVER_INDEX = 11; // Index for the game over scene
+const int PAUSE_INDEX = 6; // Index for the pause scene
+const int GAMEOVER_INDEX = 10; // Index for the game over scene
 
 SceneMain::SceneMain() 
     : m_tileSize(0.0f)
@@ -267,6 +267,7 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
 
     m_collisionTree->clear();
 
+
     // Pause menu & upgrade menu closing logic
     ButtonState escapeState = inputSystem.GetKeyState(SDL_SCANCODE_ESCAPE);
     ButtonState xboxBackState = BS_NEUTRAL;
@@ -283,12 +284,12 @@ void SceneMain::Process(float deltaTime, InputSystem& inputSystem)
             m_upgradeManager.CloseMenu();
             m_pActiveUpgradeStation = nullptr;
             m_isUpgradeMenuUIVisible = false; // Hide ImGui window
-            Game::GetInstance().m_pInputSystem->ShowMouseCursor(false); // Hide mouse if game needs it
+            Game::GetInstance().m_pInputSystem->ShowMouseCursor(true); // Hide mouse if game needs it
         }
         else
         {
             m_paused = true;
-            Game::GetInstance().SetCurrentScene(PAUSE_INDEX); // 7 is pause screen
+            Game::GetInstance().SetCurrentScene(PAUSE_INDEX); // 6 is pause screen
             return;
         }
     }

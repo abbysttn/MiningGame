@@ -16,7 +16,6 @@
 
 // Scenes
 #include "scenetitlescreen.h"
-#include "SceneSplashScreenAUT.h"
 #include "SceneSplashScreenFMOD.h"
 #include "startcutscene.h"
 #include "sceneloadingscreen.h"
@@ -125,15 +124,6 @@ bool Game::Initialise()
 	}
 
 	// Splash screens
-	Scene* pSplashSceneAUT = new SceneSplashScreenAUT();
-	if (!pSplashSceneAUT->Initialise(*m_pRenderer))
-	{
-		LogManager::GetInstance().Log("AUT Splash screen failed to load!");
-		delete pSplashSceneAUT;
-		return false;
-	}
-	m_scenes.push_back(pSplashSceneAUT);
-	
 	Scene* pSplashSceneFMOD = new SceneSplashScreenFMOD();
 	if (!pSplashSceneFMOD->Initialise(*m_pRenderer))
 	{
@@ -157,7 +147,7 @@ bool Game::Initialise()
 	Scene* pTitleScene = new SceneTitlescreen(m_pFMODSystem);
 	if (!pTitleScene->Initialise(*m_pRenderer))
 	{
-		LogManager::GetInstance().Log("Titlescreen fialed to load!!");
+		LogManager::GetInstance().Log("Titlescreen failed to load!!");
 		delete pTitleScene;
 		m_scenes.clear();
 		return false;
@@ -168,7 +158,7 @@ bool Game::Initialise()
 	Scene* pLoadingScene = new SceneLoadingScreen();
 	if (!pLoadingScene->Initialise(*m_pRenderer))
 	{
-		LogManager::GetInstance().Log("Titlescreen fialed to load!!");
+		LogManager::GetInstance().Log("Titlescreen failed to load!!");
 		delete pLoadingScene;
 		m_scenes.clear();
 		return false;
@@ -317,52 +307,42 @@ void Game::Process(float deltaTime)
 	/*
 	* Scenes Order
 	* -- Splashes --
-	* AUT Splash = 0
-	* FMOD Splash = 1
+	* FMOD Splash = 0
 	* -- Splashes end --
-	* Cutscene = 2
-	* Title screen = 3
+	* Cutscene = 1
+	* Title screen = 2
 	* (Instructions scene)
-	* Loading Screen = 4
-	* Main Scene = 5
-	* End cutscene = 6
+	* Loading Screen = 3
+	* Main Scene = 4
+	* End cutscene = 5
 	* ----------------
-	* Pause screen = 7
-	* Controls screen = 8
-	* Keyboard controls screen = 9
-	* Controller controls screen = 10
-	* Game over = 11
+	* Pause screen = 6
+	* Controls screen = 7
+	* Keyboard controls screen = 8
+	* Controller controls screen = 9
+	* Game over = 10
 	*/
 
 	if (m_iCurrentScene == 0)
 	{
-		SceneSplashScreenAUT* autSplash = dynamic_cast<SceneSplashScreenAUT*>(m_scenes[m_iCurrentScene]);
-		if (autSplash && autSplash->IsFinished())
+		SceneSplashScreenFMOD* fmodSplash = dynamic_cast<SceneSplashScreenFMOD*>(m_scenes[m_iCurrentScene]);
+		if (fmodSplash && fmodSplash->IsFinished())
 		{
-			SetCurrentScene(1); // Move to FMOD splash screen
+			SetCurrentScene(1); // Move to cutscene
 		}
 	}
 
 	else if (m_iCurrentScene == 1)
 	{
-		SceneSplashScreenFMOD* fmodSplash = dynamic_cast<SceneSplashScreenFMOD*>(m_scenes[m_iCurrentScene]);
-		if (fmodSplash && fmodSplash->IsFinished())
-		{
-			SetCurrentScene(2); // Move to cutscene
-		}
-	}
-
-	else if (m_iCurrentScene == 2)
-	{
 		StartCutscene* cutscene = dynamic_cast<StartCutscene*>(m_scenes[m_iCurrentScene]);
 		if (cutscene && cutscene->IsFinished())
 		{
-			SetCurrentScene(3); // Move to Title
+			SetCurrentScene(2); // Move to Title
 		}
 	}
 
 	// loading screen
-	else if (m_iCurrentScene == 4)
+	else if (m_iCurrentScene == 3)
 	{
 		SceneLoadingScreen* loadingScreen = dynamic_cast<SceneLoadingScreen*>(m_scenes[m_iCurrentScene]);
 		if (loadingScreen)
@@ -374,31 +354,31 @@ void Game::Process(float deltaTime)
 
 			if (loadingScreen->IsFinished())
 			{
-				SetCurrentScene(5); // Move to main scene
+				SetCurrentScene(4); // Move to main scene
 			}
 		}
 	}
 
-	else if (m_iCurrentScene == 5)
+	else if (m_iCurrentScene == 4)
 	{
 		SceneMain* mainScene = dynamic_cast<SceneMain*>(m_scenes[m_iCurrentScene]);
 		if (mainScene)
 		{
 			if (mainScene->GameWon())
 			{
-				SetCurrentScene(6); // Move to end cutscene
+				SetCurrentScene(5); // Move to end cutscene
 			}
 		}
 	}
 
-	else if (m_iCurrentScene == 6)
+	else if (m_iCurrentScene == 5)
 	{
 		EndCutscene* endCutscene = dynamic_cast<EndCutscene*>(m_scenes[m_iCurrentScene]);
 		if (endCutscene)
 		{
 			if (endCutscene->IsFinished())
 			{
-				SetCurrentScene(3); // Move to title
+				SetCurrentScene(2); // Move to title
 			}
 		}
 	}
@@ -443,7 +423,7 @@ void Game::DebugDraw
 
 		ImGui::Begin("Debug Window", &open, ImGuiWindowFlags_MenuBar);
 
-		ImGui::Text("COMP710 GP Framework (%s)", "2025, S1");
+		ImGui::Text("A Miner Setback");
 		ImGui::Text("Press Backspace to hide/show");
 
 		if (ImGui::Button("Quit"))
@@ -477,10 +457,10 @@ void Game::SetCurrentScene(int sceneIndex)
 {
 	if (sceneIndex >= 0 && sceneIndex < static_cast<int>(m_scenes.size()))
 	{
-		if (m_iCurrentScene == 3) {
+		if (m_iCurrentScene == 2) {
 			m_isGamePaused = false;
 		}
-		else if (m_iCurrentScene == 7) {
+		else if (m_iCurrentScene == 6) {
 			m_isGamePaused = true;
 		}
 
@@ -494,7 +474,7 @@ void Game::SetCurrentScene(int sceneIndex)
 
 		if (m_pInputSystem)
 		{
-			if (m_iCurrentScene == 3 || m_iCurrentScene == 7 || m_iCurrentScene == 8 || m_iCurrentScene == 9 || m_iCurrentScene == 10 || m_iCurrentScene == 11)
+			if (m_iCurrentScene == 2 || m_iCurrentScene == 6 || m_iCurrentScene == 7 || m_iCurrentScene == 8 || m_iCurrentScene == 9 || m_iCurrentScene == 10)
 			{
 				m_pInputSystem->ShowMouseCursor(true);
 				m_pInputSystem->SetRelativeMode(false);

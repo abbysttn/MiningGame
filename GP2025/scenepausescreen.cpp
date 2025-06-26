@@ -19,9 +19,9 @@
 // Imgui
 #include "imgui/imgui.h"
 
-const int TITLE_SCENE_INDEX = 3;
-const int MAIN_SCENE_INDEX = 5;
-const int CONTROLS_SCENE_INDEX = 8;
+const int TITLE_SCENE_INDEX = 2;
+const int MAIN_SCENE_INDEX = 4;
+const int CONTROLS_SCENE_INDEX = 7;
 
 ScenePauseScreen::ScenePauseScreen()
 	: m_pResumeBtnTexture(nullptr)

@@ -14,7 +14,7 @@
 // IMGUI
 #include "imgui/imgui.h"
 
-const int CONTROLS_MENU_SCENE_INDEX = 8;
+const int CONTROLS_MENU_SCENE_INDEX = 7;
 
 SceneKeyboardControls::SceneKeyboardControls()
     : m_pBackBtnTexture(nullptr)

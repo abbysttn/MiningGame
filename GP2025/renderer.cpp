@@ -106,11 +106,11 @@ bool Renderer::Initialise(bool windowed, int width, int height)
 
 		width = widest;
 		height = andItsHeight;
+
+		m_isFullscreen = true;
 	}
 
 	bool initialised = InitialiseOpenGL(width, height);
-
-	SetFullscreen(!windowed);
 
 	if (initialised)
 	{
@@ -144,7 +144,7 @@ bool Renderer::InitialiseOpenGL(int screenWidth, int screenHeight)
 	m_iWidth = screenWidth;
 	m_iHeight = screenHeight;
 
-	m_pWindow = SDL_CreateWindow("COMP710 GP Framework 2025", SDL_WINDOWPOS_UNDEFINED,
+	m_pWindow = SDL_CreateWindow("A Miner Setback", SDL_WINDOWPOS_UNDEFINED,
 						     	  SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -188,26 +188,56 @@ void Renderer::Clear()
 
 void Renderer::Present()
 {
+	if (m_blockNextFrame)
+	{
+		m_blockNextFrame = false;
+		return;
+	}
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	SDL_GL_SwapWindow(m_pWindow);
 }
 
-void Renderer::SetFullscreen(bool fullscreen)
+void Renderer::ToggleFullscreen()
 {
-	if (fullscreen)
-	{
-		// SDL_SetWindowFullscreen(m_pWindow, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_ALWAYS_ON_TOP);
-		SDL_SetWindowFullscreen(m_pWindow, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALWAYS_ON_TOP);
-		SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
-		SDL_SetWindowSize(m_pWindow, m_iWidth, m_iHeight);
-	}
+	m_isFullscreen = !m_isFullscreen;
 
+	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+
+	if (m_isFullscreen)
+	{
+		if (SDL_SetWindowFullscreen(m_pWindow, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0)
+		{
+			SDL_Log("Failed to enter fullscreen: %s", SDL_GetError());
+			m_isFullscreen = false; // Rollback
+		}
+	}
 	else
 	{
-		SDL_SetWindowFullscreen(m_pWindow, 0);
+		if (SDL_SetWindowFullscreen(m_pWindow, 0) != 0)
+		{
+			SDL_Log("Failed to exit fullscreen: %s", SDL_GetError());
+			m_isFullscreen = true; // Rollback
+		}
+		else
+		{
+			// Resize to original intended window size
+			SDL_SetWindowSize(m_pWindow, 854, 480);
+			SDL_SetWindowPosition(m_pWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+		}
 	}
+
+	// Always re-fetch the actual window size and update OpenGL viewport
+	int w, h;
+	SDL_GetWindowSize(m_pWindow, &w, &h);
+	glViewport(0, 0, w, h);
+	m_iWidth = w;
+	m_iHeight = h;
+
+	// Optionally skip rendering next frame to avoid flicker
+	m_blockNextFrame = true;
 }
 
 void Renderer::SetClearColour(unsigned char r, unsigned char g, unsigned char b)

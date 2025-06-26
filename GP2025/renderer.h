@@ -56,7 +56,8 @@ public:
 	void SetZoom(float zoom) { m_zoom = zoom; }
 	void SetSceneMain(SceneMain* scene);
 
-
+	void ToggleFullscreen();
+	bool GetIsFullscreen() { return m_isFullscreen; }
 
 	SDL_Renderer* GetSDLRenderer() const { return m_pSDLRenderer; }
 
@@ -64,7 +65,6 @@ public:
 
 protected:
 	bool InitialiseOpenGL(int screenWidth, int screenHeight);
-	void SetFullscreen(bool fullscreen);
 
 	void LogSdlError();
 
@@ -94,6 +94,9 @@ protected:
 	float m_fClearBlue;
 
 	Texture* m_pWhiteTexture;
+
+	bool m_isFullscreen;
+	bool m_blockNextFrame = false;
 
 private:
 	float m_zoom = 1.0f;

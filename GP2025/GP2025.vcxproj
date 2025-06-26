@@ -178,7 +178,6 @@
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scenecheckerboards.cpp" />
     <ClCompile Include="scenepausescreen.cpp" />
-    <ClCompile Include="SceneSplashScreenAUT.cpp" />
     <ClCompile Include="SceneSplashScreenFMOD.cpp" />
     <ClCompile Include="scenetitlescreen.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -237,7 +236,6 @@
     <ClInclude Include="sceneloadingscreen.h" />
     <ClInclude Include="scenemain.h" />
     <ClInclude Include="scenepausescreen.h" />
-    <ClInclude Include="SceneSplashScreenAUT.h" />
     <ClInclude Include="SceneSplashScreenFMOD.h" />
     <ClInclude Include="scenetitlescreen.h" />
     <ClInclude Include="SDL_ttf.h" />

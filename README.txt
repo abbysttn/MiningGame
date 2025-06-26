@@ -1,11 +1,4 @@
         ~~~A MINER SETBACK~~~
-      COMP710 Game Programming          
- 
-	  ~~~DEVELOPERS~~~
-       Abby Sutton - 22170987
-      Matthew Warn - 22166789
-     Duane Belleza - 22168617
-          Sam Hurd - 22173824
 
              ~~~GOAL~~~
    Dig down to rescue your friend
