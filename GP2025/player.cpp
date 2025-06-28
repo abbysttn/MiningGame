@@ -79,9 +79,6 @@ void Player::Process(float deltaTime, InputSystem& inputSystem)
         SetCurrentStamina(m_stamina + deltaTime * 3.0f);
     }
     else 
-    {
-        SetCurrentStamina(m_stamina - (deltaTime / 2));
-    }
 
     if (GetCurrentStamina() <= 0.0f)
     {

@@ -15,9 +15,9 @@
 #include "imgui/imgui.h"
 
 // Scene index
-const int PAUSE_SCENE_INDEX = 7;
-const int KEYBOARD_CONTROLS_SCENE_INDEX = 9;
-const int CONTROLLER_CONTROLS_SCENE_INDEX = 10;
+const int PAUSE_SCENE_INDEX = 6;
+const int KEYBOARD_CONTROLS_SCENE_INDEX = 8;
+const int CONTROLLER_CONTROLS_SCENE_INDEX = 9;
 
 SceneControlsMenu::SceneControlsMenu()
 	: m_pKeyboardBtnTexture(nullptr), m_pKeyboardBtnSprite(nullptr)

@@ -178,7 +178,6 @@
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scenecheckerboards.cpp" />
     <ClCompile Include="scenepausescreen.cpp" />
-    <ClCompile Include="SceneSplashScreenAUT.cpp" />
     <ClCompile Include="SceneSplashScreenFMOD.cpp" />
     <ClCompile Include="scenetitlescreen.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -227,6 +226,7 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="quadtree.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="resourcetype.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="scenecheckerboards.h" />
@@ -237,7 +237,6 @@
     <ClInclude Include="sceneloadingscreen.h" />
     <ClInclude Include="scenemain.h" />
     <ClInclude Include="scenepausescreen.h" />
-    <ClInclude Include="SceneSplashScreenAUT.h" />
     <ClInclude Include="SceneSplashScreenFMOD.h" />
     <ClInclude Include="scenetitlescreen.h" />
     <ClInclude Include="SDL_ttf.h" />
@@ -259,6 +258,12 @@
   <ItemGroup>
     <None Include="game\shaders\sprite.frag" />
     <None Include="game\shaders\sprite.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\ams_favicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GP2025.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

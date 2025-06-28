@@ -17,8 +17,8 @@
 // Lib
 #include <algorithm>
 
-const int MAIN_SCENE_INDEX = 5;
-const int TITLE_SCENE_INDEX = 3;
+const int MAIN_SCENE_INDEX = 4;
+const int TITLE_SCENE_INDEX = 2;
 
 SceneGameOver::SceneGameOver()
     : m_pRestartBtnTexture(nullptr)

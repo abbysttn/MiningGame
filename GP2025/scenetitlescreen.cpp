@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <iostream>
 
-const int LOADING_INDEX = 4;
+const int LOADING_INDEX = 3;
 
 SceneTitlescreen::SceneTitlescreen(FMOD::System* fmodSystem)
 	: m_pStartBtnTexture(nullptr)
@@ -107,6 +107,7 @@ bool SceneTitlescreen::Initialise(Renderer& renderer)
 	m_pTitleSprite = renderer.CreateSprite("../assets/titleScreen.png");
 	m_pTitleSprite->SetX(static_cast<int>(m_screenWidth / 2));
 	m_pTitleSprite->SetY(static_cast<int>(m_screenHeight * m_titleTopMargin));
+	m_pTitleSprite->SetScale(0.3f);
 
 	// Font
 	const char* fontFilename = "../assets/fonts/joystix.otf";

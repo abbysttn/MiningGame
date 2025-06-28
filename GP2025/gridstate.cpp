@@ -109,7 +109,7 @@ void GridState::BreakBlock(Vector2 position, char direction, Player* player)
 				case 'O': 
 					if (player != nullptr) 
 					{
-						player->AddOxygen(5.0f);
+						player->AddOxygen(15.0f);
 					}
 					m_lastBlockType = 3;
 					recognizedType = false;
