@@ -226,6 +226,7 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="quadtree.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="resourcetype.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="scenecheckerboards.h" />
@@ -257,6 +258,12 @@
   <ItemGroup>
     <None Include="game\shaders\sprite.frag" />
     <None Include="game\shaders\sprite.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\ams_favicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GP2025.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

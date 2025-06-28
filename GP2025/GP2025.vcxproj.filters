@@ -112,9 +112,16 @@
     <ClInclude Include="scenekeyboardcontrols.h" />
     <ClInclude Include="scenecontrollercontrols.h" />
     <ClInclude Include="scenegameover.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="game\shaders\sprite.frag" />
     <None Include="game\shaders\sprite.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\ams_favicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GP2025.rc" />
   </ItemGroup>
 </Project>
